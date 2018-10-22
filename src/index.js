@@ -20,6 +20,7 @@ const typeDefs = gql`
     id: String!
     name: String!
     parentIds: [String!]
+    nodeType: String!
   }
 `;
 
@@ -38,6 +39,7 @@ const resolvers = {
         const {
           path_codes: pathCodes,
           path_labels: pathLabels,
+          children,
         } = response.data;
         const paths = pathCodes.map((cs, i) =>
           cs.map((c, j) => ({
@@ -56,6 +58,7 @@ const resolvers = {
                 id,
                 name,
                 parentIds: [],
+                nodeType: id === efoId ? "base" : "parent",
               };
             }
             if (i < pReversed.length - 1) {
@@ -68,7 +71,20 @@ const resolvers = {
           });
           return acc;
         }, {});
-        const nodes = Object.values(nodesObj);
+
+        const childrenObj = children.reduce((acc, d) => {
+          acc[d.code] = {
+            id: d.code,
+            name: d.label,
+            parentIds: [efoId],
+            nodeType: "child",
+          };
+          return acc;
+        }, {});
+        const nodes = [
+          ...Object.values(nodesObj),
+          ...Object.values(childrenObj),
+        ];
 
         return { nodes };
       });
