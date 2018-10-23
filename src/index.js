@@ -5,8 +5,15 @@ import { target, disease } from "./apis/openTargets";
 const typeDefs = gql`
   type Query {
     hello: String!
+    target(ensgId: String!): Target!
     disease(efoId: String!): Disease!
     diseaseDAG(efoId: String!): DiseaseDAG!
+  }
+  type Target {
+    id: String!
+    name: String!
+    symbol: String!
+    synonyms: [String!]!
   }
   type Disease {
     id: String!
@@ -27,6 +34,22 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     hello: () => "Hello world!",
+    target: (_, { ensgId }) => {
+      return target(ensgId).then(response => {
+        const {
+          approved_symbol: symbol,
+          approved_name: name,
+          symbol_synonyms: symbolSynonyms,
+          name_synonyms: nameSynonyms,
+        } = response.data;
+        return {
+          id: ensgId,
+          name,
+          symbol,
+          synonyms: [...symbolSynonyms, ...nameSynonyms],
+        };
+      });
+    },
     disease: (_, { efoId }) => {
       return disease(efoId).then(response => {
         const { label: name, efo_synonyms: synonyms } = response.data;
