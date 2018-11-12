@@ -1,11 +1,12 @@
 import express from "express";
 import { ApolloServer, gql } from "apollo-server-express";
+import _ from "lodash";
 import { target, disease } from "./apis/openTargets";
 
 const typeDefs = gql`
   type Query {
-    hello: String!
     target(ensgId: String!): Target!
+    targetSummary(ensgId: String!): TargetSummary!
     disease(efoId: String!): Disease!
     diseaseDAG(efoId: String!): DiseaseDAG!
   }
@@ -14,6 +15,16 @@ const typeDefs = gql`
     name: String!
     symbol: String!
     synonyms: [String!]!
+  }
+  type TargetSummary {
+    id: String!
+    name: String!
+    symbol: String!
+    synonyms: [String!]!
+    drugs: TargetSummaryDrugs!
+    pathways: TargetSummaryPathways!
+    cancerBiomarkers: TargetSummaryCancerBiomarkers!
+    chemicalProbes: TargetSummaryChemicalProbes!
   }
   type Disease {
     id: String!
@@ -29,12 +40,37 @@ const typeDefs = gql`
     parentIds: [String!]
     nodeType: String!
   }
+  type TargetSummaryDrugs {
+    count: Int!
+    modalities: TargetDrugModalitiesAgg!
+    trialsByPhase: [TargetDrugTrialsByPhaseAgg!]!
+  }
+  type TargetDrugModalitiesAgg {
+    antibody: Boolean!
+    peptide: Boolean!
+    protein: Boolean!
+    smallMolecule: Boolean!
+  }
+  type TargetDrugTrialsByPhaseAgg {
+    phase: Int!
+    trialCount: Int!
+  }
+  type TargetSummaryPathways {
+    count: Int!
+  }
+  type TargetSummaryCancerBiomarkers {
+    count: Int!
+    diseaseCount: Int!
+  }
+  type TargetSummaryChemicalProbes {
+    portalProbeCount: Int!
+    hasProbeMinerLink: Boolean!
+  }
 `;
 
 const resolvers = {
   Query: {
-    hello: () => "Hello world!",
-    target: (_, { ensgId }) => {
+    target: (obj, { ensgId }) => {
       return target(ensgId).then(response => {
         const {
           approved_symbol: symbol,
@@ -50,13 +86,63 @@ const resolvers = {
         };
       });
     },
-    disease: (_, { efoId }) => {
+    targetSummary: (obj, { ensgId }) => {
+      return target(ensgId).then(response => {
+        const {
+          approved_symbol: symbol,
+          approved_name: name,
+          symbol_synonyms: symbolSynonyms,
+          name_synonyms: nameSynonyms,
+          reactome,
+          cancerbiomarkers: cancerBiomarkers,
+          chemicalprobes: chemicalProbes,
+        } = response.data;
+        return {
+          id: ensgId,
+          name,
+          symbol,
+          synonyms: [...symbolSynonyms, ...nameSynonyms],
+          pathways: {
+            count: reactome.length,
+          },
+          cancerBiomarkers: {
+            count: _.uniq(cancerBiomarkers.map(d => d.biomarker)).length,
+            diseaseCount: _.uniq(
+              cancerBiomarkers.reduce((acc, d) => {
+                return acc.concat(d.diseases.map(d2 => d2.id));
+              }, [])
+            ).length,
+          },
+          chemicalProbes: {
+            portalProbeCount: chemicalProbes.portalprobes.length,
+            hasProbeMinerLink: chemicalProbes.probeminer ? true : false,
+          },
+          drugs: {
+            count: 5,
+            modalities: {
+              antibody: false,
+              peptide: false,
+              protein: false,
+              smallMolecule: true,
+            },
+            trialsByPhase: [
+              { phase: 0, trialCount: 48 },
+              { phase: 1, trialCount: 12 },
+              { phase: 2, trialCount: 24 },
+              { phase: 3, trialCount: 77 },
+              { phase: 4, trialCount: 89 },
+            ],
+          },
+        };
+      });
+    },
+    disease: (obj, { efoId }) => {
       return disease(efoId).then(response => {
         const { label: name, efo_synonyms: synonyms } = response.data;
         return { id: efoId, name, synonyms };
       });
     },
-    diseaseDAG: (_, { efoId }) => {
+    diseaseDAG: (obj, { efoId }) => {
       return disease(efoId).then(response => {
         // for some reason, path_codes and path_labels are not zipped
         const {
