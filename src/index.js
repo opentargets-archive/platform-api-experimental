@@ -1,7 +1,7 @@
 import express from "express";
 import { ApolloServer, gql } from "apollo-server-express";
 import _ from "lodash";
-import { target, disease } from "./apis/openTargets";
+import { target, targetDrugs, disease } from "./apis/openTargets";
 
 const typeDefs = gql`
   type Query {
@@ -87,54 +87,96 @@ const resolvers = {
       });
     },
     targetSummary: (obj, { ensgId }) => {
-      return target(ensgId).then(response => {
-        const {
-          approved_symbol: symbol,
-          approved_name: name,
-          symbol_synonyms: symbolSynonyms,
-          name_synonyms: nameSynonyms,
-          reactome,
-          cancerbiomarkers: cancerBiomarkers,
-          chemicalprobes: chemicalProbes,
-        } = response.data;
-        return {
-          id: ensgId,
-          name,
-          symbol,
-          synonyms: [...symbolSynonyms, ...nameSynonyms],
-          pathways: {
-            count: reactome.length,
-          },
-          cancerBiomarkers: {
-            count: _.uniq(cancerBiomarkers.map(d => d.biomarker)).length,
-            diseaseCount: _.uniq(
-              cancerBiomarkers.reduce((acc, d) => {
-                return acc.concat(d.diseases.map(d2 => d2.id));
-              }, [])
-            ).length,
-          },
-          chemicalProbes: {
-            portalProbeCount: chemicalProbes.portalprobes.length,
-            hasProbeMinerLink: chemicalProbes.probeminer ? true : false,
-          },
-          drugs: {
-            count: 5,
-            modalities: {
+      return Promise.all([target(ensgId), targetDrugs(ensgId)]).then(
+        ([targetResponse, targetDrugsResponse]) => {
+          const {
+            approved_symbol: symbol,
+            approved_name: name,
+            symbol_synonyms: symbolSynonyms,
+            name_synonyms: nameSynonyms,
+            reactome,
+            cancerbiomarkers: cancerBiomarkers,
+            chemicalprobes: chemicalProbes,
+          } = targetResponse.data;
+
+          const drugCount = _.uniq(
+            targetDrugsResponse.data.data.map(d => d.drug.molecule_name)
+          ).length;
+          const drugModalities = targetDrugsResponse.data.data.reduce(
+            (acc, d) => {
+              if (d.drug.molecule_type) {
+                switch (d.drug.molecule_type.toLowerCase()) {
+                  case "antibody":
+                    acc.antibody = true;
+                    break;
+                  case "peptide":
+                    acc.peptide = true;
+                    break;
+                  case "protein":
+                    acc.protein = true;
+                    break;
+                  case "small molecule":
+                    acc.smallMolecule = true;
+                    break;
+                }
+              }
+              return acc;
+            },
+            {
               antibody: false,
               peptide: false,
               protein: false,
-              smallMolecule: true,
+              smallMolecule: false,
+            }
+          );
+          const drugTrialsByPhase = targetDrugsResponse.data.data
+            .reduce(
+              (acc, d) => {
+                acc[
+                  d.evidence.drug2clinic.max_phase_for_disease.numeric_index
+                ] += 1;
+                return acc;
+              },
+              [0, 0, 0, 0, 0]
+            )
+            .map((d, i) => ({ phase: i, trialCount: d }));
+
+          return {
+            id: ensgId,
+            name,
+            symbol,
+            synonyms: [...symbolSynonyms, ...nameSynonyms],
+            pathways: {
+              count: reactome.length,
             },
-            trialsByPhase: [
-              { phase: 0, trialCount: 48 },
-              { phase: 1, trialCount: 12 },
-              { phase: 2, trialCount: 24 },
-              { phase: 3, trialCount: 77 },
-              { phase: 4, trialCount: 89 },
-            ],
-          },
-        };
-      });
+            cancerBiomarkers: {
+              count: cancerBiomarkers
+                ? _.uniq(cancerBiomarkers.map(d => d.biomarker)).length
+                : 0,
+              diseaseCount: cancerBiomarkers
+                ? _.uniq(
+                    cancerBiomarkers.reduce((acc, d) => {
+                      return acc.concat(d.diseases.map(d2 => d2.id));
+                    }, [])
+                  ).length
+                : 0,
+            },
+            chemicalProbes: {
+              portalProbeCount:
+                chemicalProbes && chemicalProbes.portalprobes
+                  ? chemicalProbes.portalprobes.length
+                  : 0,
+              hasProbeMinerLink:
+                chemicalProbes && chemicalProbes.probeminer ? true : false,
+            },
+            drugs: {
+              count: drugCount,
+              modalities: drugModalities,
+              trialsByPhase: drugTrialsByPhase,
+            },
+          };
+        }
+      );
     },
     disease: (obj, { efoId }) => {
       return disease(efoId).then(response => {
