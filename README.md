@@ -2,6 +2,10 @@
 
 Experimental GraphQL API to serve `platform-app`.
 
+## How to use
+
+Clone the repo, `yarn install`, `yarn start`.
+
 # Copyright
 
 Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
