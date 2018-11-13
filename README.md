@@ -4,7 +4,7 @@ Experimental GraphQL API to serve `platform-app`.
 
 ## How to use
 
-Clone the repo, `yarn install`, `yarn start`.
+Clone the repo, `yarn install`, `yarn start`. Browse to http://localhost:4000/graphql.
 
 # Copyright
 
