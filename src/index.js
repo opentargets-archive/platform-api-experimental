@@ -1,7 +1,12 @@
 import express from "express";
 import { ApolloServer, gql } from "apollo-server-express";
 import _ from "lodash";
-import { target, targetDrugs, disease } from "./apis/openTargets";
+import {
+  target,
+  targetDrugs,
+  disease,
+  targetSimilar,
+} from "./apis/openTargets";
 
 const typeDefs = gql`
   type Query {
@@ -26,6 +31,7 @@ const typeDefs = gql`
     cancerBiomarkers: TargetSummaryCancerBiomarkers!
     chemicalProbes: TargetSummaryChemicalProbes!
     protein: TargetSummaryProtein!
+    similarTargets: TargetSummarySimilarTargets!
   }
   type Disease {
     id: String!
@@ -71,6 +77,9 @@ const typeDefs = gql`
     hasProtVista: Boolean!
     subcellularLocation: [String!]
   }
+  type TargetSummarySimilarTargets {
+    count: Int!
+  }
 `;
 
 const resolvers = {
@@ -92,8 +101,12 @@ const resolvers = {
       });
     },
     targetSummary: (obj, { ensgId }) => {
-      return Promise.all([target(ensgId), targetDrugs(ensgId)]).then(
-        ([targetResponse, targetDrugsResponse]) => {
+      return Promise.all([
+        target(ensgId),
+        targetDrugs(ensgId),
+        targetSimilar(ensgId),
+      ]).then(
+        ([targetResponse, targetDrugsResponse, targetSimilarResponse]) => {
           const {
             uniprot_id: uniprotId,
             uniprot_subcellular_location: uniprotSubcellularLocation,
@@ -148,6 +161,8 @@ const resolvers = {
             )
             .map((d, i) => ({ phase: i, trialCount: d }));
 
+          const similarTargetsCount = targetSimilarResponse.data.data.length;
+
           return {
             id: ensgId,
             name,
@@ -184,6 +199,9 @@ const resolvers = {
             protein: {
               hasProtVista: uniprotId ? true : false,
               subcellularLocation: uniprotSubcellularLocation,
+            },
+            similarTargets: {
+              count: similarTargetsCount,
             },
           };
         }
