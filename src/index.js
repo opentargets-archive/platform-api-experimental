@@ -25,6 +25,7 @@ const typeDefs = gql`
     pathways: TargetSummaryPathways!
     cancerBiomarkers: TargetSummaryCancerBiomarkers!
     chemicalProbes: TargetSummaryChemicalProbes!
+    protein: TargetSummaryProtein!
   }
   type Disease {
     id: String!
@@ -66,6 +67,10 @@ const typeDefs = gql`
     portalProbeCount: Int!
     hasProbeMinerLink: Boolean!
   }
+  type TargetSummaryProtein {
+    hasProtVista: Boolean!
+    subcellularLocation: [String!]
+  }
 `;
 
 const resolvers = {
@@ -90,6 +95,8 @@ const resolvers = {
       return Promise.all([target(ensgId), targetDrugs(ensgId)]).then(
         ([targetResponse, targetDrugsResponse]) => {
           const {
+            uniprot_id: uniprotId,
+            uniprot_subcellular_location: uniprotSubcellularLocation,
             approved_symbol: symbol,
             approved_name: name,
             symbol_synonyms: symbolSynonyms,
@@ -173,6 +180,10 @@ const resolvers = {
               count: drugCount,
               modalities: drugModalities,
               trialsByPhase: drugTrialsByPhase,
+            },
+            protein: {
+              hasProtVista: uniprotId ? true : false,
+              subcellularLocation: uniprotSubcellularLocation,
             },
           };
         }
