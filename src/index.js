@@ -79,6 +79,7 @@ const typeDefs = gql`
   }
   type TargetSummarySimilarTargets {
     count: Int!
+    averageCommonDiseases: Int!
   }
 `;
 
@@ -162,6 +163,11 @@ const resolvers = {
             .map((d, i) => ({ phase: i, trialCount: d }));
 
           const similarTargetsCount = targetSimilarResponse.data.data.length;
+          const similarTargetsAverageCommonDiseases =
+            targetSimilarResponse.data.data.reduce((acc, d) => {
+              acc += d.shared_diseases.length;
+              return acc;
+            }, 0) / similarTargetsCount;
 
           return {
             id: ensgId,
@@ -202,6 +208,9 @@ const resolvers = {
             },
             similarTargets: {
               count: similarTargetsCount,
+              averageCommonDiseases: Math.round(
+                similarTargetsAverageCommonDiseases
+              ),
             },
           };
         }
