@@ -9,6 +9,7 @@ const targetSummary = (obj, { ensgId }) => {
   ]).then(([targetResponse, targetDrugsResponse, targetSimilarResponse]) => {
     const {
       uniprot_id: uniprotId,
+      uniprot_function: uniprotFunction,
       uniprot_subcellular_location: uniprotSubcellularLocation,
       approved_symbol: symbol,
       approved_name: name,
@@ -61,15 +62,18 @@ const targetSummary = (obj, { ensgId }) => {
 
     const similarTargetsCount = targetSimilarResponse.data.data.length;
     const similarTargetsAverageCommonDiseases =
-      targetSimilarResponse.data.data.reduce((acc, d) => {
-        acc += d.shared_diseases.length;
-        return acc;
-      }, 0) / similarTargetsCount;
+      similarTargetsCount > 0
+        ? targetSimilarResponse.data.data.reduce((acc, d) => {
+            acc += d.shared_diseases.length;
+            return acc;
+          }, 0) / similarTargetsCount
+        : 0;
 
     return {
       id: ensgId,
       name,
       symbol,
+      description: uniprotFunction ? uniprotFunction[0] : null,
       synonyms: [...symbolSynonyms, ...nameSynonyms],
       pathways: {
         count: reactome.length,

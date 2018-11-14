@@ -6,6 +6,7 @@ type Query {
 type TargetSummary {
   id: String!
   name: String!
+  description: String
   symbol: String!
   synonyms: [String!]!
   drugs: TargetSummaryDrugs!
