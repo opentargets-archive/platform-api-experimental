@@ -74,6 +74,28 @@ type TargetSummarySimilarTargets {
 type TargetDetailDrugs {
   rows: [DrugsRow!]!
 }
+enum DrugActivity {
+  AGONIST
+  ANTAGONIST
+  UP_OR_DOWN
+}
+enum DrugType {
+  SMALL_MOLECULE
+  PEPTIDE
+  PROTEIN
+  ANTIBODY
+}
+enum TrialStatus {
+  ACTIVE_NOT_RECRUITING
+  COMPLETED
+  NOT_APPLICABLE
+  NOT_YET_RECRUITING
+  RECRUITING
+  SUSPENDED
+  TERMINATED
+  UNKNOWN_STATUS
+  WITHDRAWN
+}
 type DrugsRow {
   targetId: String!
   targetSymbol: String!
@@ -82,10 +104,10 @@ type DrugsRow {
   efoLabel: String!
   drugId: String!
   drugName: String!
-  drugType: String!
+  drugType: DrugType!
   phase: Int!
-  status: String
-  activity: String!
+  status: TrialStatus
+  activity: DrugActivity!
   evidenceUrl: String!
   evidenceSource: String!
   mechanismOfAction: String!
