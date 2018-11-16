@@ -1,6 +1,7 @@
 type Query {
   targetSummary(ensgId: String!): TargetSummary!
   targetDetailDrugs(ensgId: String!): TargetDetailDrugs!
+  targetDetailCancerBiomarkers(ensgId: String!): TargetDetailCancerBiomarkers
   #   targetAssociations(
   #     ensgId: String!
   #     orderBy: Ordering
@@ -71,9 +72,9 @@ type TargetSummarySimilarTargets {
   averageCommonDiseases: Int!
 }
 type TargetDetailDrugs {
-  rows: [EvidenceDrugsRow!]!
+  rows: [DrugsRow!]!
 }
-type EvidenceDrugsRow {
+type DrugsRow {
   targetId: String!
   targetSymbol: String!
   targetClass: String!
@@ -90,6 +91,25 @@ type EvidenceDrugsRow {
   mechanismOfAction: String!
   mechanismOfActionUrl: String
   mechanismOfActionSource: String
+}
+type TargetDetailCancerBiomarkers {
+  rows: [CancerBiomarkersRow!]!
+}
+type CancerBiomarkersRow {
+  biomarker: String!
+  diseases: [BiomarkerDisease!]!
+  evidenceLevel: String!
+  drugName: String!
+  association: String!
+  sources: [SourceLink!]!
+}
+type BiomarkerDisease {
+  efoId: String!
+  efoLabel: String!
+}
+type SourceLink {
+  url: String!
+  label: String!
 }
 
 # type TargetAssociations {
