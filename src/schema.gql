@@ -76,7 +76,7 @@ type TargetDetailDrugs {
 type EvidenceDrugsRow {
   targetId: String!
   targetSymbol: String!
-  targetClass: String
+  targetClass: String!
   efoId: String!
   efoLabel: String!
   drugId: String!
@@ -84,7 +84,12 @@ type EvidenceDrugsRow {
   drugType: String!
   phase: Int!
   status: String
-  activity: String
+  activity: String!
+  evidenceUrl: String!
+  evidenceSource: String!
+  mechanismOfAction: String!
+  mechanismOfActionUrl: String
+  mechanismOfActionSource: String
 }
 
 # type TargetAssociations {
