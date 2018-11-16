@@ -74,7 +74,10 @@ const targetSummary = (obj, { ensgId }) => {
       name,
       symbol,
       description: uniprotFunction ? uniprotFunction[0] : null,
-      synonyms: [...symbolSynonyms, ...nameSynonyms],
+      synonyms: _.uniqWith(
+        [...symbolSynonyms, ...nameSynonyms],
+        (a, b) => a.toLowerCase() === b.toLowerCase()
+      ),
       pathways: {
         count: reactome.length,
       },
