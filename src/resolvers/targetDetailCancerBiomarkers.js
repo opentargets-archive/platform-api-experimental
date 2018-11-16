@@ -23,12 +23,13 @@ const targetDetailCancerBiomarkers = async (obj, { ensgId }) => {
       ...(publicationSource ? [publicationSource] : []),
       ...otherSources,
     ];
+    const associationType = d.association.replace(" ", "_").toUpperCase();
     return {
       biomarker: d.individualbiomarker || d.biomarker, // TODO: refactor upstream
       diseases: d.diseases.map(d2 => ({ efoId: d2.id, efoLabel: d2.label })),
       evidenceLevel: d.evidencelevel,
       drugName: d.drugfullname,
-      association: d.association,
+      associationType,
       sources,
     };
   });

@@ -95,12 +95,18 @@ type DrugsRow {
 type TargetDetailCancerBiomarkers {
   rows: [CancerBiomarkersRow!]!
 }
+enum AssociationType {
+  RESISTANT
+  RESPONSIVE
+  NOT_RESPONSIVE
+  INCREASED_TOXICITY
+}
 type CancerBiomarkersRow {
   biomarker: String!
   diseases: [BiomarkerDisease!]!
   evidenceLevel: String!
   drugName: String!
-  association: String!
+  associationType: AssociationType!
   sources: [SourceLink!]!
 }
 type BiomarkerDisease {
