@@ -4,6 +4,7 @@ import express from "express";
 import { ApolloServer, gql } from "apollo-server-express";
 
 import targetSummary from "./resolvers/targetSummary";
+import targetDetailDrugs from "./resolvers/targetDetailDrugs";
 import diseaseSummary from "./resolvers/diseaseSummary";
 import diseaseDAG from "./resolvers/diseaseDAG";
 
@@ -15,6 +16,7 @@ const typeDefs = fs.readFileSync(schemaFile, "utf8");
 const resolvers = {
   Query: {
     targetSummary,
+    targetDetailDrugs,
     diseaseSummary,
     diseaseDAG,
   },

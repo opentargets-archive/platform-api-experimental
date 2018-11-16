@@ -1,5 +1,11 @@
 type Query {
   targetSummary(ensgId: String!): TargetSummary!
+  targetDetailDrugs(ensgId: String!): TargetDetailDrugs!
+  #   targetAssociations(
+  #     ensgId: String!
+  #     orderBy: Ordering
+  #     size: Int
+  #   ): TargetAssociations!
   diseaseSummary(efoId: String!): DiseaseSummary!
   diseaseDAG(efoId: String!): DiseaseDAG!
 }
@@ -64,3 +70,34 @@ type TargetSummarySimilarTargets {
   count: Int!
   averageCommonDiseases: Int!
 }
+type TargetDetailDrugs {
+  rows: [EvidenceDrugsRow!]!
+}
+type EvidenceDrugsRow {
+  efoId: String!
+  efoLabel: String!
+  drugId: String!
+  drugName: String!
+  phase: Int!
+  status: String
+}
+
+# type TargetAssociations {
+#   associations: [TargetAssociation!]!
+# }
+# type TargetAssociation {
+#   efoId: String!
+#   efoLabel: String!
+#   therapeuticAreaEfoId: String!
+#   therapeuticAreaEfoLabel: String!
+#   scoreOverall: Float!
+#   scoresByDataType: [DataTypeScore!]!
+# }
+# type DataTypeScore {
+#   dataType: String!
+#   score: Float!
+# }
+# type Ordering {
+#   field: String!
+#   ascending: Boolean!
+# }
