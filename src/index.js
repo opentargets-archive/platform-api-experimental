@@ -6,6 +6,7 @@ import { ApolloServer, gql } from "apollo-server-express";
 import targetSummary from "./resolvers/targetSummary";
 import targetDetailDrugs from "./resolvers/targetDetailDrugs";
 import targetDetailCancerBiomarkers from "./resolvers/targetDetailCancerBiomarkers";
+import targetDetailPathways from "./resolvers/targetDetailPathways";
 import diseaseSummary from "./resolvers/diseaseSummary";
 import diseaseDAG from "./resolvers/diseaseDAG";
 
@@ -19,6 +20,7 @@ const resolvers = {
     targetSummary,
     targetDetailDrugs,
     targetDetailCancerBiomarkers,
+    targetDetailPathways,
     diseaseSummary,
     diseaseDAG,
   },

@@ -2,6 +2,7 @@ type Query {
   targetSummary(ensgId: String!): TargetSummary!
   targetDetailDrugs(ensgId: String!): TargetDetailDrugs!
   targetDetailCancerBiomarkers(ensgId: String!): TargetDetailCancerBiomarkers
+  targetDetailPathways(ensgId: String!): TargetDetailPathways
   #   targetAssociations(
   #     ensgId: String!
   #     orderBy: Ordering
@@ -139,7 +140,14 @@ type SourceLink {
   url: String!
   label: String!
 }
-
+type TargetDetailPathways {
+  nodes: [ReactomeDAGNode!]!
+}
+type ReactomeDAGNode {
+  id: String!
+  name: String!
+  parentIds: [String!]
+}
 # type TargetAssociations {
 #   associations: [TargetAssociation!]!
 # }
