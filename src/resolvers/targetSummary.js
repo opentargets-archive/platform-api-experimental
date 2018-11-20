@@ -72,6 +72,14 @@ const targetSummary = (obj, { ensgId }) => {
           }, 0) / similarTargetsCount
         : 0;
 
+    const pathwayCategories = reactomeTopLevel.map(c => {
+      return {
+        ...c,
+        isAssociated: reactome.some(s =>
+          s.value["pathway types"].some(p => p["pathway type"] === c.id)
+        ),
+      };
+    });
     const mousePhenotypeCategories = mousePhenotypesTopLevel.map(c => {
       return {
         ...c,
@@ -94,6 +102,7 @@ const targetSummary = (obj, { ensgId }) => {
       ),
       pathways: {
         count: reactome.length,
+        pathwayCategories,
       },
       cancerBiomarkers: {
         count: cancerBiomarkers

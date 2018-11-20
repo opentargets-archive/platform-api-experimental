@@ -51,6 +51,12 @@ type TargetDrugTrialsByPhaseAgg {
 }
 type TargetSummaryPathways {
   count: Int!
+  pathwayCategories: [PathwayCategory!]!
+}
+type PathwayCategory {
+  id: String!
+  name: String!
+  isAssociated: Boolean!
 }
 type TargetSummaryCancerBiomarkers {
   count: Int!
