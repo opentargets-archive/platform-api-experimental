@@ -18,6 +18,7 @@ type TargetSummary {
   chemicalProbes: TargetSummaryChemicalProbes!
   protein: TargetSummaryProtein!
   similarTargets: TargetSummarySimilarTargets!
+  mousePhenotypes: TargetSummaryMousePhenotypes!
 }
 type DiseaseSummary {
   id: String!
@@ -66,6 +67,14 @@ type TargetSummaryProtein {
 type TargetSummarySimilarTargets {
   count: Int!
   averageCommonDiseases: Int!
+}
+type TargetSummaryMousePhenotypes {
+  phenotypeCategories: [MousePhenotypeCategory!]!
+}
+type MousePhenotypeCategory {
+  id: String!
+  name: String!
+  isAssociated: Boolean!
 }
 type TargetDetailDrugs {
   rows: [DrugsRow!]!

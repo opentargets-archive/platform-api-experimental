@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 // https://www.ebi.ac.uk/ols//api/ontologies/mp/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FMP_0000001/jstree/children/99815577_1
 const mousePhenotypesTopLevel = [
   {
@@ -495,7 +497,13 @@ const mousePhenotypesTopLevel = [
   },
 ];
 
-export default mousePhenotypesTopLevel.map(d => ({
-  id: d.iri.split("/").pop(),
-  name: d.text,
-}));
+export default _.sortBy(
+  mousePhenotypesTopLevel.map(d => ({
+    id: d.iri
+      .split("/")
+      .pop()
+      .replace("_", ":"),
+    name: d.text,
+  })),
+  "name"
+);

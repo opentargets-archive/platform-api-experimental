@@ -1,5 +1,7 @@
 import _ from "lodash";
 import { target, targetDrugs, targetSimilar } from "../apis/openTargets";
+import reactomeTopLevel from "../constants/reactomeTopLevel";
+import mousePhenotypesTopLevel from "../constants/mousePhenotypesTopLevel";
 
 const targetSummary = (obj, { ensgId }) => {
   return Promise.all([
@@ -18,6 +20,7 @@ const targetSummary = (obj, { ensgId }) => {
       reactome,
       cancerbiomarkers: cancerBiomarkers,
       chemicalprobes: chemicalProbes,
+      mouse_phenotypes: mousePhenotypeGenes,
     } = targetResponse.data;
 
     const drugCount = _.uniq(
@@ -69,6 +72,17 @@ const targetSummary = (obj, { ensgId }) => {
           }, 0) / similarTargetsCount
         : 0;
 
+    const mousePhenotypeCategories = mousePhenotypesTopLevel.map(c => {
+      return {
+        ...c,
+        isAssociated: mousePhenotypeGenes.some(g =>
+          g.phenotypes
+            .filter(p => p.genotype_phenotype.length > 0)
+            .some(p => p.category_mp_identifier === c.id)
+        ),
+      };
+    });
+
     return {
       id: ensgId,
       name,
@@ -113,6 +127,9 @@ const targetSummary = (obj, { ensgId }) => {
       similarTargets: {
         count: similarTargetsCount,
         averageCommonDiseases: Math.round(similarTargetsAverageCommonDiseases),
+      },
+      mousePhenotypes: {
+        phenotypeCategories: mousePhenotypeCategories,
       },
     };
   });
