@@ -30,7 +30,7 @@ const targetDetailDrugs = async (obj, { ensgId }) => {
     const phase = d.evidence.drug2clinic.max_phase_for_disease.numeric_index;
     const status = d.evidence.drug2clinic.status
       ? d.evidence.drug2clinic.status
-          .replace(" ", "_")
+          .replace(/\s+/g, "_")
           .replace(",", "")
           .toUpperCase()
       : null;
