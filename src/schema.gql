@@ -3,11 +3,6 @@ type Query {
   targetDetailDrugs(ensgId: String!): TargetDetailDrugs!
   targetDetailCancerBiomarkers(ensgId: String!): TargetDetailCancerBiomarkers
   targetDetailPathways(ensgId: String!): TargetDetailPathways
-  #   targetAssociations(
-  #     ensgId: String!
-  #     orderBy: Ordering
-  #     size: Int
-  #   ): TargetAssociations!
   diseaseSummary(efoId: String!): DiseaseSummary!
   diseaseDAG(efoId: String!): DiseaseDAG!
 }
@@ -148,22 +143,3 @@ type ReactomeDAGNode {
   name: String!
   parentIds: [String!]
 }
-# type TargetAssociations {
-#   associations: [TargetAssociation!]!
-# }
-# type TargetAssociation {
-#   efoId: String!
-#   efoLabel: String!
-#   therapeuticAreaEfoId: String!
-#   therapeuticAreaEfoLabel: String!
-#   scoreOverall: Float!
-#   scoresByDataType: [DataTypeScore!]!
-# }
-# type DataTypeScore {
-#   dataType: String!
-#   score: Float!
-# }
-# type Ordering {
-#   field: String!
-#   ascending: Boolean!
-# }
