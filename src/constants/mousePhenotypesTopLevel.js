@@ -503,7 +503,7 @@ export default _.sortBy(
       .split("/")
       .pop()
       .replace("_", ":"),
-    name: d.text,
+    name: d.text.replace(" phenotype", ""),
   })),
   "name"
 );
