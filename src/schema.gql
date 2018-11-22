@@ -66,6 +66,7 @@ type TargetSummaryCancerBiomarkers {
 type TargetSummaryChemicalProbes {
   portalProbeCount: Int!
   hasProbeMinerLink: Boolean!
+  probeMinerLink: String
 }
 type TargetSummaryProtein {
   hasProtVista: Boolean!
