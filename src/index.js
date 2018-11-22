@@ -3,6 +3,7 @@ import path from "path";
 import express from "express";
 import { ApolloServer, gql } from "apollo-server-express";
 
+import targetAssociations from "./resolvers/targetAssociations";
 import targetSummary from "./resolvers/targetSummary";
 import targetDetailDrugs from "./resolvers/targetDetailDrugs";
 import targetDetailCancerBiomarkers from "./resolvers/targetDetailCancerBiomarkers";
@@ -17,6 +18,7 @@ const typeDefs = fs.readFileSync(schemaFile, "utf8");
 // create resolver object (mirrors typeDefs)
 const resolvers = {
   Query: {
+    targetAssociations,
     targetSummary,
     targetDetailDrugs,
     targetDetailCancerBiomarkers,

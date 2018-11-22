@@ -42,16 +42,16 @@ export async function targetDrugsIterated(ensgId) {
 export const targetSimilar = ensgId =>
   axios.get(`${ROOT}private/relation/target/${ensgId}?id=${ensgId}&size=10000`);
 export const targetAssociations = ensgId =>
-  axios.post(`${ROOT}public/associations/filter`, {
+  axios.post(`${ROOT}public/association/filter`, {
     target: [ensgId],
     facets: false,
     direct: true,
-    size: 50,
+    size: 10000,
     sort: ["association_score.overall"],
     search: "",
     draw: 2,
   });
 export const targetAssociationsFacets = ensgId =>
   axios.get(
-    `${ROOT}public/associations/filter?target=${ensgId}&outputstructure=flat&facets=true&direct=true&size=1`
+    `${ROOT}public/association/filter?target=${ensgId}&outputstructure=flat&facets=true&direct=true&size=1`
   );
