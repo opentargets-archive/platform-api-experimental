@@ -9,6 +9,7 @@ import targetDetailCancerBiomarkers from "./resolvers/targetDetailCancerBiomarke
 import targetDetailPathways from "./resolvers/targetDetailPathways";
 import diseaseSummary from "./resolvers/diseaseSummary";
 import diseaseDAG from "./resolvers/diseaseDAG";
+import targetDetailChemicalProbes from "./resolvers/targetDetailChemicalProbes.js";
 
 // load the schema
 const schemaFile = path.join(__dirname, "schema.gql");
@@ -23,6 +24,7 @@ const resolvers = {
     targetDetailPathways,
     diseaseSummary,
     diseaseDAG,
+    targetDetailChemicalProbes,
   },
 };
 
