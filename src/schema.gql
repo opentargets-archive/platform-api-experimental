@@ -19,9 +19,17 @@ type Disease {
   id: String!
   name: String!
 }
+enum DataType {
+  GENETIC
+  SOMATIC
+  DRUG
+  PATHWAY
+  EXPRESSION
+  TEXT_MINING
+  ANIMAL_MODEL
+}
 type AssociationDataType {
-  id: String!
-  name: String!
+  dataType: DataType!
   score: Float!
 }
 type TargetSummary {
