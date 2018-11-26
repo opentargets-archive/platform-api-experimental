@@ -14,6 +14,7 @@ type TargetAssociation {
   disease: Disease!
   score: Float!
   dataTypes: [AssociationDataType!]!
+  therapeuticAreas: [Disease!]
 }
 type Disease {
   id: String!
@@ -118,9 +119,12 @@ enum DrugActivity {
 }
 enum DrugType {
   SMALL_MOLECULE
-  PEPTIDE
   PROTEIN
+  ENZYME
   ANTIBODY
+  OLIGOSACCHARIDE
+  OLIGONUCLEOTIDE
+  UNKNOWN
 }
 enum TrialStatus {
   ACTIVE_NOT_RECRUITING

@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { targetAssociations } from "../apis/openTargets";
 
 const DATA_TYPE_MAP = {
@@ -25,10 +26,15 @@ const resolver = (obj, { ensgId }) => {
           score: 1.0 * d.association_score.datatypes[dt],
         };
       });
+      const therapeuticAreas = _.zip(
+        d.disease.efo_info.therapeutic_area.codes,
+        d.disease.efo_info.therapeutic_area.labels
+      ).map(l => ({ id: l[0], name: l[1] }));
       return {
         disease,
         score,
         dataTypes,
+        therapeuticAreas: therapeuticAreas.length > 0 ? therapeuticAreas : null,
       };
     });
 
