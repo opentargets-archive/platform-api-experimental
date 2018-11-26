@@ -123,6 +123,8 @@ const targetSummary = (obj, { ensgId }) => {
             : 0,
         hasProbeMinerLink:
           chemicalProbes && chemicalProbes.probeminer ? true : false,
+        probeMinerLink:
+          chemicalProbes && chemicalProbes.probeminer ? chemicalProbes.probeminer.link : "",
       },
       drugs: {
         count: drugCount,
