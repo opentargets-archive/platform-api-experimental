@@ -1,19 +1,29 @@
 import { gql } from "apollo-server-express";
+import _ from "lodash";
 
-export const typeDef = gql`
-  # extend type Query {
-  #   target: Target!
-  # }
-  type Target {
-    id: String!
-    symbol: String!
-    name: String!
-    description: String
-    synonyms: [String!]!
-  }
-`;
+import {
+  typeDefs as TargetSummaries,
+  resolvers as resolversTargetSummaries,
+} from "./TargetSummaries";
 
-export const resolvers = {
+export const typeDefs = [
+  ...TargetSummaries,
+  gql`
+    # extend type Query {
+    #   target: Target!
+    # }
+    type Target {
+      id: String!
+      symbol: String!
+      name: String!
+      description: String
+      synonyms: [String!]!
+      summaries: TargetSummaries!
+    }
+  `,
+];
+
+export const resolvers = _.merge(resolversTargetSummaries, {
   // Query: {
   //   target: () => ({}),
   // },
@@ -28,5 +38,6 @@ export const resolvers = {
       targetLoader.load(ensgId).then(({ description }) => description),
     synonyms: (obj, args, { ensgId, targetLoader }) =>
       targetLoader.load(ensgId).then(({ synonyms }) => synonyms),
+    summaries: () => ({}),
   },
-};
+});

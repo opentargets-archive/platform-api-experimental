@@ -14,7 +14,7 @@ import diseaseDAG from "./resolvers/diseaseDAG";
 import targetDetailChemicalProbes from "./resolvers/targetDetailChemicalProbes.js";
 
 import {
-  typeDef as Target,
+  typeDefs as Target,
   resolvers as resolversTarget,
 } from "./schema/Target";
 // import { targets } from "./apis/openTargets";
@@ -43,7 +43,7 @@ const resolvers = {
 };
 
 const server = new ApolloServer({
-  typeDefs: [typeDefs, Target],
+  typeDefs: [typeDefs, ...Target],
   resolvers: _.merge(resolvers, resolversTarget),
   context: ({ req }) => ({
     targetLoader: createTargetLoader(),
