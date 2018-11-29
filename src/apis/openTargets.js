@@ -7,6 +7,11 @@ const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
 
 export const disease = efoId => axios.get(`${ROOT}private/disease/${efoId}`);
 export const target = ensgId => axios.get(`${ROOT}private/target/${ensgId}`);
+export const targets = ensgIds =>
+  Promise.all([
+    Promise.resolve(ensgIds),
+    axios.post(`${ROOT}private/target`, { id: ensgIds }),
+  ]);
 export const targetDrugs = (ensgId, next = null) =>
   next
     ? axios.get(

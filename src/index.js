@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import express from "express";
 import { ApolloServer, gql } from "apollo-server-express";
+import _ from "lodash";
 
 import targetAssociations from "./resolvers/targetAssociations";
 import targetSummary from "./resolvers/targetSummary";
@@ -11,6 +12,13 @@ import targetDetailPathways from "./resolvers/targetDetailPathways";
 import diseaseSummary from "./resolvers/diseaseSummary";
 import diseaseDAG from "./resolvers/diseaseDAG";
 import targetDetailChemicalProbes from "./resolvers/targetDetailChemicalProbes.js";
+
+import {
+  typeDef as Target,
+  resolvers as resolversTarget,
+} from "./schema/Target";
+// import { targets } from "./apis/openTargets";
+import { createTargetLoader } from "./apis/dataloaders";
 
 // load the schema
 const schemaFile = path.join(__dirname, "schema.gql");
@@ -27,10 +35,20 @@ const resolvers = {
     diseaseSummary,
     diseaseDAG,
     targetDetailChemicalProbes,
+    target: (obj, { ensgId }, context) => {
+      context.ensgId = ensgId;
+      return {};
+    },
   },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+  typeDefs: [typeDefs, Target],
+  resolvers: _.merge(resolvers, resolversTarget),
+  context: ({ req }) => ({
+    targetLoader: createTargetLoader(),
+  }),
+});
 
 const app = express();
 server.applyMiddleware({ app });

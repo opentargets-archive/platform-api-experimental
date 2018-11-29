@@ -7,7 +7,9 @@ type Query {
   targetDetailChemicalProbes(ensgId: String!): TargetDetailChemicalProbes
   diseaseSummary(efoId: String!): DiseaseSummary!
   diseaseDAG(efoId: String!): DiseaseDAG!
+  target(ensgId: String!): Target!
 }
+
 type TargetAssociations {
   associations: [TargetAssociation!]!
 }
