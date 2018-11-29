@@ -4,7 +4,7 @@ type Query {
   targetDetailDrugs(ensgId: String!): TargetDetailDrugs!
   targetDetailCancerBiomarkers(ensgId: String!): TargetDetailCancerBiomarkers
   targetDetailPathways(ensgId: String!): TargetDetailPathways
-  targetDetailChemicalProbes(ensgId: String!): targetDetailChemicalProbes
+  targetDetailChemicalProbes(ensgId: String!): TargetDetailChemicalProbes
   diseaseSummary(efoId: String!): DiseaseSummary!
   diseaseDAG(efoId: String!): DiseaseDAG!
 }
@@ -182,7 +182,7 @@ type SourceLink {
   url: String!
   label: String!
 }
-type targetDetailChemicalProbes {
+type TargetDetailChemicalProbes {
   # probeMinerLink: String
   rows: [ChemicalProbesRow!]!
 }
