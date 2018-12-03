@@ -16,10 +16,10 @@ import _ from "lodash";
 //   resolvers as resolversTargetChemicalProbes,
 // } from "./summaries/ChemicalProbes";
 
-// import {
-//   typeDefs as TargetSummaryCancerBiomarkers,
-//   resolvers as resolversTargetCancerBiomarkers,
-// } from "./summaries/CancerBiomarkers";
+import {
+  typeDefs as TargetDetailCancerBiomarkers,
+  resolvers as resolversTargetCancerBiomarkers,
+} from "./details/CancerBiomarkers";
 
 import {
   typeDefs as TargetDetailDrugs,
@@ -35,7 +35,7 @@ export const typeDefs = [
   // TargetSummaryPathways,
   // TargetSummaryProtein,
   // TargetSummaryChemicalProbes,
-  // TargetSummaryCancerBiomarkers,
+  TargetDetailCancerBiomarkers,
   TargetDetailDrugs,
   // TargetSummaryRelatedTargets,
   gql`
@@ -43,7 +43,7 @@ export const typeDefs = [
       # pathways: TargetSummaryPathways
       # protein: TargetSummaryProtein
       # chemicalProbes: TargetSummaryChemicalProbes
-      # cancerBiomarkers: TargetSummaryCancerBiomarkers
+      cancerBiomarkers: TargetDetailCancerBiomarkers
       drugs: TargetDetailDrugs
       # relatedTargets: TargetSummaryRelatedTargets
     }
@@ -54,7 +54,7 @@ export const resolvers = _.merge(
   // resolversTargetSummary,
   // resolversTargetProtein,
   // resolversTargetChemicalProbes,
-  // resolversTargetCancerBiomarkers,
+  resolversTargetCancerBiomarkers,
   resolversTargetDrugs,
   // resolversTargetRelatedTargets,
   {
@@ -62,7 +62,7 @@ export const resolvers = _.merge(
       // pathways: () => ({}),
       // protein: () => ({}),
       // chemicalProbes: () => ({}),
-      // cancerBiomarkers: () => ({}),
+      cancerBiomarkers: ({ _ensgId }) => ({ _ensgId }),
       // drugs: () => ({}),
       drugs: ({ _ensgId }) => ({ _ensgId }),
       // relatedTargets: () => ({}),

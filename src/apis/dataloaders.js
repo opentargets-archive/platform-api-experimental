@@ -4,6 +4,7 @@ import _ from "lodash";
 import { targets, targetsDrugs } from "./openTargets";
 import reactomeTopLevel from "../constants/reactomeTopLevel";
 import mousePhenotypesTopLevel from "../constants/mousePhenotypesTopLevel";
+import getMultiplePublicationsSource from "../utils/getMultiplePublicationsSource";
 
 // Note: dataloader assumes that the response array is in the same
 //       order as the passed keys - this must be checked in the
@@ -84,6 +85,34 @@ export const createTargetLoader = () =>
                     }, [])
                   ).length
                 : 0,
+              rows: cancerBiomarkers
+                ? cancerBiomarkers.map(r => {
+                    const publicationSource = getMultiplePublicationsSource(
+                      r.references.pubmed.map(d2 => d2.pmid) || []
+                    );
+                    const otherSources = (r.references.other || []).map(d2 => ({
+                      url: d2.link,
+                      name: d2.name,
+                    }));
+                    const sources = [
+                      ...(publicationSource ? [publicationSource] : []),
+                      ...otherSources,
+                    ];
+                    const associationType = r.association
+                      .replace(" ", "_")
+                      .toUpperCase();
+                    return {
+                      diseases: r.diseases.map(d2 => ({
+                        id: d2.id,
+                        name: d2.label,
+                      })),
+                      drugName: r.drugfullname,
+                      associationType,
+                      evidenceLevel: r.evidencelevel,
+                      sources,
+                    };
+                  })
+                : [],
             },
             chemicalProbes: {
               hasStructuralGenomicsConsortium:
