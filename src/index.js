@@ -18,7 +18,10 @@ import {
   resolvers as resolversTarget,
 } from "./schema/Target";
 // import { targets } from "./apis/openTargets";
-import { createTargetLoader } from "./apis/dataloaders";
+import {
+  createTargetLoader,
+  createTargetDrugsLoader,
+} from "./apis/dataloaders";
 
 // load the schema
 const schemaFile = path.join(__dirname, "schema.gql");
@@ -47,6 +50,7 @@ const server = new ApolloServer({
   resolvers: _.merge(resolvers, resolversTarget),
   context: ({ req }) => ({
     targetLoader: createTargetLoader(),
+    targetDrugsLoader: createTargetDrugsLoader(),
   }),
 });
 

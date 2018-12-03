@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import _ from "lodash";
 
-import { targets } from "./openTargets";
+import { targets, targetsDrugs } from "./openTargets";
 import reactomeTopLevel from "../constants/reactomeTopLevel";
 import mousePhenotypesTopLevel from "../constants/mousePhenotypesTopLevel";
 
@@ -135,5 +135,62 @@ export const createTargetLoader = () =>
             },
           };
         });
+    })
+  );
+
+export const createTargetDrugsLoader = () =>
+  new DataLoader(keys =>
+    targetsDrugs(keys).then(([ensgIds, data]) => {
+      return ensgIds.map(ensgId => {
+        const relevantRows = data.filter(d => d.target.id === ensgId);
+        const drugs = _.uniqBy(relevantRows, "drug.molecule_name");
+        const trials = _.uniqBy(
+          relevantRows,
+          d => d.evidence.drug2clinic.urls[0].url
+        );
+        const drugCount = drugs.length;
+        const drugModalities = {
+          antibody: drugs.filter(
+            r => r.drug.molecule_type.toLowerCase() === "antibody"
+          ).length,
+          enzyme: drugs.filter(
+            r => r.drug.molecule_type.toLowerCase() === "enzyme"
+          ).length,
+          oligonucleotide: drugs.filter(
+            r => r.drug.molecule_type.toLowerCase() === "oligonucleotide"
+          ).length,
+          oligosaccharide: drugs.filter(
+            r => r.drug.molecule_type.toLowerCase() === "oligosaccharide"
+          ).length,
+          protein: drugs.filter(
+            r => r.drug.molecule_type.toLowerCase() === "protein"
+          ).length,
+          smallMolecule: drugs.filter(
+            r => r.drug.molecule_type.toLowerCase() === "small molecule"
+          ).length,
+          other: drugs.filter(
+            r => r.drug.molecule_type.toLowerCase() === "other"
+          ).length,
+        };
+        const phaseCounts = trials.reduce(
+          (acc, t) => {
+            const phase =
+              t.evidence.drug2clinic.max_phase_for_disease.numeric_index;
+            acc[phase] += 1;
+            return acc;
+          },
+          { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
+        );
+        const trialsByPhase = Object.keys(phaseCounts).map(p => ({
+          phase: p,
+          trialCount: phaseCounts[p],
+        }));
+
+        return {
+          drugCount,
+          drugModalities,
+          trialsByPhase,
+        };
+      });
     })
   );

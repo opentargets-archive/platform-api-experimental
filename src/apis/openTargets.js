@@ -22,6 +22,37 @@ export const targetDrugs = (ensgId, next = null) =>
     : axios.get(
         `${ROOT}public/evidence/filter?size=1000&datasource=chembl&fields=disease.efo_info&fields=drug&fields=evidence&fields=target&fields=access_level&target=${ensgId}&expandefo=true`
       );
+const targetsDrugsIteration = async (ensgIds, next = null) => {
+  const props = {
+    size: 10000,
+    datasource: ["chembl"],
+    fields: ["disease.efo_info", "drug", "evidence", "target", "access_level"],
+    expandefo: true,
+    target: ensgIds,
+  };
+  return next
+    ? axios.post(`${ROOT}public/evidence/filter`, { ...props, next })
+    : axios.post(`${ROOT}public/evidence/filter`, props);
+};
+async function targetsDrugsIterated(ensgIds) {
+  const first = targetsDrugsIteration(ensgIds);
+  let prev = await first;
+  // console.log(prev);
+  let rows = [];
+  while (true) {
+    const next = prev ? prev.data.next : null;
+    rows = [...rows, ...prev.data.data];
+    if (next) {
+      prev = await targetsDrugsIteration(ensgIds, next);
+    } else {
+      break;
+    }
+  }
+  return rows;
+}
+export const targetsDrugs = ensgIds =>
+  Promise.all([Promise.resolve(ensgIds), targetsDrugsIterated(ensgIds)]);
+
 export async function targetDrugsIterated(ensgId) {
   const first = axios.get(
     `${ROOT}public/evidence/filter?size=1000&datasource=chembl&fields=disease.efo_info&fields=drug&fields=evidence&fields=target&fields=access_level&target=${ensgId}&expandefo=true`
