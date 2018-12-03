@@ -81,16 +81,41 @@ export const createTargetLoader = () =>
                 : 0,
             },
             chemicalProbes: {
-              portalProbeCount:
-                chemicalProbes && chemicalProbes.portalprobes
-                  ? chemicalProbes.portalprobes.length
-                  : 0,
-              hasProbeMinerLink:
+              hasStructuralGenomicsConsortium:
+                chemicalProbes &&
+                chemicalProbes.portalprobes &&
+                chemicalProbes.portalprobes.some(d =>
+                  d.sourcelinks.some(
+                    d2 => d2.source === "Structural Genomics Consortium"
+                  )
+                ),
+              hasChemicalProbesPortal:
+                chemicalProbes &&
+                chemicalProbes.portalprobes &&
+                chemicalProbes.portalprobes.some(d =>
+                  d.sourcelinks.some(
+                    d2 => d2.source === "Chemical Probes Portal"
+                  )
+                ),
+              hasOpenScienceProbes:
+                chemicalProbes &&
+                chemicalProbes.portalprobes &&
+                chemicalProbes.portalprobes.some(d =>
+                  d.sourcelinks.some(d2 => d2.source === "Open Science Probes")
+                ),
+              hasProbeMiner:
                 chemicalProbes && chemicalProbes.probeminer ? true : false,
-              probeMinerLink:
-                chemicalProbes && chemicalProbes.probeminer
-                  ? chemicalProbes.probeminer.link
-                  : "",
+
+              // portalProbeCount:
+              //   chemicalProbes && chemicalProbes.portalprobes
+              //     ? chemicalProbes.portalprobes.length
+              //     : 0,
+              // hasProbeMinerLink:
+              //   chemicalProbes && chemicalProbes.probeminer ? true : false,
+              // probeMinerLink:
+              //   chemicalProbes && chemicalProbes.probeminer
+              //     ? chemicalProbes.probeminer.link
+              //     : "",
             },
             protein: {
               uniprotId,
