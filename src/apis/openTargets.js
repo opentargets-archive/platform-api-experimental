@@ -37,7 +37,6 @@ const targetsDrugsIteration = async (ensgIds, next = null) => {
 async function targetsDrugsIterated(ensgIds) {
   const first = targetsDrugsIteration(ensgIds);
   let prev = await first;
-  // console.log(prev);
   let rows = [];
   while (true) {
     const next = prev ? prev.data.next : null;
