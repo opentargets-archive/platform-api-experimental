@@ -138,6 +138,12 @@ export const createTargetLoader = () =>
     })
   );
 
+const MAP_ACTIVITY = {
+  drug_positive_modulator: "agonist",
+  drug_negative_modulator: "antagonist",
+  up_or_down: "up_or_down",
+};
+
 export const createTargetDrugsLoader = () =>
   new DataLoader(keys =>
     targetsDrugs(keys).then(([ensgIds, data]) => {
@@ -198,9 +204,17 @@ export const createTargetDrugsLoader = () =>
             drug: {
               id: r.drug.id.split("/").pop(),
               name: r.drug.molecule_name,
+              type: r.drug.molecule_type.replace(" ", "_").toUpperCase(),
+              activity: MAP_ACTIVITY[r.target.activity].toUpperCase(),
             },
             clinicalTrial: {
               phase: r.evidence.drug2clinic.max_phase_for_disease.numeric_index,
+              status: r.evidence.drug2clinic.status
+                ? r.evidence.drug2clinic.status
+                    .replace(/\s+/g, "_")
+                    .replace(",", "")
+                    .toUpperCase()
+                : null,
             },
           };
         });

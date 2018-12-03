@@ -15,7 +15,7 @@ export const typeDefs = gql`
     OLIGONUCLEOTIDE
     UNKNOWN
   }
-  enum TrialStatus {
+  enum ClinicalTrialStatus {
     ACTIVE_NOT_RECRUITING
     COMPLETED
     NOT_APPLICABLE
@@ -33,12 +33,12 @@ export const typeDefs = gql`
   type Drug {
     id: String!
     name: String!
-    # type: DrugType!
-    # activity: DrugActivity!
+    type: DrugType!
+    activity: DrugActivity!
   }
   type ClinicalTrial {
     phase: Int!
-    # status: ClinicalTrialStatus
+    status: ClinicalTrialStatus
   }
   type EvidenceRowDrugs {
     target: Target!
