@@ -146,10 +146,26 @@ export const createTargetLoader = () =>
               //     : 0,
               // hasProbeMinerLink:
               //   chemicalProbes && chemicalProbes.probeminer ? true : false,
-              // probeMinerLink:
-              //   chemicalProbes && chemicalProbes.probeminer
-              //     ? chemicalProbes.probeminer.link
-              //     : "",
+              rows:
+                chemicalProbes && chemicalProbes.portalprobes
+                  ? chemicalProbes.portalprobes.map(d => {
+                      return {
+                        chemicalProbe: d.chemicalprobe,
+                        note: d.note !== "none" ? d.note : "",
+                        sources: d.sourcelinks.map(sl => ({
+                          url:
+                            sl.link.toLowerCase().substring(0, 4) === "http"
+                              ? sl.link
+                              : "http://" + sl.link,
+                          name: sl.source,
+                        })),
+                      };
+                    })
+                  : [],
+              probeMinerUrl:
+                chemicalProbes && chemicalProbes.probeminer
+                  ? chemicalProbes.probeminer.link
+                  : null,
             },
             protein: {
               uniprotId,
