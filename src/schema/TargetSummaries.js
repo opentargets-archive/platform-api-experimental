@@ -2,21 +2,33 @@ import { gql } from "apollo-server-express";
 import _ from "lodash";
 
 import {
-  typeDefs as TargetSummaryPathway2,
-  resolvers as resolversTargetSummary2,
+  typeDefs as TargetSummaryPathways,
+  resolvers as resolversTargetSummary,
 } from "./summaries/Pathways";
 
+import {
+  typeDefs as TargetSummaryProtein,
+  resolvers as resolversTargetProtein,
+} from "./summaries/Protein";
+
 export const typeDefs = [
-  TargetSummaryPathway2,
+  TargetSummaryPathways,
+  TargetSummaryProtein,
   gql`
     type TargetSummaries {
-      pathways: TargetSummaryPathways2
+      pathways: TargetSummaryPathways
+      protein: TargetSummaryProtein
     }
   `,
 ];
 
-export const resolvers = _.merge(resolversTargetSummary2, {
-  TargetSummaries: {
-    pathways: () => ({}),
-  },
-});
+export const resolvers = _.merge(
+  resolversTargetSummary,
+  resolversTargetProtein,
+  {
+    TargetSummaries: {
+      pathways: () => ({}),
+      protein: () => ({}),
+    },
+  }
+);

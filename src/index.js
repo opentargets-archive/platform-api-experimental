@@ -27,14 +27,14 @@ const typeDefs = fs.readFileSync(schemaFile, "utf8");
 // create resolver object (mirrors typeDefs)
 const resolvers = {
   Query: {
-    targetAssociations,
-    targetSummary,
-    targetDetailDrugs,
-    targetDetailCancerBiomarkers,
-    targetDetailPathways,
-    diseaseSummary,
-    diseaseDAG,
-    targetDetailChemicalProbes,
+    // targetAssociations,
+    // targetSummary,
+    // targetDetailDrugs,
+    // targetDetailCancerBiomarkers,
+    // targetDetailPathways,
+    // diseaseSummary,
+    // diseaseDAG,
+    // targetDetailChemicalProbes,
     target: (obj, { ensgId }, context) => {
       context.ensgId = ensgId;
       return {};

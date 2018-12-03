@@ -1,12 +1,12 @@
 type Query {
   targetAssociations(ensgId: String!): TargetAssociations!
-  targetSummary(ensgId: String!): TargetSummary!
-  targetDetailDrugs(ensgId: String!): TargetDetailDrugs!
-  targetDetailCancerBiomarkers(ensgId: String!): TargetDetailCancerBiomarkers
-  targetDetailPathways(ensgId: String!): TargetDetailPathways
-  targetDetailChemicalProbes(ensgId: String!): TargetDetailChemicalProbes
-  diseaseSummary(efoId: String!): DiseaseSummary!
-  diseaseDAG(efoId: String!): DiseaseDAG!
+  # targetSummary(ensgId: String!): TargetSummary!
+  # targetDetailDrugs(ensgId: String!): TargetDetailDrugs!
+  # targetDetailCancerBiomarkers(ensgId: String!): TargetDetailCancerBiomarkers
+  # targetDetailPathways(ensgId: String!): TargetDetailPathways
+  # targetDetailChemicalProbes(ensgId: String!): TargetDetailChemicalProbes
+  # diseaseSummary(efoId: String!): DiseaseSummary!
+  # diseaseDAG(efoId: String!): DiseaseDAG!
   target(ensgId: String!): Target!
 }
 
@@ -36,168 +36,168 @@ type AssociationDataType {
   dataType: DataType!
   score: Float!
 }
-type TargetSummary {
-  id: String!
-  name: String!
-  description: String
-  symbol: String!
-  synonyms: [String!]!
-  drugs: TargetSummaryDrugs!
-  pathways: TargetSummaryPathways!
-  cancerBiomarkers: TargetSummaryCancerBiomarkers!
-  chemicalProbes: TargetSummaryChemicalProbes!
-  protein: TargetSummaryProtein!
-  similarTargets: TargetSummarySimilarTargets!
-  mousePhenotypes: TargetSummaryMousePhenotypes!
-}
-type DiseaseSummary {
-  id: String!
-  name: String!
-  synonyms: [String!]!
-}
-type DiseaseDAG {
-  nodes: [DiseaseDAGNode!]!
-}
-type DiseaseDAGNode {
-  id: String!
-  name: String!
-  parentIds: [String!]
-  nodeType: String!
-}
-type TargetSummaryDrugs {
-  count: Int!
-  modalities: TargetDrugModalitiesAgg!
-  trialsByPhase: [TargetDrugTrialsByPhaseAgg!]!
-}
-type TargetDrugModalitiesAgg {
-  antibody: Boolean!
-  peptide: Boolean!
-  protein: Boolean!
-  smallMolecule: Boolean!
-}
-type TargetDrugTrialsByPhaseAgg {
-  phase: Int!
-  trialCount: Int!
-}
-type TargetSummaryPathways {
-  count: Int!
-  pathwayCategories: [PathwayCategory!]!
-}
-type PathwayCategory {
-  id: String!
-  name: String!
-  isAssociated: Boolean!
-}
-type TargetSummaryCancerBiomarkers {
-  count: Int!
-  diseaseCount: Int!
-}
-type TargetSummaryChemicalProbes {
-  portalProbeCount: Int!
-  hasProbeMinerLink: Boolean!
-  probeMinerLink: String
-}
-type TargetSummaryProtein {
-  hasProtVista: Boolean!
-  subcellularLocation: [String!]
-}
-type TargetSummarySimilarTargets {
-  count: Int!
-  averageCommonDiseases: Int!
-}
-type TargetSummaryMousePhenotypes {
-  phenotypeCategories: [MousePhenotypeCategory!]!
-}
-type MousePhenotypeCategory {
-  id: String!
-  name: String!
-  isAssociated: Boolean!
-}
-type TargetDetailDrugs {
-  rows: [DrugsRow!]!
-}
-enum DrugActivity {
-  AGONIST
-  ANTAGONIST
-  UP_OR_DOWN
-}
-enum DrugType {
-  SMALL_MOLECULE
-  PROTEIN
-  ENZYME
-  ANTIBODY
-  OLIGOSACCHARIDE
-  OLIGONUCLEOTIDE
-  UNKNOWN
-}
-enum TrialStatus {
-  ACTIVE_NOT_RECRUITING
-  COMPLETED
-  NOT_APPLICABLE
-  NOT_YET_RECRUITING
-  RECRUITING
-  SUSPENDED
-  TERMINATED
-  UNKNOWN_STATUS
-  WITHDRAWN
-}
-type DrugsRow {
-  targetId: String!
-  targetSymbol: String!
-  targetClass: String!
-  efoId: String!
-  efoLabel: String!
-  drugId: String!
-  drugName: String!
-  drugType: DrugType!
-  phase: Int!
-  status: TrialStatus
-  activity: DrugActivity!
-  evidenceUrl: String!
-  evidenceSource: String!
-  mechanismOfAction: String!
-  mechanismOfActionUrl: String
-  mechanismOfActionSource: String
-}
-type TargetDetailCancerBiomarkers {
-  rows: [CancerBiomarkersRow!]!
-}
-enum AssociationType {
-  RESISTANT
-  RESPONSIVE
-  NOT_RESPONSIVE
-  INCREASED_TOXICITY
-}
-type CancerBiomarkersRow {
-  biomarker: String!
-  diseases: [BiomarkerDisease!]!
-  evidenceLevel: String!
-  drugName: String!
-  associationType: AssociationType!
-  sources: [SourceLink!]!
-}
-type BiomarkerDisease {
-  efoId: String!
-  efoLabel: String!
-}
-type SourceLink {
-  url: String!
-  label: String!
-}
-type TargetDetailChemicalProbes {
-  # probeMinerLink: String
-  rows: [ChemicalProbesRow!]!
-}
-type ChemicalProbesRow {
-  chemicalprobe: String!
-  note: String
-  sources: [SourceLink!]!
-}
-type TargetDetailPathways {
-  nodes: [ReactomeDAGNode!]!
-}
-type ReactomeDAGNode {
-  id: String!
-  name: String!
-  parentIds: [String!]
-}
+# type TargetSummary {
+#   id: String!
+#   name: String!
+#   description: String
+#   symbol: String!
+#   synonyms: [String!]!
+#   drugs: TargetSummaryDrugs!
+#   pathways: TargetSummaryPathways!
+#   cancerBiomarkers: TargetSummaryCancerBiomarkers!
+#   chemicalProbes: TargetSummaryChemicalProbes!
+#   protein: TargetSummaryProtein!
+#   similarTargets: TargetSummarySimilarTargets!
+#   mousePhenotypes: TargetSummaryMousePhenotypes!
+# }
+# type DiseaseSummary {
+#   id: String!
+#   name: String!
+#   synonyms: [String!]!
+# }
+# type DiseaseDAG {
+#   nodes: [DiseaseDAGNode!]!
+# }
+# type DiseaseDAGNode {
+#   id: String!
+#   name: String!
+#   parentIds: [String!]
+#   nodeType: String!
+# }
+# type TargetSummaryDrugs {
+#   count: Int!
+#   modalities: TargetDrugModalitiesAgg!
+#   trialsByPhase: [TargetDrugTrialsByPhaseAgg!]!
+# }
+# type TargetDrugModalitiesAgg {
+#   antibody: Boolean!
+#   peptide: Boolean!
+#   protein: Boolean!
+#   smallMolecule: Boolean!
+# }
+# type TargetDrugTrialsByPhaseAgg {
+#   phase: Int!
+#   trialCount: Int!
+# }
+# type TargetSummaryPathways {
+#   count: Int!
+#   pathwayCategories: [PathwayCategory!]!
+# }
+# type PathwayCategory {
+#   id: String!
+#   name: String!
+#   isAssociated: Boolean!
+# }
+# type TargetSummaryCancerBiomarkers {
+#   count: Int!
+#   diseaseCount: Int!
+# }
+# type TargetSummaryChemicalProbes {
+#   portalProbeCount: Int!
+#   hasProbeMinerLink: Boolean!
+#   probeMinerLink: String
+# }
+# type TargetSummaryProtein {
+#   hasProtVista: Boolean!
+#   subcellularLocation: [String!]
+# }
+# type TargetSummarySimilarTargets {
+#   count: Int!
+#   averageCommonDiseases: Int!
+# }
+# type TargetSummaryMousePhenotypes {
+#   phenotypeCategories: [MousePhenotypeCategory!]!
+# }
+# type MousePhenotypeCategory {
+#   id: String!
+#   name: String!
+#   isAssociated: Boolean!
+# }
+# type TargetDetailDrugs {
+#   rows: [DrugsRow!]!
+# }
+# enum DrugActivity {
+#   AGONIST
+#   ANTAGONIST
+#   UP_OR_DOWN
+# }
+# enum DrugType {
+#   SMALL_MOLECULE
+#   PROTEIN
+#   ENZYME
+#   ANTIBODY
+#   OLIGOSACCHARIDE
+#   OLIGONUCLEOTIDE
+#   UNKNOWN
+# }
+# enum TrialStatus {
+#   ACTIVE_NOT_RECRUITING
+#   COMPLETED
+#   NOT_APPLICABLE
+#   NOT_YET_RECRUITING
+#   RECRUITING
+#   SUSPENDED
+#   TERMINATED
+#   UNKNOWN_STATUS
+#   WITHDRAWN
+# }
+# type DrugsRow {
+#   targetId: String!
+#   targetSymbol: String!
+#   targetClass: String!
+#   efoId: String!
+#   efoLabel: String!
+#   drugId: String!
+#   drugName: String!
+#   drugType: DrugType!
+#   phase: Int!
+#   status: TrialStatus
+#   activity: DrugActivity!
+#   evidenceUrl: String!
+#   evidenceSource: String!
+#   mechanismOfAction: String!
+#   mechanismOfActionUrl: String
+#   mechanismOfActionSource: String
+# }
+# type TargetDetailCancerBiomarkers {
+#   rows: [CancerBiomarkersRow!]!
+# }
+# enum AssociationType {
+#   RESISTANT
+#   RESPONSIVE
+#   NOT_RESPONSIVE
+#   INCREASED_TOXICITY
+# }
+# type CancerBiomarkersRow {
+#   biomarker: String!
+#   diseases: [BiomarkerDisease!]!
+#   evidenceLevel: String!
+#   drugName: String!
+#   associationType: AssociationType!
+#   sources: [SourceLink!]!
+# }
+# type BiomarkerDisease {
+#   efoId: String!
+#   efoLabel: String!
+# }
+# type SourceLink {
+#   url: String!
+#   label: String!
+# }
+# type TargetDetailChemicalProbes {
+#   # probeMinerLink: String
+#   rows: [ChemicalProbesRow!]!
+# }
+# type ChemicalProbesRow {
+#   chemicalprobe: String!
+#   note: String
+#   sources: [SourceLink!]!
+# }
+# type TargetDetailPathways {
+#   nodes: [ReactomeDAGNode!]!
+# }
+# type ReactomeDAGNode {
+#   id: String!
+#   name: String!
+#   parentIds: [String!]
+# }
