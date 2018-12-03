@@ -16,15 +16,22 @@ import {
   resolvers as resolversTargetChemicalProbes,
 } from "./summaries/ChemicalProbes";
 
+import {
+  typeDefs as TargetSummaryCancerBiomarkers,
+  resolvers as resolversTargetCancerBiomarkers,
+} from "./summaries/CancerBiomarkers";
+
 export const typeDefs = [
   TargetSummaryPathways,
   TargetSummaryProtein,
   TargetSummaryChemicalProbes,
+  TargetSummaryCancerBiomarkers,
   gql`
     type TargetSummaries {
       pathways: TargetSummaryPathways
       protein: TargetSummaryProtein
       chemicalProbes: TargetSummaryChemicalProbes
+      cancerBiomarkers: TargetSummaryCancerBiomarkers
     }
   `,
 ];
@@ -33,11 +40,13 @@ export const resolvers = _.merge(
   resolversTargetSummary,
   resolversTargetProtein,
   resolversTargetChemicalProbes,
+  resolversTargetCancerBiomarkers,
   {
     TargetSummaries: {
       pathways: () => ({}),
       protein: () => ({}),
       chemicalProbes: () => ({}),
+      cancerBiomarkers: () => ({}),
     },
   }
 );

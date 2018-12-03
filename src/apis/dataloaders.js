@@ -69,8 +69,13 @@ export const createTargetLoader = () =>
               pathwayCategories,
             },
             cancerBiomarkers: {
-              count: cancerBiomarkers
+              hasCancerBiomarkers:
+                cancerBiomarkers && cancerBiomarkers.length > 0,
+              cancerBiomarkerCount: cancerBiomarkers
                 ? _.uniq(cancerBiomarkers.map(d => d.biomarker)).length
+                : 0,
+              drugCount: cancerBiomarkers
+                ? _.uniq(cancerBiomarkers.map(d => d.drugfullname)).length
                 : 0,
               diseaseCount: cancerBiomarkers
                 ? _.uniq(
