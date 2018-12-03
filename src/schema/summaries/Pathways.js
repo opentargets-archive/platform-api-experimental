@@ -8,7 +8,7 @@ export const typeDefs = gql`
 
 export const resolvers = {
   TargetSummaryPathways: {
-    count: (obj, args, { ensgId, targetLoader }) =>
-      targetLoader.load(ensgId).then(({ pathways }) => pathways.count),
+    count: ({ _ensgId }, args, { targetLoader }) =>
+      targetLoader.load(_ensgId).then(({ pathways }) => pathways.count),
   },
 };

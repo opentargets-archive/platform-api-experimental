@@ -185,11 +185,31 @@ export const createTargetDrugsLoader = () =>
           phase: p,
           trialCount: phaseCounts[p],
         }));
+        const rows = relevantRows.map(r => {
+          return {
+            target: {
+              id: r.target.id,
+              symbol: r.target.gene_info.symbol,
+            },
+            disease: {
+              id: r.disease.efo_info.efo_id.split("/").pop(),
+              name: r.disease.efo_info.label,
+            },
+            drug: {
+              id: r.drug.id.split("/").pop(),
+              name: r.drug.molecule_name,
+            },
+            clinicalTrial: {
+              phase: r.evidence.drug2clinic.max_phase_for_disease.numeric_index,
+            },
+          };
+        });
 
         return {
           drugCount,
           drugModalities,
           trialsByPhase,
+          rows,
         };
       });
     })

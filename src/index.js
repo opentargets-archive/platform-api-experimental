@@ -38,10 +38,7 @@ const resolvers = {
     // diseaseSummary,
     // diseaseDAG,
     // targetDetailChemicalProbes,
-    target: (obj, { ensgId }, context) => {
-      context.ensgId = ensgId;
-      return {};
-    },
+    target: (obj, { ensgId }) => ({ _ensgId: ensgId }),
   },
 };
 

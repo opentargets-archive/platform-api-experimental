@@ -59,12 +59,12 @@ export const resolvers = _.merge(
   resolversTargetRelatedTargets,
   {
     TargetSummaries: {
-      pathways: () => ({}),
-      protein: () => ({}),
-      chemicalProbes: () => ({}),
-      cancerBiomarkers: () => ({}),
-      drugs: () => ({}),
-      relatedTargets: () => ({}),
+      pathways: ({ _ensgId }) => ({ _ensgId }),
+      protein: ({ _ensgId }) => ({ _ensgId }),
+      chemicalProbes: ({ _ensgId }) => ({ _ensgId }),
+      cancerBiomarkers: ({ _ensgId }) => ({ _ensgId }),
+      drugs: ({ _ensgId }) => ({ _ensgId }),
+      relatedTargets: ({ _ensgId }) => ({ _ensgId }),
     },
   }
 );

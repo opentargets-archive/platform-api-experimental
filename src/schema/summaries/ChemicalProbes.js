@@ -11,23 +11,23 @@ export const typeDefs = gql`
 
 export const resolvers = {
   TargetSummaryChemicalProbes: {
-    hasStructuralGenomicsConsortium: (obj, args, { ensgId, targetLoader }) =>
+    hasStructuralGenomicsConsortium: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(
           ({ chemicalProbes }) => chemicalProbes.hasStructuralGenomicsConsortium
         ),
-    hasChemicalProbesPortal: (obj, args, { ensgId, targetLoader }) =>
+    hasChemicalProbesPortal: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ chemicalProbes }) => chemicalProbes.hasChemicalProbesPortal),
-    hasOpenScienceProbes: (obj, args, { ensgId, targetLoader }) =>
+    hasOpenScienceProbes: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ chemicalProbes }) => chemicalProbes.hasOpenScienceProbes),
-    hasProbeMiner: (obj, args, { ensgId, targetLoader }) =>
+    hasProbeMiner: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ chemicalProbes }) => chemicalProbes.hasProbeMiner),
   },
 };

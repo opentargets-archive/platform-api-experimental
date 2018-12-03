@@ -10,7 +10,7 @@ export const typeDefs = gql`
 
 export const resolvers = {
   TargetSummaryRelatedTargets: {
-    relatedTargetsCount: (obj, args, { ensgId }) =>
-      targetSimilar(ensgId).then(response => response.data.data.length),
+    relatedTargetsCount: ({ _ensgId }) =>
+      targetSimilar(_ensgId).then(response => response.data.data.length),
   },
 };

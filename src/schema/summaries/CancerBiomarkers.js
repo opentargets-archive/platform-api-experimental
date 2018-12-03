@@ -11,21 +11,21 @@ export const typeDefs = gql`
 
 export const resolvers = {
   TargetSummaryCancerBiomarkers: {
-    hasCancerBiomarkers: (obj, args, { ensgId, targetLoader }) =>
+    hasCancerBiomarkers: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ cancerBiomarkers }) => cancerBiomarkers.hasCancerBiomarkers),
-    cancerBiomarkerCount: (obj, args, { ensgId, targetLoader }) =>
+    cancerBiomarkerCount: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ cancerBiomarkers }) => cancerBiomarkers.cancerBiomarkerCount),
-    diseaseCount: (obj, args, { ensgId, targetLoader }) =>
+    diseaseCount: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ cancerBiomarkers }) => cancerBiomarkers.diseaseCount),
-    drugCount: (obj, args, { ensgId, targetLoader }) =>
+    drugCount: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ cancerBiomarkers }) => cancerBiomarkers.drugCount),
   },
 };

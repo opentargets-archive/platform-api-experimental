@@ -6,8 +6,14 @@ import {
   resolvers as resolversTargetSummaries,
 } from "./TargetSummaries";
 
+import {
+  typeDefs as TargetDetails,
+  resolvers as resolversTargetDetails,
+} from "./TargetDetails";
+
 export const typeDefs = [
   ...TargetSummaries,
+  ...TargetDetails,
   gql`
     # extend type Query {
     #   target: Target!
@@ -19,25 +25,37 @@ export const typeDefs = [
       description: String
       synonyms: [String!]!
       summaries: TargetSummaries!
+      details: TargetDetails!
     }
   `,
 ];
 
-export const resolvers = _.merge(resolversTargetSummaries, {
-  // Query: {
-  //   target: () => ({}),
-  // },
-  Target: {
-    id: (obj, args, { ensgId, targetLoader }) =>
-      targetLoader.load(ensgId).then(({ id }) => id),
-    symbol: (obj, args, { ensgId, targetLoader }) =>
-      targetLoader.load(ensgId).then(({ symbol }) => symbol),
-    name: (obj, args, { ensgId, targetLoader }) =>
-      targetLoader.load(ensgId).then(({ name }) => name),
-    description: (obj, args, { ensgId, targetLoader }) =>
-      targetLoader.load(ensgId).then(({ description }) => description),
-    synonyms: (obj, args, { ensgId, targetLoader }) =>
-      targetLoader.load(ensgId).then(({ synonyms }) => synonyms),
-    summaries: () => ({}),
-  },
-});
+export const resolvers = _.merge(
+  resolversTargetSummaries,
+  resolversTargetDetails,
+  {
+    // Query: {
+    //   target: () => ({}),
+    // },
+    Target: {
+      id: ({ _ensgId, id }, args, { targetLoader }) =>
+        id ? id : targetLoader.load(_ensgId).then(({ id }) => id),
+      symbol: ({ _ensgId, symbol }, args, { targetLoader }) =>
+        symbol
+          ? symbol
+          : targetLoader.load(_ensgId).then(({ symbol }) => symbol),
+      name: ({ _ensgId, name }, args, { targetLoader }) =>
+        name ? name : targetLoader.load(_ensgId).then(({ name }) => name),
+      description: ({ _ensgId, description }, args, { targetLoader }) =>
+        description
+          ? description
+          : targetLoader.load(_ensgId).then(({ description }) => description),
+      synonyms: ({ _ensgId, synonyms }, args, { targetLoader }) =>
+        synonyms
+          ? synonyms
+          : targetLoader.load(_ensgId).then(({ synonyms }) => synonyms),
+      summaries: ({ _ensgId }) => ({ _ensgId }),
+      details: ({ _ensgId }) => ({ _ensgId }),
+    },
+  }
+);

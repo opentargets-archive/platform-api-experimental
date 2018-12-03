@@ -14,12 +14,12 @@ export const typeDefs = gql`
 
 export const resolvers = {
   TargetSummaryProtein: {
-    hasSequenceAnnotationVisualisation: (obj, args, { ensgId, targetLoader }) =>
+    hasSequenceAnnotationVisualisation: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ protein }) => (protein.uniprotId ? true : false)),
-    hasProteinStructure: (obj, args, { ensgId, targetLoader }) =>
-      targetLoader.load(ensgId).then(({ protein }) => {
+    hasProteinStructure: ({ _ensgId }, args, { targetLoader }) =>
+      targetLoader.load(_ensgId).then(({ protein }) => {
         if (protein.uniprotId) {
           return bestStructure(protein.uniprotId).then(pdbId =>
             pdbId ? true : false
@@ -28,27 +28,27 @@ export const resolvers = {
           return false;
         }
       }),
-    hasSubcellularLocation: (obj, args, { ensgId, targetLoader }) =>
+    hasSubcellularLocation: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ protein }) =>
           protein.uniprotSubcellularLocation &&
           protein.uniprotSubcellularLocation.length > 0
             ? true
             : false
         ),
-    hasSubunitData: (obj, args, { ensgId, targetLoader }) =>
+    hasSubunitData: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ protein }) =>
           protein.uniprotSubcellularLocation &&
           protein.uniprotSubcellularLocation.length > 0
             ? true
             : false
         ),
-    hasUniprotKeywords: (obj, args, { ensgId, targetLoader }) =>
+    hasUniprotKeywords: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ protein }) =>
           protein.uniprotKeywords && protein.uniprotKeywords.length > 0
             ? true

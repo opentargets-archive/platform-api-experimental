@@ -19,10 +19,10 @@ type TargetAssociation {
   dataTypes: [AssociationDataType!]!
   therapeuticAreas: [Disease!]
 }
-type Disease {
-  id: String!
-  name: String!
-}
+# type Disease {
+#   id: String!
+#   name: String!
+# }
 enum DataType {
   GENETIC
   SOMATIC

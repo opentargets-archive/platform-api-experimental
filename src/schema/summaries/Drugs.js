@@ -23,13 +23,15 @@ export const typeDefs = gql`
 
 export const resolvers = {
   TargetSummaryDrugs: {
-    drugCount: (obj, args, { ensgId, targetDrugsLoader }) =>
-      targetDrugsLoader.load(ensgId).then(({ drugCount }) => drugCount),
-    drugModalities: (obj, args, { ensgId, targetDrugsLoader }) =>
+    drugCount: ({ _ensgId }, args, { targetDrugsLoader }) =>
+      targetDrugsLoader.load(_ensgId).then(({ drugCount }) => drugCount),
+    drugModalities: ({ _ensgId }, args, { targetDrugsLoader }) =>
       targetDrugsLoader
-        .load(ensgId)
+        .load(_ensgId)
         .then(({ drugModalities }) => drugModalities),
-    trialsByPhase: (obj, args, { ensgId, targetDrugsLoader }) =>
-      targetDrugsLoader.load(ensgId).then(({ trialsByPhase }) => trialsByPhase),
+    trialsByPhase: ({ _ensgId }, args, { targetDrugsLoader }) =>
+      targetDrugsLoader
+        .load(_ensgId)
+        .then(({ trialsByPhase }) => trialsByPhase),
   },
 };
