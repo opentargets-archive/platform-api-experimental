@@ -39,12 +39,20 @@ export const typeDefs = gql`
   type ClinicalTrial {
     phase: Int!
     status: ClinicalTrialStatus
+    sourceUrl: String!
+    sourceName: String!
+  }
+  type MechanismOfAction {
+    name: String!
+    sourceUrl: String
+    sourceName: String
   }
   type EvidenceRowDrugs {
     target: Target!
     disease: Disease!
     drug: Drug!
     clinicalTrial: ClinicalTrial!
+    mechanismOfAction: MechanismOfAction!
   }
   type TargetDetailDrugs {
     rows: [EvidenceRowDrugs!]!

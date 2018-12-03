@@ -196,6 +196,7 @@ export const createTargetDrugsLoader = () =>
             target: {
               id: r.target.id,
               symbol: r.target.gene_info.symbol,
+              class: r.target.target_class[0],
             },
             disease: {
               id: r.disease.efo_info.efo_id.split("/").pop(),
@@ -215,6 +216,22 @@ export const createTargetDrugsLoader = () =>
                     .replace(",", "")
                     .toUpperCase()
                 : null,
+              sourceName: r.evidence.drug2clinic.urls[0].nice_name.replace(
+                " Information",
+                ""
+              ),
+              sourceUrl: r.evidence.drug2clinic.urls[0].url,
+            },
+            mechanismOfAction: {
+              name: r.evidence.target2drug.mechanism_of_action,
+              sourceName:
+                r.evidence.target2drug.urls.length === 3
+                  ? r.evidence.target2drug.urls[2].nice_name
+                  : null,
+              sourceUrl:
+                r.evidence.target2drug.urls.length === 3
+                  ? r.evidence.target2drug.urls[2].url
+                  : null,
             },
           };
         });
