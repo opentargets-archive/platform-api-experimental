@@ -1,10 +1,10 @@
 import { gql } from "apollo-server-express";
 import _ from "lodash";
 
-// import {
-//   typeDefs as TargetSummaryPathways,
-//   resolvers as resolversTargetSummary,
-// } from "./summaries/Pathways";
+import {
+  typeDefs as TargetDetailPathways,
+  resolvers as resolversTargetPathways,
+} from "./details/Pathways";
 
 // import {
 //   typeDefs as TargetSummaryProtein,
@@ -32,7 +32,7 @@ import {
 // } from "./summaries/RelatedTargets";
 
 export const typeDefs = [
-  // TargetSummaryPathways,
+  TargetDetailPathways,
   // TargetSummaryProtein,
   TargetDetailChemicalProbes,
   TargetDetailCancerBiomarkers,
@@ -40,7 +40,7 @@ export const typeDefs = [
   // TargetSummaryRelatedTargets,
   gql`
     type TargetDetails {
-      # pathways: TargetSummaryPathways
+      pathways: TargetDetailPathways
       # protein: TargetSummaryProtein
       chemicalProbes: TargetDetailChemicalProbes
       cancerBiomarkers: TargetDetailCancerBiomarkers
@@ -51,7 +51,7 @@ export const typeDefs = [
 ];
 
 export const resolvers = _.merge(
-  // resolversTargetSummary,
+  resolversTargetPathways,
   // resolversTargetProtein,
   resolversTargetChemicalProbes,
   resolversTargetCancerBiomarkers,
@@ -59,11 +59,10 @@ export const resolvers = _.merge(
   // resolversTargetRelatedTargets,
   {
     TargetDetails: {
-      // pathways: () => ({}),
+      pathways: ({ _ensgId }) => ({ _ensgId }),
       // protein: () => ({}),
       chemicalProbes: ({ _ensgId }) => ({ _ensgId }),
       cancerBiomarkers: ({ _ensgId }) => ({ _ensgId }),
-      // drugs: () => ({}),
       drugs: ({ _ensgId }) => ({ _ensgId }),
       // relatedTargets: () => ({}),
     },
