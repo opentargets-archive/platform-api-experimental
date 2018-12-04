@@ -6,8 +6,8 @@ export const typeDefs = gql`
   type TargetSummaryProtein {
     hasSequenceAnnotationVisualisation: Boolean!
     hasProteinStructure: Boolean!
-    hasSubcellularLocation: Boolean!
-    hasSubunitData: Boolean!
+    hasSubCellularLocation: Boolean!
+    hasSubUnitData: Boolean!
     hasUniprotKeywords: Boolean!
   }
 `;
@@ -28,21 +28,20 @@ export const resolvers = {
           return false;
         }
       }),
-    hasSubcellularLocation: ({ _ensgId }, args, { targetLoader }) =>
+    hasSubCellularLocation: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
         .load(_ensgId)
         .then(({ protein }) =>
-          protein.uniprotSubcellularLocation &&
-          protein.uniprotSubcellularLocation.length > 0
+          protein.uniprotSubCellularLocations &&
+          protein.uniprotSubCellularLocations.length > 0
             ? true
             : false
         ),
-    hasSubunitData: ({ _ensgId }, args, { targetLoader }) =>
+    hasSubUnitData: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader
         .load(_ensgId)
         .then(({ protein }) =>
-          protein.uniprotSubcellularLocation &&
-          protein.uniprotSubcellularLocation.length > 0
+          protein.uniprotSubUnit && protein.uniprotSubUnit.length > 0
             ? true
             : false
         ),

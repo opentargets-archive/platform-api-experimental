@@ -4,6 +4,7 @@ import _ from "lodash";
 import { targets, targetsDrugs } from "./openTargets";
 import reactomeTopLevel from "../constants/reactomeTopLevel";
 import mousePhenotypesTopLevel from "../constants/mousePhenotypesTopLevel";
+import uniprotSubCellularLocations from "../constants/uniprotSubCellularLocations";
 import getMultiplePublicationsSource from "../utils/getMultiplePublicationsSource";
 
 // Note: dataloader assumes that the response array is in the same
@@ -24,8 +25,8 @@ export const createTargetLoader = () =>
             id,
             uniprot_id: uniprotId,
             uniprot_function: uniprotFunction,
-            uniprot_subcellular_location: uniprotSubcellularLocation,
-            uniprot_subunit: uniprotSubunit,
+            uniprot_subcellular_location: uniprotSubCellularLocation,
+            uniprot_subunit: uniprotSubUnit,
             uniprot_keywords: uniprotKeywords,
             approved_symbol: symbol,
             approved_name: name,
@@ -179,10 +180,11 @@ export const createTargetLoader = () =>
             protein: {
               uniprotId,
               uniprotKeywords,
-              uniprotSubcellularLocation,
-              uniprotSubunit,
+              uniprotSubUnit,
               hasProtVista: uniprotId ? true : false,
-              subcellularLocation: uniprotSubcellularLocation,
+              uniprotSubCellularLocations: uniprotSubCellularLocation.map(
+                d => uniprotSubCellularLocations[d]
+              ),
             },
             mousePhenotypes: {
               phenotypeCategories: mousePhenotypeCategories,

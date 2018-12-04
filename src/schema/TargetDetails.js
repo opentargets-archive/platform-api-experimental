@@ -6,10 +6,10 @@ import {
   resolvers as resolversTargetPathways,
 } from "./details/Pathways";
 
-// import {
-//   typeDefs as TargetSummaryProtein,
-//   resolvers as resolversTargetProtein,
-// } from "./summaries/Protein";
+import {
+  typeDefs as TargetDetailProtein,
+  resolvers as resolversTargetProtein,
+} from "./details/Protein";
 
 import {
   typeDefs as TargetDetailChemicalProbes,
@@ -33,7 +33,7 @@ import {
 
 export const typeDefs = [
   TargetDetailPathways,
-  // TargetSummaryProtein,
+  TargetDetailProtein,
   TargetDetailChemicalProbes,
   TargetDetailCancerBiomarkers,
   TargetDetailDrugs,
@@ -41,7 +41,7 @@ export const typeDefs = [
   gql`
     type TargetDetails {
       pathways: TargetDetailPathways
-      # protein: TargetSummaryProtein
+      protein: TargetDetailProtein
       chemicalProbes: TargetDetailChemicalProbes
       cancerBiomarkers: TargetDetailCancerBiomarkers
       drugs: TargetDetailDrugs
@@ -52,7 +52,7 @@ export const typeDefs = [
 
 export const resolvers = _.merge(
   resolversTargetPathways,
-  // resolversTargetProtein,
+  resolversTargetProtein,
   resolversTargetChemicalProbes,
   resolversTargetCancerBiomarkers,
   resolversTargetDrugs,
@@ -60,7 +60,7 @@ export const resolvers = _.merge(
   {
     TargetDetails: {
       pathways: ({ _ensgId }) => ({ _ensgId }),
-      // protein: () => ({}),
+      protein: ({ _ensgId }) => ({ _ensgId }),
       chemicalProbes: ({ _ensgId }) => ({ _ensgId }),
       cancerBiomarkers: ({ _ensgId }) => ({ _ensgId }),
       drugs: ({ _ensgId }) => ({ _ensgId }),
