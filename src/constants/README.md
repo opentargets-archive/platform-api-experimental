@@ -17,3 +17,7 @@ First download the locations TSV file from [UniProt](https://www.uniprot.org/loc
 ```
 cat ~/Downloads/locations-all.tab | jq -rRs '[split("\n")[1:-1] | .[] | split("\t")| {"id":.[0], "description":.[1], "category":.[2], "name":.[3]}]' > ./src/constants/uniprotSubCellularLocations.json
 ```
+
+## UniProt keywords
+
+The keywords file in the `constants` directory is downloaded from [UniProt](https://www.uniprot.org/docs/keywlist.txt).

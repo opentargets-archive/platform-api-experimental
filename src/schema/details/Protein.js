@@ -8,10 +8,15 @@ export const typeDefs = gql`
     name: String!
     description: String!
   }
+  type UniprotKeyword {
+    id: String!
+    name: String!
+    category: String!
+  }
   type TargetDetailProtein {
     uniprotId: String
     pdbId: String
-    keywords: [String!]
+    keywords: [UniprotKeyword!]
     subCellularLocations: [UniprotSubCellularLocation!]
     subUnit: [String!]
   }
