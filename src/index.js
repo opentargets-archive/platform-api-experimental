@@ -1,36 +1,34 @@
-import fs from "fs";
-import path from "path";
 import express from "express";
-import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServer } from "apollo-server-express";
+import _ from "lodash";
 
-import targetAssociations from "./resolvers/targetAssociations";
-import targetSummary from "./resolvers/targetSummary";
-import targetDetailDrugs from "./resolvers/targetDetailDrugs";
-import targetDetailCancerBiomarkers from "./resolvers/targetDetailCancerBiomarkers";
-import targetDetailPathways from "./resolvers/targetDetailPathways";
-import diseaseSummary from "./resolvers/diseaseSummary";
-import diseaseDAG from "./resolvers/diseaseDAG";
-import targetDetailChemicalProbes from "./resolvers/targetDetailChemicalProbes.js";
+import { typeDefs as Query, resolvers as resolversQuery } from "./schema/Query";
 
-// load the schema
-const schemaFile = path.join(__dirname, "schema.gql");
-const typeDefs = fs.readFileSync(schemaFile, "utf8");
+import {
+  typeDefs as Target,
+  resolvers as resolversTarget,
+} from "./schema/Target";
 
-// create resolver object (mirrors typeDefs)
-const resolvers = {
-  Query: {
-    targetAssociations,
-    targetSummary,
-    targetDetailDrugs,
-    targetDetailCancerBiomarkers,
-    targetDetailPathways,
-    diseaseSummary,
-    diseaseDAG,
-    targetDetailChemicalProbes,
-  },
-};
+import {
+  typeDefs as Disease,
+  resolvers as resolversDisease,
+} from "./schema/Disease";
 
-const server = new ApolloServer({ typeDefs, resolvers });
+import {
+  createTargetLoader,
+  createTargetDrugsLoader,
+  createDiseaseLoader,
+} from "./apis/dataloaders";
+
+const server = new ApolloServer({
+  typeDefs: [...Query, ...Target, ...Disease],
+  resolvers: _.merge(resolversQuery, resolversTarget, resolversDisease),
+  context: ({ req }) => ({
+    targetLoader: createTargetLoader(),
+    diseaseLoader: createDiseaseLoader(),
+    targetDrugsLoader: createTargetDrugsLoader(),
+  }),
+});
 
 const app = express();
 server.applyMiddleware({ app });
