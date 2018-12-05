@@ -4,14 +4,14 @@ import express from "express";
 import { ApolloServer, gql } from "apollo-server-express";
 import _ from "lodash";
 
-import targetAssociations from "./resolvers/targetAssociations";
-import targetSummary from "./resolvers/targetSummary";
-import targetDetailDrugs from "./resolvers/targetDetailDrugs";
-import targetDetailCancerBiomarkers from "./resolvers/targetDetailCancerBiomarkers";
-import targetDetailPathways from "./resolvers/targetDetailPathways";
-import diseaseSummary from "./resolvers/diseaseSummary";
-import diseaseDAG from "./resolvers/diseaseDAG";
-import targetDetailChemicalProbes from "./resolvers/targetDetailChemicalProbes.js";
+// import targetAssociations from "./resolvers/targetAssociations";
+// import targetSummary from "./resolvers/targetSummary";
+// import targetDetailDrugs from "./resolvers/targetDetailDrugs";
+// import targetDetailCancerBiomarkers from "./resolvers/targetDetailCancerBiomarkers";
+// import targetDetailPathways from "./resolvers/targetDetailPathways";
+// import diseaseSummary from "./resolvers/diseaseSummary";
+// import diseaseDAG from "./resolvers/diseaseDAG";
+// import targetDetailChemicalProbes from "./resolvers/targetDetailChemicalProbes.js";
 
 import {
   typeDefs as Target,

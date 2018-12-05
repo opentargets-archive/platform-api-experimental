@@ -1,5 +1,5 @@
 type Query {
-  targetAssociations(ensgId: String!): TargetAssociations!
+  # targetAssociations(ensgId: String!): TargetAssociations!
   # targetSummary(ensgId: String!): TargetSummary!
   # targetDetailDrugs(ensgId: String!): TargetDetailDrugs!
   # targetDetailCancerBiomarkers(ensgId: String!): TargetDetailCancerBiomarkers
@@ -10,32 +10,32 @@ type Query {
   target(ensgId: String!): Target!
 }
 
-type TargetAssociations {
-  associations: [TargetAssociation!]!
-}
-type TargetAssociation {
-  disease: Disease!
-  score: Float!
-  dataTypes: [AssociationDataType!]!
-  therapeuticAreas: [Disease!]
-}
+# type TargetAssociations {
+#   associations: [TargetAssociation!]!
+# }
+# type TargetAssociation {
+#   disease: Disease!
+#   score: Float!
+#   dataTypes: [AssociationDataType!]!
+#   therapeuticAreas: [Disease!]
+# }
 # type Disease {
 #   id: String!
 #   name: String!
 # }
-enum DataType {
-  GENETIC
-  SOMATIC
-  DRUG
-  PATHWAY
-  EXPRESSION
-  TEXT_MINING
-  ANIMAL_MODEL
-}
-type AssociationDataType {
-  dataType: DataType!
-  score: Float!
-}
+# enum DataType {
+#   GENETIC
+#   SOMATIC
+#   DRUG
+#   PATHWAY
+#   EXPRESSION
+#   TEXT_MINING
+#   ANIMAL_MODEL
+# }
+# type AssociationDataType {
+#   dataType: DataType!
+#   score: Float!
+# }
 # type TargetSummary {
 #   id: String!
 #   name: String!
