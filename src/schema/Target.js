@@ -11,9 +11,15 @@ import {
   resolvers as resolversTargetDetails,
 } from "./TargetDetails";
 
+import {
+  typeDefs as TargetDiseasesConnection,
+  resolvers as resolversTargetDiseasesConnection,
+} from "./TargetDiseasesConnection";
+
 export const typeDefs = [
   ...TargetSummaries,
   ...TargetDetails,
+  ...TargetDiseasesConnection,
   gql`
     # extend type Query {
     #   target: Target!
@@ -26,6 +32,7 @@ export const typeDefs = [
       synonyms: [String!]!
       summaries: TargetSummaries!
       details: TargetDetails!
+      diseasesConnection: TargetDiseasesConnection!
     }
   `,
 ];
@@ -33,6 +40,7 @@ export const typeDefs = [
 export const resolvers = _.merge(
   resolversTargetSummaries,
   resolversTargetDetails,
+  resolversTargetDiseasesConnection,
   {
     // Query: {
     //   target: () => ({}),
@@ -56,6 +64,7 @@ export const resolvers = _.merge(
           : targetLoader.load(_ensgId).then(({ synonyms }) => synonyms),
       summaries: ({ _ensgId }) => ({ _ensgId }),
       details: ({ _ensgId }) => ({ _ensgId }),
+      diseasesConnection: ({ _ensgId }) => ({ _ensgId }),
     },
   }
 );
