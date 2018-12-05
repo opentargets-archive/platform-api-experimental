@@ -13,6 +13,8 @@ import _ from "lodash";
 // import diseaseDAG from "./resolvers/diseaseDAG";
 // import targetDetailChemicalProbes from "./resolvers/targetDetailChemicalProbes.js";
 
+import { typeDefs as Query, resolvers as resolversQuery } from "./schema/Query";
+
 import {
   typeDefs as Target,
   resolvers as resolversTarget,
@@ -29,29 +31,29 @@ import {
   createDiseaseLoader,
 } from "./apis/dataloaders";
 
-// load the schema
-const schemaFile = path.join(__dirname, "schema.gql");
-const typeDefs = fs.readFileSync(schemaFile, "utf8");
+// // load the schema
+// const schemaFile = path.join(__dirname, "schema.gql");
+// const typeDefs = fs.readFileSync(schemaFile, "utf8");
 
 // create resolver object (mirrors typeDefs)
-const resolvers = {
-  Query: {
-    // targetAssociations,
-    // targetSummary,
-    // targetDetailDrugs,
-    // targetDetailCancerBiomarkers,
-    // targetDetailPathways,
-    // diseaseSummary,
-    // diseaseDAG,
-    // targetDetailChemicalProbes,
-    target: (obj, { ensgId }) => ({ _ensgId: ensgId }),
-    disease: (obj, { efoId }) => ({ _efoId: efoId }),
-  },
-};
+// const resolvers = {
+//   Query: {
+//     // targetAssociations,
+//     // targetSummary,
+//     // targetDetailDrugs,
+//     // targetDetailCancerBiomarkers,
+//     // targetDetailPathways,
+//     // diseaseSummary,
+//     // diseaseDAG,
+//     // targetDetailChemicalProbes,
+//     target: (obj, { ensgId }) => ({ _ensgId: ensgId }),
+//     disease: (obj, { efoId }) => ({ _efoId: efoId }),
+//   },
+// };
 
 const server = new ApolloServer({
-  typeDefs: [typeDefs, ...Target, ...Disease],
-  resolvers: _.merge(resolvers, resolversTarget, resolversDisease),
+  typeDefs: [...Query, ...Target, ...Disease],
+  resolvers: _.merge(resolversQuery, resolversTarget, resolversDisease),
   context: ({ req }) => ({
     targetLoader: createTargetLoader(),
     diseaseLoader: createDiseaseLoader(),
