@@ -62,9 +62,9 @@ export const resolvers = _.merge(
         synonyms
           ? synonyms
           : targetLoader.load(_ensgId).then(({ synonyms }) => synonyms),
-      summaries: ({ _ensgId }) => ({ _ensgId }),
-      details: ({ _ensgId }) => ({ _ensgId }),
-      diseasesConnection: ({ _ensgId }) => ({ _ensgId }),
+      summaries: _.identity,
+      details: _.identity,
+      diseasesConnection: _.identity,
     },
   }
 );
