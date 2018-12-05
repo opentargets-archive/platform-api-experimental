@@ -46,9 +46,15 @@ export const resolvers = _.merge(
       edges: ({ _ensgId }) =>
         targetAssociations(_ensgId).then(response => {
           const edges = response.data.data.map(d => {
+            const therapeuticAreas = _.zip(
+              d.disease.efo_info.therapeutic_area.codes,
+              d.disease.efo_info.therapeutic_area.labels
+            ).map(l => ({ id: l[0], name: l[1] }));
             const disease = {
               id: d.disease.id,
               name: d.disease.efo_info.label,
+              therapeuticAreas:
+                therapeuticAreas.length > 0 ? therapeuticAreas : [],
             };
             const score = 1.0 * d.association_score.overall;
             const dataTypes = Object.keys(d.association_score.datatypes).map(
@@ -60,10 +66,7 @@ export const resolvers = _.merge(
                 };
               }
             );
-            // const therapeuticAreas = _.zip(
-            //   d.disease.efo_info.therapeutic_area.codes,
-            //   d.disease.efo_info.therapeutic_area.labels
-            // ).map(l => ({ id: l[0], name: l[1] }));
+
             return {
               node: disease,
               score,

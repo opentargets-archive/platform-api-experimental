@@ -208,10 +208,23 @@ export const createDiseaseLoader = () =>
       return efoIds
         .map(d => idMap[d])
         .map(d => {
-          const { id, label: name } = d;
+          const {
+            id,
+            label: name,
+            path_codes: pathCodes,
+            path_labels: pathLabels,
+          } = d;
+          const therapeuticAreas = _.uniqBy(
+            _.zip(pathCodes.map(d => d[0]), pathLabels.map(d => d[0])).map(
+              l => ({ id: l[0], name: l[1] })
+            ),
+            "id"
+          );
           return {
             id,
             name,
+            therapeuticAreas:
+              therapeuticAreas.length > 0 ? therapeuticAreas : [],
           };
         });
     })

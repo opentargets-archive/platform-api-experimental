@@ -9,6 +9,7 @@ export const typeDefs = [
     type Disease {
       id: String!
       name: String!
+      therapeuticAreas: [Disease!]!
     }
   `,
 ];
@@ -24,6 +25,16 @@ export const resolvers = _.merge(
         id ? id : diseaseLoader.load(_efoId).then(({ id }) => id),
       name: ({ _efoId, name }, args, { diseaseLoader }) =>
         name ? name : diseaseLoader.load(_efoId).then(({ name }) => name),
+      therapeuticAreas: (
+        { _efoId, therapeuticAreas },
+        args,
+        { diseaseLoader }
+      ) =>
+        therapeuticAreas
+          ? therapeuticAreas
+          : diseaseLoader
+              .load(_efoId)
+              .then(({ therapeuticAreas }) => therapeuticAreas),
     },
   }
 );
