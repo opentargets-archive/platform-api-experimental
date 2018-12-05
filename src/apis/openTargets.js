@@ -6,6 +6,11 @@ const STEM = "v3/platform";
 const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
 
 export const disease = efoId => axios.get(`${ROOT}private/disease/${efoId}`);
+export const diseases = efoIds =>
+  Promise.all([
+    Promise.resolve(efoIds),
+    axios.post(`${ROOT}private/disease`, { diseases: efoIds }),
+  ]);
 export const target = ensgId => axios.get(`${ROOT}private/target/${ensgId}`);
 export const targets = ensgIds =>
   Promise.all([

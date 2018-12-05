@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import _ from "lodash";
 
-import { targets, targetsDrugs } from "./openTargets";
+import { targets, diseases, targetsDrugs } from "./openTargets";
 import reactomeTopLevel from "../constants/reactomeTopLevel";
 import mousePhenotypesTopLevel from "../constants/mousePhenotypesTopLevel";
 import uniprotSubCellularLocations from "../constants/uniprotSubCellularLocations";
@@ -192,6 +192,26 @@ export const createTargetLoader = () =>
             mousePhenotypes: {
               phenotypeCategories: mousePhenotypeCategories,
             },
+          };
+        });
+    })
+  );
+
+export const createDiseaseLoader = () =>
+  new DataLoader(keys =>
+    diseases(keys).then(([efoIds, { data }]) => {
+      const idMap = data.data.reduce((acc, obj) => {
+        const efoId = obj.code.split("/").pop();
+        acc[efoId] = { id: efoId, ...obj };
+        return acc;
+      }, {});
+      return efoIds
+        .map(d => idMap[d])
+        .map(d => {
+          const { id, label: name } = d;
+          return {
+            id,
+            name,
           };
         });
     })

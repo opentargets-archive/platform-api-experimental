@@ -17,10 +17,16 @@ import {
   typeDefs as Target,
   resolvers as resolversTarget,
 } from "./schema/Target";
-// import { targets } from "./apis/openTargets";
+
+import {
+  typeDefs as Disease,
+  resolvers as resolversDisease,
+} from "./schema/Disease";
+
 import {
   createTargetLoader,
   createTargetDrugsLoader,
+  createDiseaseLoader,
 } from "./apis/dataloaders";
 
 // load the schema
@@ -39,14 +45,16 @@ const resolvers = {
     // diseaseDAG,
     // targetDetailChemicalProbes,
     target: (obj, { ensgId }) => ({ _ensgId: ensgId }),
+    disease: (obj, { efoId }) => ({ _efoId: efoId }),
   },
 };
 
 const server = new ApolloServer({
-  typeDefs: [typeDefs, ...Target],
-  resolvers: _.merge(resolvers, resolversTarget),
+  typeDefs: [typeDefs, ...Target, ...Disease],
+  resolvers: _.merge(resolvers, resolversTarget, resolversDisease),
   context: ({ req }) => ({
     targetLoader: createTargetLoader(),
+    diseaseLoader: createDiseaseLoader(),
     targetDrugsLoader: createTargetDrugsLoader(),
   }),
 });

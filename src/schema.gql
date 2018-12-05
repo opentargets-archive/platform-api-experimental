@@ -8,6 +8,7 @@ type Query {
   # diseaseSummary(efoId: String!): DiseaseSummary!
   # diseaseDAG(efoId: String!): DiseaseDAG!
   target(ensgId: String!): Target!
+  disease(efoId: String!): Disease!
 }
 
 # type TargetAssociations {

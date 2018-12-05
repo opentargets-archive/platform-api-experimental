@@ -26,10 +26,6 @@ export const typeDefs = gql`
     UNKNOWN_STATUS
     WITHDRAWN
   }
-  type Disease {
-    id: String!
-    name: String!
-  }
   type Drug {
     id: String!
     name: String!
