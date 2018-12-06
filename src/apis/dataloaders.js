@@ -50,10 +50,13 @@ export const createTargetLoader = () =>
           const lowLevelPathways = reactome.map(d => ({
             id: d.id,
             name: d.value["pathway name"],
-            parents: d.value["pathway types"].map(d2 => ({
-              id: d2["pathway type"],
-              name: d2["pathway type name"],
-            })),
+            parents: _.uniqBy(
+              d.value["pathway types"].map(d2 => ({
+                id: d2["pathway type"],
+                name: d2["pathway type name"],
+              })),
+              "id"
+            ),
           }));
           const mousePhenotypeCategories = mousePhenotypesTopLevel.map(c => {
             return {
