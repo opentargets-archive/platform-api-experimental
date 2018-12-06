@@ -82,7 +82,7 @@ export const createTargetLoader = () =>
             },
             cancerBiomarkers: {
               hasCancerBiomarkers:
-                cancerBiomarkers && cancerBiomarkers.length > 0,
+                cancerBiomarkers && cancerBiomarkers.length > 0 ? true : false,
               cancerBiomarkerCount: cancerBiomarkers
                 ? _.uniq(cancerBiomarkers.map(d => d.biomarker)).length
                 : 0,
@@ -133,7 +133,9 @@ export const createTargetLoader = () =>
                   d.sourcelinks.some(
                     d2 => d2.source === "Structural Genomics Consortium"
                   )
-                ),
+                )
+                  ? true
+                  : false,
               hasChemicalProbesPortal:
                 chemicalProbes &&
                 chemicalProbes.portalprobes &&
@@ -141,13 +143,17 @@ export const createTargetLoader = () =>
                   d.sourcelinks.some(
                     d2 => d2.source === "Chemical Probes Portal"
                   )
-                ),
+                )
+                  ? true
+                  : false,
               hasOpenScienceProbes:
                 chemicalProbes &&
                 chemicalProbes.portalprobes &&
                 chemicalProbes.portalprobes.some(d =>
                   d.sourcelinks.some(d2 => d2.source === "Open Science Probes")
-                ),
+                )
+                  ? true
+                  : false,
               hasProbeMiner:
                 chemicalProbes && chemicalProbes.probeminer ? true : false,
 
