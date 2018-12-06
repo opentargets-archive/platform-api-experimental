@@ -12,6 +12,7 @@ export const typeDefs = gql`
     name: String
   }
   type RowCancerBiomarkers {
+    biomarker: String!
     diseases: [Disease!]!
     drugName: String!
     associationType: AssociationType!

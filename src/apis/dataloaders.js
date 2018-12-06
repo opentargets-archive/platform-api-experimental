@@ -113,6 +113,7 @@ export const createTargetLoader = () =>
                       .replace(" ", "_")
                       .toUpperCase();
                     return {
+                      biomarker: r.individualbiomarker || r.biomarker,
                       diseases: r.diseases.map(d2 => ({
                         _efoId: d2.id, // needed if other disease fields are queried
                         id: d2.id,
