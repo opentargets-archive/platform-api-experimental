@@ -114,6 +114,7 @@ export const createTargetLoader = () =>
                       .toUpperCase();
                     return {
                       diseases: r.diseases.map(d2 => ({
+                        _efoId: d2.id, // needed if other disease fields are queried
                         id: d2.id,
                         name: d2.label,
                       })),
