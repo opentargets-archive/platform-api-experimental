@@ -6,6 +6,7 @@ export const typeDefs = gql`
     cancerBiomarkerCount: Int!
     diseaseCount: Int!
     drugCount: Int!
+    sources: [Source!]!
   }
 `;
 
@@ -27,5 +28,11 @@ export const resolvers = {
       targetLoader
         .load(_ensgId)
         .then(({ cancerBiomarkers }) => cancerBiomarkers.drugCount),
+    sources: () => [
+      {
+        name: "Cancer Genome Interpreter",
+        url: "https://www.cancergenomeinterpreter.org/biomarkers",
+      },
+    ],
   },
 };
