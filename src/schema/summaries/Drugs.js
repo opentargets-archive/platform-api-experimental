@@ -18,6 +18,7 @@ export const typeDefs = gql`
     drugCount: Int!
     drugModalities: DrugModalityAggregation!
     trialsByPhase: [DrugTrialsByPhaseAggregation!]!
+    sources: [Source!]!
   }
 `;
 
@@ -33,5 +34,6 @@ export const resolvers = {
       targetDrugsLoader
         .load(_ensgId)
         .then(({ trialsByPhase }) => trialsByPhase),
+    sources: () => [{ name: "ChEMBL", url: "https://www.ebi.ac.uk/chembl/" }],
   },
 };

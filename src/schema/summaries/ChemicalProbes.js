@@ -6,6 +6,7 @@ export const typeDefs = gql`
     hasChemicalProbesPortal: Boolean!
     hasOpenScienceProbes: Boolean!
     hasProbeMiner: Boolean!
+    sources: [Source!]!
   }
 `;
 
@@ -29,5 +30,14 @@ export const resolvers = {
       targetLoader
         .load(_ensgId)
         .then(({ chemicalProbes }) => chemicalProbes.hasProbeMiner),
+    sources: () => [
+      { name: "SGC", url: "https://www.thesgc.org/" },
+      { name: "Chemical Probes Portal", url: "http://www.chemicalprobes.org/" },
+      {
+        name: "Open Science Probes",
+        url: "http://www.sgc-ffm.uni-frankfurt.de/",
+      },
+      { name: "ProbeMiner", url: "https://probeminer.icr.ac.uk/#/" },
+    ],
   },
 };

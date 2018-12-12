@@ -9,6 +9,7 @@ export const typeDefs = gql`
     hasSubCellularLocation: Boolean!
     hasSubUnitData: Boolean!
     hasUniprotKeywords: Boolean!
+    sources: [Source!]!
   }
 `;
 
@@ -53,5 +54,9 @@ export const resolvers = {
             ? true
             : false
         ),
+    sources: () => [
+      { name: "UniProt", url: "https://www.uniprot.org/" },
+      { name: "PDBe", url: "https://www.ebi.ac.uk/pdbe/" },
+    ],
   },
 };
