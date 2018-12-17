@@ -4,7 +4,7 @@ import { bestStructure } from "../../apis/pdb";
 
 export const typeDefs = gql`
   type Pdb {
-    id: String!
+    pdbId: String!
     chain: String
     start: Int!
     end: Int!
