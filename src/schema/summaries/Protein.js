@@ -22,7 +22,7 @@ export const resolvers = {
     hasProteinStructure: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader.load(_ensgId).then(({ protein }) => {
         if (protein.uniprotId) {
-          return bestStructure(protein.uniprotId).then(pdbId =>
+          return bestStructure(protein.uniprotId).then(({ pdbId }) =>
             pdbId ? true : false
           );
         } else {
