@@ -13,8 +13,20 @@ export const bestStructure = uniprotId =>
       response.data[uniprotId].length > 0
     ) {
       // these are ranked by coverage, so take the first as best
-      return response.data[uniprotId][0].pdb_id;
+      const pdbId = response.data[uniprotId][0].pdb_id;
+
+      // give all results back
+      const pdbEntries = response.data[uniprotId].map(d => ({
+        id: d.pdb_id,
+        chain: d.chain_id,
+        start: d.unp_start,
+        end: d.unp_end,
+        coverage: d.coverage,
+        resolution: d.resolution,
+        method: d.experimental_method,
+      }));
+      return { pdbId, pdbEntries };
     } else {
-      return null;
+      return { pdbId: null, pdbEntries: [] };
     }
   });
