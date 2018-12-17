@@ -1,6 +1,7 @@
 import { gql } from "apollo-server-express";
 
 import { bestStructure } from "../../apis/pdb";
+import { secondaryStructure } from "../../apis/uniprot";
 
 export const typeDefs = gql`
   type Pdb {
@@ -22,6 +23,11 @@ export const typeDefs = gql`
     name: String!
     category: String!
   }
+  type UniprotStructuralFeature {
+    type: String!
+    start: Int!
+    end: Int!
+  }
   type TargetDetailProtein {
     uniprotId: String
     pdbId: String
@@ -29,6 +35,8 @@ export const typeDefs = gql`
     keywords: [UniprotKeyword!]
     subCellularLocations: [UniprotSubCellularLocation!]
     subUnit: [String!]
+    structuralFeatures: [UniprotStructuralFeature!]!
+    sequenceLength: Int
   }
 `;
 
@@ -64,5 +72,25 @@ export const resolvers = {
         .then(({ protein }) => protein.uniprotSubCellularLocations),
     subUnit: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader.load(_ensgId).then(({ protein }) => protein.uniprotSubUnit),
+    structuralFeatures: ({ _ensgId }, args, { targetLoader }) =>
+      targetLoader.load(_ensgId).then(({ protein }) => {
+        if (protein.uniprotId) {
+          return secondaryStructure(protein.uniprotId).then(
+            ({ features }) => features
+          );
+        } else {
+          return [];
+        }
+      }),
+    sequenceLength: ({ _ensgId }, args, { targetLoader }) =>
+      targetLoader.load(_ensgId).then(({ protein }) => {
+        if (protein.uniprotId) {
+          return secondaryStructure(protein.uniprotId).then(
+            ({ length }) => length
+          );
+        } else {
+          return null;
+        }
+      }),
   },
 };
