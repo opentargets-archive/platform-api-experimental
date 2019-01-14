@@ -37,7 +37,7 @@ export const resolvers = {
         name: "Open Science Probes",
         url: "http://www.sgc-ffm.uni-frankfurt.de/",
       },
-      { name: "ProbeMiner", url: "https://probeminer.icr.ac.uk/#/" },
+      { name: "Probe Miner", url: "https://probeminer.icr.ac.uk/#/" },
     ],
   },
 };
