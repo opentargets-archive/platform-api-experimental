@@ -61,11 +61,14 @@ export const createTargetLoader = () =>
           const mousePhenotypeCategories = mousePhenotypesTopLevel.map(c => {
             return {
               ...c,
-              isAssociated: mousePhenotypeGenes.some(g =>
-                g.phenotypes
-                  .filter(p => p.genotype_phenotype.length > 0)
-                  .some(p => p.category_mp_identifier === c.id)
-              ),
+              isAssociated:
+                mousePhenotypeGenes &&
+                Array.isArray(mousePhenotypeGenes) &&
+                mousePhenotypeGenes.some(g =>
+                  g.phenotypes
+                    .filter(p => p.genotype_phenotype.length > 0)
+                    .some(p => p.category_mp_identifier === c.id)
+                ),
             };
           });
 
