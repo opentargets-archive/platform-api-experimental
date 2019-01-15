@@ -25,6 +25,7 @@ export const typeDefs = gql`
     TERMINATED
     UNKNOWN_STATUS
     WITHDRAWN
+    ENROLLING_BY_INVITATION
   }
   type Drug {
     id: String!
