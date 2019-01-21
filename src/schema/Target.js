@@ -26,6 +26,7 @@ export const typeDefs = [
     # }
     type Target {
       id: String!
+      uniprotId: String!
       symbol: String!
       name: String!
       description: String
@@ -48,6 +49,10 @@ export const resolvers = _.merge(
     Target: {
       id: ({ _ensgId, id }, args, { targetLoader }) =>
         id ? id : targetLoader.load(_ensgId).then(({ id }) => id),
+      uniprotId: ({ _ensgId, id }, args, { targetLoader }) =>
+        id
+          ? id
+          : targetLoader.load(_ensgId).then(({ protein }) => protein.uniprotId),
       symbol: ({ _ensgId, symbol }, args, { targetLoader }) =>
         symbol
           ? symbol
