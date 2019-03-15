@@ -222,6 +222,11 @@ export const createDiseaseLoader = () =>
       return efoIds
         .map(d => idMap[d])
         .map(d => {
+          // TODO: Remove this condition when this is fixed https://github.com/opentargets/platform/issues/486
+          if(!d) {
+            return {id: 'UNKNOWN'}
+          }
+
           const {
             id,
             label: name,
