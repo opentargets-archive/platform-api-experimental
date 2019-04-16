@@ -34,6 +34,7 @@ export const createTargetLoader = () =>
             symbol_synonyms: symbolSynonyms,
             name_synonyms: nameSynonyms,
             reactome,
+            tractability,
             cancerbiomarkers: cancerBiomarkers,
             chemicalprobes: chemicalProbes,
             mouse_phenotypes: mousePhenotypeGenes,
@@ -133,6 +134,12 @@ export const createTargetLoader = () =>
                   })
                 : [],
             },
+            tractability: {
+              hasSmallMoleculeTractabilityAssessment:
+                tractability.smallmolecule.buckets.length !== 0,
+              hasAntibodyTractabilityAssessment:
+                tractability.antibody.buckets.length !== 0,
+            },
             chemicalProbes: {
               hasStructuralGenomicsConsortium:
                 chemicalProbes &&
@@ -223,8 +230,8 @@ export const createDiseaseLoader = () =>
         .map(d => idMap[d])
         .map(d => {
           // TODO: Remove this condition when this is fixed https://github.com/opentargets/platform/issues/486
-          if(!d) {
-            return {id: 'UNKNOWN'}
+          if (!d) {
+            return { id: "UNKNOWN" };
           }
 
           const {
