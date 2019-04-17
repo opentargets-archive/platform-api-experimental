@@ -37,6 +37,7 @@ export const createTargetLoader = () =>
             cancerbiomarkers: cancerBiomarkers,
             chemicalprobes: chemicalProbes,
             mouse_phenotypes: mousePhenotypeGenes,
+            go: geneOntologyTerms,
           } = d;
 
           const topLevelPathways = reactomeTopLevel.map(c => {
@@ -71,6 +72,39 @@ export const createTargetLoader = () =>
                 ),
             };
           });
+          const geneOntology = geneOntologyTerms.reduce(
+            (acc, d) => {
+              const goId = d.id;
+              const [prefix, term] = d.value.term.split(":");
+              let category;
+              switch (prefix) {
+                case "C":
+                  acc.cellularComponentTermsCount += 1;
+                  category = "CELLULAR_COMPONENT";
+                  break;
+                case "P":
+                  acc.biologicalProcessTermsCount += 1;
+                  category = "BIOLOGICAL_PROCESS";
+                  break;
+                case "F":
+                  acc.molecularFunctionTermsCount += 1;
+                  category = "MOLECULAR_FUNCTION";
+                  break;
+              }
+              acc.rows.push({
+                id: goId,
+                term,
+                category,
+              });
+              return acc;
+            },
+            {
+              molecularFunctionTermsCount: 0,
+              biologicalProcessTermsCount: 0,
+              cellularComponentTermsCount: 0,
+              rows: [],
+            }
+          );
 
           return {
             id,
@@ -81,6 +115,7 @@ export const createTargetLoader = () =>
               [...symbolSynonyms, ...nameSynonyms],
               (a, b) => a.toLowerCase() === b.toLowerCase()
             ),
+            geneOntology,
             pathways: {
               count: reactome.length,
               lowLevelPathways,
@@ -223,8 +258,8 @@ export const createDiseaseLoader = () =>
         .map(d => idMap[d])
         .map(d => {
           // TODO: Remove this condition when this is fixed https://github.com/opentargets/platform/issues/486
-          if(!d) {
-            return {id: 'UNKNOWN'}
+          if (!d) {
+            return { id: "UNKNOWN" };
           }
 
           const {

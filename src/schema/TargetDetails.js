@@ -2,6 +2,11 @@ import { gql } from "apollo-server-express";
 import _ from "lodash";
 
 import {
+  typeDefs as TargetDetailGeneOntology,
+  resolvers as resolversTargetGeneOntology,
+} from "./details/GeneOntology";
+
+import {
   typeDefs as TargetDetailPathways,
   resolvers as resolversTargetPathways,
 } from "./details/Pathways";
@@ -32,6 +37,7 @@ import {
 } from "./details/RelatedTargets";
 
 export const typeDefs = [
+  TargetDetailGeneOntology,
   TargetDetailPathways,
   TargetDetailProtein,
   TargetDetailChemicalProbes,
@@ -40,6 +46,7 @@ export const typeDefs = [
   TargetDetailRelatedTargets,
   gql`
     type TargetDetails {
+      geneOntology: TargetDetailGeneOntology
       pathways: TargetDetailPathways
       protein: TargetDetailProtein
       chemicalProbes: TargetDetailChemicalProbes
@@ -51,6 +58,7 @@ export const typeDefs = [
 ];
 
 export const resolvers = _.merge(
+  resolversTargetGeneOntology,
   resolversTargetPathways,
   resolversTargetProtein,
   resolversTargetChemicalProbes,
@@ -59,6 +67,7 @@ export const resolvers = _.merge(
   resolversTargetRelatedTargets,
   {
     TargetDetails: {
+      geneOntology: _.identity,
       pathways: _.identity,
       protein: _.identity,
       chemicalProbes: _.identity,
