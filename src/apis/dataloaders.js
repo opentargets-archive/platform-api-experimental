@@ -12,6 +12,114 @@ import getMultiplePublicationsSource from "../utils/getMultiplePublicationsSourc
 //       order as the passed keys - this must be checked in the
 //       batch function
 
+const smallMoleculeTractabilityLevels = [
+  // clinical precedence
+  {
+    label: "Phase 4",
+    bucket: 1,
+  },
+  {
+    label: "Phase 2 or 3",
+    bucket: 2,
+  },
+  {
+    label: "Phase 0 or 1",
+    bucket: 3,
+  },
+  // discovery precedence
+  {
+    label: "PDB targets with ligands",
+    bucket: 4,
+  },
+  {
+    label: "Active compounds in ChEMBL",
+    bucket: 7,
+  },
+  // predicted tractable
+  {
+    label: "DrugEBIlity score > 0.7",
+    bucket: 5,
+  },
+  {
+    label: "DrugEBIlity score 0 to 0.7",
+    bucket: 6,
+  },
+  {
+    label: "Druggable genome",
+    bucket: 8,
+  },
+  // unknown
+  // {
+  //     label: 'Remaining genome',
+  //     bucket: 10
+  // }
+];
+const antibodyTractabilityLevels = [
+  // clinical precedence
+  {
+    label: "Phase 4",
+    bucket: 1,
+  },
+  {
+    label: "Phase 2 or 3",
+    bucket: 2,
+  },
+  {
+    label: "Phase 0 or 1",
+    bucket: 3,
+  },
+  // predicted tractable (high)
+  {
+    label: "UniProt location - high confidence",
+    bucket: 4,
+  },
+  {
+    label: "GO cell component - high confidence",
+    bucket: 5,
+  },
+  // predicted tractable (mid-low)
+  {
+    label: "UniProt location - low or unknown confidence",
+    bucket: 6,
+  },
+  {
+    label: "UniProt predicted signal peptide or transmembrane region",
+    bucket: 7,
+  },
+  {
+    label: "GO cell component - medium confidence",
+    bucket: 8,
+  },
+  // predicted tractable (HPA)
+  {
+    label: "Human Protein Atlas - high confidence",
+    bucket: 9,
+  },
+  // unknown
+  // {
+  //     label: 'Remaining genome',
+  //     bucket: 10
+  // }
+];
+const transformTractability = rawTractability => {
+  return {
+    hasSmallMoleculeTractabilityAssessment:
+      rawTractability.smallmolecule.buckets.length !== 0,
+    hasAntibodyTractabilityAssessment:
+      rawTractability.antibody.buckets.length !== 0,
+    smallMolecule: smallMoleculeTractabilityLevels.map(d => ({
+      chemblBucket: d.bucket,
+      description: d.label,
+      value: rawTractability.smallmolecule.buckets.indexOf(d.bucket) >= 0,
+    })),
+    antibody: antibodyTractabilityLevels.map(d => ({
+      chemblBucket: d.bucket,
+      description: d.label,
+      value: rawTractability.antibody.buckets.indexOf(d.bucket) >= 0,
+    })),
+  };
+};
+
 export const createTargetLoader = () =>
   new DataLoader(keys =>
     targets(keys).then(([ensgIds, { data }]) => {
@@ -34,6 +142,7 @@ export const createTargetLoader = () =>
             symbol_synonyms: symbolSynonyms,
             name_synonyms: nameSynonyms,
             reactome,
+            tractability,
             cancerbiomarkers: cancerBiomarkers,
             chemicalprobes: chemicalProbes,
             mouse_phenotypes: mousePhenotypeGenes,
@@ -168,6 +277,7 @@ export const createTargetLoader = () =>
                   })
                 : [],
             },
+            tractability: transformTractability(tractability),
             chemicalProbes: {
               hasStructuralGenomicsConsortium:
                 chemicalProbes &&
