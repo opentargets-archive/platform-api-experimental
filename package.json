@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "start": "node dist/index.js",
-    "build": "babel src -d dist && cp src/constants/uniprotSubCellularLocations.json src/constants/keywlist.txt dist/constants",
+    "build": "babel src -d dist && cp src/constants/uniprotSubCellularLocations.json src/constants/keywlist.txt src/constants/omnipathData.json dist/constants",
     "dev": "nodemon ./src/index.js --exec babel-node -e js",
     "deploy": "now && now alias"
   },
