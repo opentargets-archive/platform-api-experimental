@@ -6,6 +6,8 @@ import reactomeTopLevel from "../constants/reactomeTopLevel";
 import mousePhenotypesTopLevel from "../constants/mousePhenotypesTopLevel";
 import uniprotSubCellularLocations from "../constants/uniprotSubCellularLocations";
 import uniprotKeywordsLookup from "../constants/uniprotKeywords";
+import omnipathData from "../constants/omnipathData";
+import omnipathCategories from "../constants/omnipathCategories";
 import getMultiplePublicationsSource from "../utils/getMultiplePublicationsSource";
 
 // Note: dataloader assumes that the response array is in the same
@@ -120,6 +122,45 @@ const transformTractability = rawTractability => {
   };
 };
 
+const countInteractions = interactions => {
+  let ppi = 0;
+  let pathways = 0;
+  let enzymeSubstrate = 0;
+
+  interactions.forEach(interaction => {
+    let hasContributedToPathways = false;
+    let hasContributedToPPI = false;
+    let hasContributedToEnzymeSubstrate = false;
+
+    const { sources } = interaction;
+
+    sources.forEach(source => {
+      if(omnipathCategories.Pathways[source]) {
+        if(!hasContributedToPathways) {
+          pathways++;
+          hasContributedToPathways = true;
+        } 
+      } else if(omnipathCategories.PPI[source]) {
+        if(!hasContributedToPPI) {
+          ppi++;
+          hasContributedToPPI = true;
+        }
+      } else if(omnipathCategories.EnzymeSubstrate[source]) {
+        if(!hasContributedToEnzymeSubstrate) {
+          enzymeSubstrate++;
+          hasContributedToEnzymeSubstrate = true;
+        }
+      }
+    });
+  });
+
+  return {
+    ppi,
+    pathways,
+    enzymeSubstrate,
+  }
+};
+
 export const createTargetLoader = () =>
   new DataLoader(keys =>
     targets(keys).then(([ensgIds, { data }]) => {
@@ -214,6 +255,9 @@ export const createTargetLoader = () =>
               rows: [],
             }
           );
+
+          const interactions = omnipathData.filter(d => d.source === uniprotId || d.target === uniprotId);
+          const proteinInteractions = countInteractions(interactions);
 
           return {
             id,
@@ -351,6 +395,7 @@ export const createTargetLoader = () =>
             mousePhenotypes: {
               phenotypeCategories: mousePhenotypeCategories,
             },
+            proteinInteractions,
           };
         });
     })
