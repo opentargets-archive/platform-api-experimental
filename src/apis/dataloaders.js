@@ -127,15 +127,14 @@ const countInteractions = interactions => {
   let pathways = 0;
   let enzymeSubstrate = 0;
 
-  for(let i = 0; i < interactions.length; i++) {
+  interactions.forEach(interaction => {
     let hasContributedToPathways = false;
     let hasContributedToPPI = false;
     let hasContributedToEnzymeSubstrate = false;
-    const { sources } = interactions[i];
 
-    for(let j = 0; j < sources.length; j++) {
-      const source = sources[j];
+    const { sources } = interaction;
 
+    sources.forEach(source => {
       if(omnipathCategories.Pathways[source]) {
         if(!hasContributedToPathways) {
           pathways++;
@@ -152,8 +151,8 @@ const countInteractions = interactions => {
           hasContributedToEnzymeSubstrate = true;
         }
       }
-    }
-  }
+    });
+  });
 
   return {
     ppi,
