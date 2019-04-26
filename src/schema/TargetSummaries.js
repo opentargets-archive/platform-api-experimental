@@ -46,6 +46,11 @@ import {
   resolvers as resolversTargetProteinInteractions
 } from "./summaries/ProteinInteractions";
 
+import {
+  typeDefs as TargetSummaryRNAAndProteinExpression,
+  resolvers as resolversTargetRNAAndProteinExpression
+} from "./summaries/RNAAndProteinExpression";
+
 export const typeDefs = [
   TargetSummaryGeneOntology,
   TargetSummaryPathways,
@@ -56,6 +61,7 @@ export const typeDefs = [
   TargetSummaryRelatedTargets,
   TargetSummaryTractability,
   TargetSummaryProteinInteractions,
+  TargetSummaryRNAAndProteinExpression,
   gql`
     type TargetSummaries {
       geneOntology: TargetSummaryGeneOntology
@@ -67,6 +73,7 @@ export const typeDefs = [
       relatedTargets: TargetSummaryRelatedTargets
       tractability: TargetSummaryTractability
       proteinInteractions: TargetSummaryProteinInteractions
+      rnaAndProteinExpression: TargetSummaryRNAAndProteinExpression
     }
   `,
 ];
@@ -81,6 +88,7 @@ export const resolvers = _.merge(
   resolversTargetRelatedTargets,
   resolversTargetTractability,
   resolversTargetProteinInteractions,
+  resolversTargetRNAAndProteinExpression,
   {
     TargetSummaries: {
       geneOntology: _.identity,
@@ -92,6 +100,7 @@ export const resolvers = _.merge(
       relatedTargets: _.identity,
       tractability: _.identity,
       proteinInteractions: _.identity,
+      rnaAndProteinExpression: _.identity,
     },
   }
 );

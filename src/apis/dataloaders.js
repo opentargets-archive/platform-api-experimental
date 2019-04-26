@@ -259,6 +259,12 @@ export const createTargetLoader = () =>
           const interactions = omnipathData.filter(d => d.source === uniprotId || d.target === uniprotId);
           const proteinInteractions = countInteractions(interactions);
 
+          const rnaAndProteinExpression = {
+            rnaBaselineExpression: true,
+            proteinBaselineExpression: false,
+            genotypeTissueExpression: true
+          };
+
           return {
             id,
             symbol,
@@ -396,6 +402,7 @@ export const createTargetLoader = () =>
               phenotypeCategories: mousePhenotypeCategories,
             },
             proteinInteractions,
+            rnaAndProteinExpression,
           };
         });
     })
