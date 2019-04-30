@@ -43,13 +43,18 @@ import {
 
 import {
   typeDefs as TargetSummaryProteinInteractions,
-  resolvers as resolversTargetProteinInteractions
+  resolvers as resolversTargetProteinInteractions,
 } from "./summaries/ProteinInteractions";
 
 import {
   typeDefs as TargetSummaryRNAAndProteinExpression,
-  resolvers as resolversTargetRNAAndProteinExpression
+  resolvers as resolversTargetRNAAndProteinExpression,
 } from "./summaries/RNAAndProteinExpression";
+
+import {
+  typeDefs as TargetSummaryCancerHallmarks,
+  resolvers as resolversTargetCancerHallmarks,
+} from "./summaries/CancerHallmarks";
 
 export const typeDefs = [
   TargetSummaryGeneOntology,
@@ -62,6 +67,7 @@ export const typeDefs = [
   TargetSummaryTractability,
   TargetSummaryProteinInteractions,
   TargetSummaryRNAAndProteinExpression,
+  TargetSummaryCancerHallmarks,
   gql`
     type TargetSummaries {
       geneOntology: TargetSummaryGeneOntology
@@ -74,6 +80,7 @@ export const typeDefs = [
       tractability: TargetSummaryTractability
       proteinInteractions: TargetSummaryProteinInteractions
       rnaAndProteinExpression: TargetSummaryRNAAndProteinExpression
+      cancerHallmarks: TargetSummaryCancerHallmarks
     }
   `,
 ];
@@ -89,6 +96,7 @@ export const resolvers = _.merge(
   resolversTargetTractability,
   resolversTargetProteinInteractions,
   resolversTargetRNAAndProteinExpression,
+  resolversTargetCancerHallmarks,
   {
     TargetSummaries: {
       geneOntology: _.identity,
@@ -101,6 +109,7 @@ export const resolvers = _.merge(
       tractability: _.identity,
       proteinInteractions: _.identity,
       rnaAndProteinExpression: _.identity,
+      cancerHallmarks: _.identity,
     },
   }
 );
