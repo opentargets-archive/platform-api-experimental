@@ -221,7 +221,7 @@ export const createTargetLoader = () =>
             tractability,
             cancerbiomarkers: cancerBiomarkers,
             chemicalprobes: chemicalProbes,
-            mouse_phenotypes: mousePhenotypesGene,
+            mouse_phenotypes: mousePhenotypesGenes,
             go: geneOntologyTerms,
             hallmarks,
           } = d;
@@ -245,13 +245,13 @@ export const createTargetLoader = () =>
               "id"
             ),
           }));
-          const mousePhenotypeCategories = mousePhenotypesTopLevel.map(c => {
+          const mousePhenotypesCategories = mousePhenotypesTopLevel.map(c => {
             return {
               ...c,
               isAssociated:
-                mousePhenotypeGenes &&
-                Array.isArray(mousePhenotypeGenes) &&
-                mousePhenotypeGenes.some(g =>
+                mousePhenotypesGenes &&
+                Array.isArray(mousePhenotypesGenes) &&
+                mousePhenotypesGenes.some(g =>
                   g.phenotypes
                     .filter(p => p.genotype_phenotype.length > 0)
                     .some(p => p.category_mp_identifier === c.id)
@@ -329,8 +329,8 @@ export const createTargetLoader = () =>
           const proteinInteractions = countInteractions(interactions);
 
           const mousePhenotypesRows =
-            mousePhenotypeGenes && Array.isArray(mousePhenotypeGenes)
-              ? mousePhenotypesGene.reduce((acc, mouseGene) => {
+            mousePhenotypesGenes && Array.isArray(mousePhenotypesGenes)
+              ? mousePhenotypesGenes.reduce((acc, mouseGene) => {
                   const {
                     mouse_gene_id: mouseGeneId,
                     mouse_gene_symbol: mouseGeneSymbol,
@@ -381,7 +381,7 @@ export const createTargetLoader = () =>
           const mousePhenotypes = {
             phenotypeCount: mousePhenotypesPhenotypeCount,
             categoryCount: mousePhenotypesCategoryCount,
-            categoriesSummary: mousePhenotypeCategories,
+            categoriesSummary: mousePhenotypesCategories,
             rows: mousePhenotypesRows,
           };
 
