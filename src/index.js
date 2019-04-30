@@ -16,6 +16,7 @@ import {
 
 import {
   createTargetLoader,
+  createExpressionLoader,
   createTargetDrugsLoader,
   createDiseaseLoader,
 } from "./apis/dataloaders";
@@ -25,6 +26,7 @@ const server = new ApolloServer({
   resolvers: _.merge(resolversQuery, resolversTarget, resolversDisease),
   context: ({ req }) => ({
     targetLoader: createTargetLoader(),
+    expressionLoader: createExpressionLoader(),
     diseaseLoader: createDiseaseLoader(),
     targetDrugsLoader: createTargetDrugsLoader(),
   }),

@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import _ from "lodash";
 
-import { targets, diseases, targetsDrugs } from "./openTargets";
+import { targets, expressions, diseases, targetsDrugs } from "./openTargets";
 import reactomeTopLevel from "../constants/reactomeTopLevel";
 import mousePhenotypesTopLevel from "../constants/mousePhenotypesTopLevel";
 import uniprotSubCellularLocations from "../constants/uniprotSubCellularLocations";
@@ -159,6 +159,22 @@ const countInteractions = interactions => {
     pathways,
     enzymeSubstrate,
   }
+};
+
+export const createExpressionLoader = () => {
+  return new DataLoader(keys => expressions(keys).then(({ data }) => {
+    return Object.keys(data.data).map(key => {
+      const { tissues } = data.data[key];
+
+      const rnaBaselineExpression = tissues.some(tissue => tissue.rna.value > 0);
+      const proteinBaselineExpression = tissues.some(tissue => tissue.protein.level >= 0);
+
+      return {
+        rnaBaselineExpression,
+        proteinBaselineExpression
+      }
+    });
+  }));
 };
 
 export const createTargetLoader = () =>

@@ -17,6 +17,9 @@ export const targets = ensgIds =>
     Promise.resolve(ensgIds),
     axios.post(`${ROOT}private/target`, { id: ensgIds }),
   ]);
+
+export const expressions = ensgIds => axios.post(`${ROOT}private/target/expression`, { gene: ensgIds });
+
 export const targetDrugs = (ensgId, next = null) =>
   next
     ? axios.get(
