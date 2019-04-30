@@ -301,15 +301,23 @@ export const createTargetLoader = () =>
                 .filter(d2 => d2.label === d)
                 .some(d2 => d2.suppress),
             })),
-            publicationsByHallmark: cancerHallmarkNames.map(d => ({
-              name: d,
-              publications: hallmarks.cancer_hallmarks
-                .filter(d2 => d2.label === d)
-                .map(d2 => ({
-                  pmId: d2.pmid,
-                  description: d2.description,
-                })),
-            })),
+            publicationsByHallmark: cancerHallmarkNames
+              .map(d => ({
+                name: d,
+                promotes: hallmarks.cancer_hallmarks
+                  .filter(d2 => d2.label === d)
+                  .some(d2 => d2.promote),
+                suppresses: hallmarks.cancer_hallmarks
+                  .filter(d2 => d2.label === d)
+                  .some(d2 => d2.suppress),
+                publications: hallmarks.cancer_hallmarks
+                  .filter(d2 => d2.label === d)
+                  .map(d2 => ({
+                    pmId: d2.pmid,
+                    description: d2.description,
+                  })),
+              }))
+              .filter(d => d.publications.length > 0),
             roleInCancer: hallmarks.attributes
               .filter(d => d.attribute_name === "role in cancer")
               .map(d => ({ name: d.description, pmId: d.pmid })),

@@ -41,6 +41,11 @@ import {
   resolvers as resolversTargetTractability,
 } from "./details/Tractability";
 
+import {
+  typeDefs as TargetDetailCancerHallmarks,
+  resolvers as resolversTargetCancerHallmarks,
+} from "./details/CancerHallmarks";
+
 export const typeDefs = [
   TargetDetailGeneOntology,
   TargetDetailPathways,
@@ -50,6 +55,7 @@ export const typeDefs = [
   TargetDetailDrugs,
   TargetDetailRelatedTargets,
   TargetDetailTractability,
+  TargetDetailCancerHallmarks,
   gql`
     type TargetDetails {
       geneOntology: TargetDetailGeneOntology
@@ -60,6 +66,7 @@ export const typeDefs = [
       drugs: TargetDetailDrugs
       relatedTargets: TargetDetailRelatedTargets
       tractability: TargetDetailTractability
+      cancerHallmarks: TargetDetailCancerHallmarks
     }
   `,
 ];
@@ -73,6 +80,7 @@ export const resolvers = _.merge(
   resolversTargetDrugs,
   resolversTargetRelatedTargets,
   resolversTargetTractability,
+  resolversTargetCancerHallmarks,
   {
     TargetDetails: {
       geneOntology: _.identity,
@@ -83,6 +91,7 @@ export const resolvers = _.merge(
       drugs: _.identity,
       relatedTargets: _.identity,
       tractability: _.identity,
+      cancerHallmarks: _.identity,
     },
   }
 );
