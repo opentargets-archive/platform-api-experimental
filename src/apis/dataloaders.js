@@ -122,6 +122,19 @@ const transformTractability = rawTractability => {
   };
 };
 
+const cancerHallmarkNames = [
+  "proliferative signalling",
+  "suppression of growth",
+  "escaping immunic response to cancer",
+  "cell replicative immortality",
+  "tumour promoting inflammation",
+  "invasion and metastasis",
+  "angiogenesis",
+  "genome instability and mutations",
+  "escaping programmed cell death",
+  "change of cellular energetics",
+];
+
 const countInteractions = interactions => {
   let ppi = 0;
   let pathways = 0;
@@ -135,18 +148,18 @@ const countInteractions = interactions => {
     const { sources } = interaction;
 
     sources.forEach(source => {
-      if(omnipathCategories.Pathways[source]) {
-        if(!hasContributedToPathways) {
+      if (omnipathCategories.Pathways[source]) {
+        if (!hasContributedToPathways) {
           pathways++;
           hasContributedToPathways = true;
-        } 
-      } else if(omnipathCategories.PPI[source]) {
-        if(!hasContributedToPPI) {
+        }
+      } else if (omnipathCategories.PPI[source]) {
+        if (!hasContributedToPPI) {
           ppi++;
           hasContributedToPPI = true;
         }
-      } else if(omnipathCategories.EnzymeSubstrate[source]) {
-        if(!hasContributedToEnzymeSubstrate) {
+      } else if (omnipathCategories.EnzymeSubstrate[source]) {
+        if (!hasContributedToEnzymeSubstrate) {
           enzymeSubstrate++;
           hasContributedToEnzymeSubstrate = true;
         }
@@ -158,23 +171,29 @@ const countInteractions = interactions => {
     ppi,
     pathways,
     enzymeSubstrate,
-  }
+  };
 };
 
 export const createExpressionLoader = () => {
-  return new DataLoader(keys => expressions(keys).then(({ data }) => {
-    return Object.keys(data.data).map(key => {
-      const { tissues } = data.data[key];
+  return new DataLoader(keys =>
+    expressions(keys).then(({ data }) => {
+      return Object.keys(data.data).map(key => {
+        const { tissues } = data.data[key];
 
-      const rnaBaselineExpression = tissues.some(tissue => tissue.rna.value > 0);
-      const proteinBaselineExpression = tissues.some(tissue => tissue.protein.level >= 0);
+        const rnaBaselineExpression = tissues.some(
+          tissue => tissue.rna.value > 0
+        );
+        const proteinBaselineExpression = tissues.some(
+          tissue => tissue.protein.level >= 0
+        );
 
-      return {
-        rnaBaselineExpression,
-        proteinBaselineExpression
-      }
-    });
-  }));
+        return {
+          rnaBaselineExpression,
+          proteinBaselineExpression,
+        };
+      });
+    })
+  );
 };
 
 export const createTargetLoader = () =>
@@ -204,6 +223,7 @@ export const createTargetLoader = () =>
             chemicalprobes: chemicalProbes,
             mouse_phenotypes: mousePhenotypeGenes,
             go: geneOntologyTerms,
+            hallmarks,
           } = d;
 
           const topLevelPathways = reactomeTopLevel.map(c => {
@@ -271,8 +291,41 @@ export const createTargetLoader = () =>
               rows: [],
             }
           );
+          const cancerHallmarks = {
+            promotionAndSuppressionByHallmark: cancerHallmarkNames.map(d => ({
+              name: d,
+              promotes: hallmarks.cancer_hallmarks
+                .filter(d2 => d2.label === d)
+                .some(d2 => d2.promote),
+              suppresses: hallmarks.cancer_hallmarks
+                .filter(d2 => d2.label === d)
+                .some(d2 => d2.suppress),
+            })),
+            publicationsByHallmark: cancerHallmarkNames
+              .map(d => ({
+                name: d,
+                promotes: hallmarks.cancer_hallmarks
+                  .filter(d2 => d2.label === d)
+                  .some(d2 => d2.promote),
+                suppresses: hallmarks.cancer_hallmarks
+                  .filter(d2 => d2.label === d)
+                  .some(d2 => d2.suppress),
+                publications: hallmarks.cancer_hallmarks
+                  .filter(d2 => d2.label === d)
+                  .map(d2 => ({
+                    pmId: d2.pmid,
+                    description: d2.description,
+                  })),
+              }))
+              .filter(d => d.publications.length > 0),
+            roleInCancer: hallmarks.attributes
+              .filter(d => d.attribute_name === "role in cancer")
+              .map(d => ({ name: d.description, pmId: d.pmid })),
+          };
 
-          const interactions = omnipathData.filter(d => d.source === uniprotId || d.target === uniprotId);
+          const interactions = omnipathData.filter(
+            d => d.source === uniprotId || d.target === uniprotId
+          );
           const proteinInteractions = countInteractions(interactions);
 
           return {
@@ -290,6 +343,7 @@ export const createTargetLoader = () =>
               lowLevelPathways,
               topLevelPathways,
             },
+            cancerHallmarks,
             cancerBiomarkers: {
               hasCancerBiomarkers:
                 cancerBiomarkers && cancerBiomarkers.length > 0 ? true : false,
