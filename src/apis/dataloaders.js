@@ -135,18 +135,18 @@ const countInteractions = interactions => {
     const { sources } = interaction;
 
     sources.forEach(source => {
-      if(omnipathCategories.Pathways[source]) {
-        if(!hasContributedToPathways) {
+      if (omnipathCategories.Pathways[source]) {
+        if (!hasContributedToPathways) {
           pathways++;
           hasContributedToPathways = true;
-        } 
-      } else if(omnipathCategories.PPI[source]) {
-        if(!hasContributedToPPI) {
+        }
+      } else if (omnipathCategories.PPI[source]) {
+        if (!hasContributedToPPI) {
           ppi++;
           hasContributedToPPI = true;
         }
-      } else if(omnipathCategories.EnzymeSubstrate[source]) {
-        if(!hasContributedToEnzymeSubstrate) {
+      } else if (omnipathCategories.EnzymeSubstrate[source]) {
+        if (!hasContributedToEnzymeSubstrate) {
           enzymeSubstrate++;
           hasContributedToEnzymeSubstrate = true;
         }
@@ -158,23 +158,29 @@ const countInteractions = interactions => {
     ppi,
     pathways,
     enzymeSubstrate,
-  }
+  };
 };
 
 export const createExpressionLoader = () => {
-  return new DataLoader(keys => expressions(keys).then(({ data }) => {
-    return Object.keys(data.data).map(key => {
-      const { tissues } = data.data[key];
+  return new DataLoader(keys =>
+    expressions(keys).then(({ data }) => {
+      return Object.keys(data.data).map(key => {
+        const { tissues } = data.data[key];
 
-      const rnaBaselineExpression = tissues.some(tissue => tissue.rna.value > 0);
-      const proteinBaselineExpression = tissues.some(tissue => tissue.protein.level >= 0);
+        const rnaBaselineExpression = tissues.some(
+          tissue => tissue.rna.value > 0
+        );
+        const proteinBaselineExpression = tissues.some(
+          tissue => tissue.protein.level >= 0
+        );
 
-      return {
-        rnaBaselineExpression,
-        proteinBaselineExpression
-      }
-    });
-  }));
+        return {
+          rnaBaselineExpression,
+          proteinBaselineExpression,
+        };
+      });
+    })
+  );
 };
 
 export const createTargetLoader = () =>
@@ -202,7 +208,7 @@ export const createTargetLoader = () =>
             tractability,
             cancerbiomarkers: cancerBiomarkers,
             chemicalprobes: chemicalProbes,
-            mouse_phenotypes: mousePhenotypeGenes,
+            mouse_phenotypes: mousePhenotypesGene,
             go: geneOntologyTerms,
           } = d;
 
@@ -272,8 +278,67 @@ export const createTargetLoader = () =>
             }
           );
 
-          const interactions = omnipathData.filter(d => d.source === uniprotId || d.target === uniprotId);
+          const interactions = omnipathData.filter(
+            d => d.source === uniprotId || d.target === uniprotId
+          );
           const proteinInteractions = countInteractions(interactions);
+
+          const mousePhenotypesRows =
+            mousePhenotypeGenes && Array.isArray(mousePhenotypeGenes)
+              ? mousePhenotypesGene.reduce((acc, mouseGene) => {
+                  const {
+                    mouse_gene_id: mouseGeneId,
+                    mouse_gene_symbol: mouseGeneSymbol,
+                    phenotypes,
+                  } = mouseGene;
+                  phenotypes.forEach(category => {
+                    const {
+                      category_mp_identifier: categoryId,
+                      category_mp_label: categoryLabel,
+                      genotype_phenotype: categoryPhenotypes,
+                    } = category;
+                    categoryPhenotypes.forEach(phenotype => {
+                      const {
+                        mp_identifier: phenotypeId,
+                        mp_label: phenotypeLabel,
+                        pmid: pmId,
+                        subject_allelic_composition: subjectAllelicComposition,
+                        subject_background: subjectBackground,
+                      } = phenotype;
+                      acc.push({
+                        mouseGeneId,
+                        mouseGeneSymbol,
+                        categoryId,
+                        categoryLabel,
+                        phenotypeId,
+                        phenotypeLabel,
+                        subjectAllelicComposition,
+                        subjectBackground,
+                        pmId,
+                      });
+                    });
+                  });
+                  return acc;
+                }, [])
+              : [];
+          const mousePhenotypesPhenotypeCount = Object.keys(
+            mousePhenotypesRows.reduce((acc, d) => {
+              acc[d.phenotypeId] = true;
+              return acc;
+            }, {})
+          ).length;
+          const mousePhenotypesCategoryCount = Object.keys(
+            mousePhenotypesRows.reduce((acc, d) => {
+              acc[d.categoryId] = true;
+              return acc;
+            }, {})
+          ).length;
+          const mousePhenotypes = {
+            phenotypeCount: mousePhenotypesPhenotypeCount,
+            categoryCount: mousePhenotypesCategoryCount,
+            categoriesSummary: mousePhenotypeCategories,
+            rows: mousePhenotypesRows,
+          };
 
           return {
             id,
@@ -408,9 +473,7 @@ export const createTargetLoader = () =>
                 d => uniprotSubCellularLocations[d]
               ),
             },
-            mousePhenotypes: {
-              phenotypeCategories: mousePhenotypeCategories,
-            },
+            mousePhenotypes,
             proteinInteractions,
           };
         });

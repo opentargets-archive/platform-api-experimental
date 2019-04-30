@@ -2,6 +2,11 @@ import { gql } from "apollo-server-express";
 import _ from "lodash";
 
 import {
+  typeDefs as TargetSummaryMousePhenotypes,
+  resolvers as resolversTargetMousePhenotypes,
+} from "./summaries/MousePhenotypes";
+
+import {
   typeDefs as TargetSummaryGeneOntology,
   resolvers as resolversTargetGeneOntology,
 } from "./summaries/GeneOntology";
@@ -43,15 +48,16 @@ import {
 
 import {
   typeDefs as TargetSummaryProteinInteractions,
-  resolvers as resolversTargetProteinInteractions
+  resolvers as resolversTargetProteinInteractions,
 } from "./summaries/ProteinInteractions";
 
 import {
   typeDefs as TargetSummaryRNAAndProteinExpression,
-  resolvers as resolversTargetRNAAndProteinExpression
+  resolvers as resolversTargetRNAAndProteinExpression,
 } from "./summaries/RNAAndProteinExpression";
 
 export const typeDefs = [
+  TargetSummaryMousePhenotypes,
   TargetSummaryGeneOntology,
   TargetSummaryPathways,
   TargetSummaryProtein,
@@ -64,6 +70,7 @@ export const typeDefs = [
   TargetSummaryRNAAndProteinExpression,
   gql`
     type TargetSummaries {
+      mousePhenotypes: TargetSummaryMousePhenotypes
       geneOntology: TargetSummaryGeneOntology
       pathways: TargetSummaryPathways
       protein: TargetSummaryProtein
@@ -79,6 +86,7 @@ export const typeDefs = [
 ];
 
 export const resolvers = _.merge(
+  resolversTargetMousePhenotypes,
   resolversTargetGeneOntology,
   resolversTargetSummary,
   resolversTargetProtein,
@@ -91,6 +99,7 @@ export const resolvers = _.merge(
   resolversTargetRNAAndProteinExpression,
   {
     TargetSummaries: {
+      mousePhenotypes: _.identity,
       geneOntology: _.identity,
       pathways: _.identity,
       protein: _.identity,
