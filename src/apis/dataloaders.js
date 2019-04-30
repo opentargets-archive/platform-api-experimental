@@ -221,7 +221,7 @@ export const createTargetLoader = () =>
             tractability,
             cancerbiomarkers: cancerBiomarkers,
             chemicalprobes: chemicalProbes,
-            mouse_phenotypes: mousePhenotypeGenes,
+            mouse_phenotypes: mousePhenotypesGenes,
             go: geneOntologyTerms,
             hallmarks,
           } = d;
@@ -245,19 +245,7 @@ export const createTargetLoader = () =>
               "id"
             ),
           }));
-          const mousePhenotypeCategories = mousePhenotypesTopLevel.map(c => {
-            return {
-              ...c,
-              isAssociated:
-                mousePhenotypeGenes &&
-                Array.isArray(mousePhenotypeGenes) &&
-                mousePhenotypeGenes.some(g =>
-                  g.phenotypes
-                    .filter(p => p.genotype_phenotype.length > 0)
-                    .some(p => p.category_mp_identifier === c.id)
-                ),
-            };
-          });
+
           const geneOntology = geneOntologyTerms.reduce(
             (acc, d) => {
               const goId = d.id;
@@ -327,6 +315,71 @@ export const createTargetLoader = () =>
             d => d.source === uniprotId || d.target === uniprotId
           );
           const proteinInteractions = countInteractions(interactions);
+
+          const mousePhenotypesRows =
+            mousePhenotypesGenes && Array.isArray(mousePhenotypesGenes)
+              ? mousePhenotypesGenes.reduce((acc, mouseGene) => {
+                  const {
+                    mouse_gene_id: mouseGeneId,
+                    mouse_gene_symbol: mouseGeneSymbol,
+                    phenotypes,
+                  } = mouseGene;
+                  phenotypes.forEach(category => {
+                    const {
+                      category_mp_identifier: categoryId,
+                      category_mp_label: categoryLabel,
+                      genotype_phenotype: categoryPhenotypes,
+                    } = category;
+                    categoryPhenotypes.forEach(phenotype => {
+                      const {
+                        mp_identifier: phenotypeId,
+                        mp_label: phenotypeLabel,
+                        pmid: pmId,
+                        subject_allelic_composition: subjectAllelicComposition,
+                        subject_background: subjectBackground,
+                      } = phenotype;
+                      acc.push({
+                        mouseGeneId,
+                        mouseGeneSymbol,
+                        categoryId,
+                        categoryLabel,
+                        phenotypeId,
+                        phenotypeLabel,
+                        subjectAllelicComposition,
+                        subjectBackground,
+                        pmId,
+                      });
+                    });
+                  });
+                  return acc;
+                }, [])
+              : [];
+          const mousePhenotypesPhenotypeCount = Object.keys(
+            mousePhenotypesRows.reduce((acc, d) => {
+              acc[d.phenotypeId] = true;
+              return acc;
+            }, {})
+          ).length;
+          const mousePhenotypesCategoryCount = Object.keys(
+            mousePhenotypesRows.reduce((acc, d) => {
+              acc[d.categoryId] = true;
+              return acc;
+            }, {})
+          ).length;
+          const mousePhenotypesCategories = mousePhenotypesTopLevel.map(c => {
+            return {
+              ...c,
+              isAssociated: mousePhenotypesRows.some(
+                d => d.categoryId === c.id
+              ),
+            };
+          });
+          const mousePhenotypes = {
+            phenotypeCount: mousePhenotypesPhenotypeCount,
+            categoryCount: mousePhenotypesCategoryCount,
+            categories: mousePhenotypesCategories,
+            rows: mousePhenotypesRows,
+          };
 
           return {
             id,
@@ -462,9 +515,7 @@ export const createTargetLoader = () =>
                 d => uniprotSubCellularLocations[d]
               ),
             },
-            mousePhenotypes: {
-              phenotypeCategories: mousePhenotypeCategories,
-            },
+            mousePhenotypes,
             proteinInteractions,
           };
         });
