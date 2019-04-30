@@ -282,23 +282,23 @@ export const createTargetLoader = () =>
           const cancerHallmarks = {
             promotionAndSuppressionByHallmark: cancerHallmarkNames.map(d => ({
               name: d,
-              promotes: hallmarks.cancer_hallmarks
+              promotes: (hallmarks ? hallmarks.cancer_hallmarks : [])
                 .filter(d2 => d2.label === d)
                 .some(d2 => d2.promote),
-              suppresses: hallmarks.cancer_hallmarks
+              suppresses: (hallmarks ? hallmarks.cancer_hallmarks : [])
                 .filter(d2 => d2.label === d)
                 .some(d2 => d2.suppress),
             })),
             publicationsByHallmark: cancerHallmarkNames
               .map(d => ({
                 name: d,
-                promotes: hallmarks.cancer_hallmarks
+                promotes: (hallmarks ? hallmarks.cancer_hallmarks : [])
                   .filter(d2 => d2.label === d)
                   .some(d2 => d2.promote),
-                suppresses: hallmarks.cancer_hallmarks
+                suppresses: (hallmarks ? hallmarks.cancer_hallmarks : [])
                   .filter(d2 => d2.label === d)
                   .some(d2 => d2.suppress),
-                publications: hallmarks.cancer_hallmarks
+                publications: (hallmarks ? hallmarks.cancer_hallmarks : [])
                   .filter(d2 => d2.label === d)
                   .map(d2 => ({
                     pmId: d2.pmid,
@@ -306,7 +306,7 @@ export const createTargetLoader = () =>
                   })),
               }))
               .filter(d => d.publications.length > 0),
-            roleInCancer: hallmarks.attributes
+            roleInCancer: (hallmarks ? hallmarks.attributes : [])
               .filter(d => d.attribute_name === "role in cancer")
               .map(d => ({ name: d.description, pmId: d.pmid })),
           };
