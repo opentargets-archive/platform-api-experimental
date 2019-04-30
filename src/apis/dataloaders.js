@@ -381,7 +381,7 @@ export const createTargetLoader = () =>
           const mousePhenotypes = {
             phenotypeCount: mousePhenotypesPhenotypeCount,
             categoryCount: mousePhenotypesCategoryCount,
-            categoriesSummary: mousePhenotypesCategories,
+            categories: mousePhenotypesCategories,
             rows: mousePhenotypesRows,
           };
 
