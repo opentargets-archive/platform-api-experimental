@@ -245,19 +245,7 @@ export const createTargetLoader = () =>
               "id"
             ),
           }));
-          const mousePhenotypesCategories = mousePhenotypesTopLevel.map(c => {
-            return {
-              ...c,
-              isAssociated:
-                mousePhenotypesGenes &&
-                Array.isArray(mousePhenotypesGenes) &&
-                mousePhenotypesGenes.some(g =>
-                  g.phenotypes
-                    .filter(p => p.genotype_phenotype.length > 0)
-                    .some(p => p.category_mp_identifier === c.id)
-                ),
-            };
-          });
+
           const geneOntology = geneOntologyTerms.reduce(
             (acc, d) => {
               const goId = d.id;
@@ -378,6 +366,14 @@ export const createTargetLoader = () =>
               return acc;
             }, {})
           ).length;
+          const mousePhenotypesCategories = mousePhenotypesTopLevel.map(c => {
+            return {
+              ...c,
+              isAssociated: mousePhenotypesRows.some(
+                d => d.categoryId === c.id
+              ),
+            };
+          });
           const mousePhenotypes = {
             phenotypeCount: mousePhenotypesPhenotypeCount,
             categoryCount: mousePhenotypesCategoryCount,
