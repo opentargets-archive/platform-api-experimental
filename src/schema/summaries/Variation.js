@@ -44,6 +44,22 @@ export const resolvers = {
         name: "Ensembl",
         url: "https://www.ensembl.org",
       },
+      {
+        name: "GWAS Catalog",
+        url: "https://www.ebi.ac.uk/gwas/",
+      },
+      {
+        name: "PheWAS Catalog",
+        url: "https://phewascatalog.org/",
+      },
+      {
+        name: "EVA",
+        url: "https://www.ebi.ac.uk/eva/",
+      },
+      {
+        name: "UniProt",
+        url: "https://www.uniprot.org/",
+      },
     ],
   },
 };
