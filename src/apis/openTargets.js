@@ -18,7 +18,8 @@ export const targets = ensgIds =>
     axios.post(`${ROOT}private/target`, { id: ensgIds }),
   ]);
 
-export const expressions = ensgIds => axios.post(`${ROOT}private/target/expression`, { gene: ensgIds });
+export const expressions = ensgIds =>
+  axios.post(`${ROOT}private/target/expression`, { gene: ensgIds });
 
 export const targetDrugs = (ensgId, next = null) =>
   next
@@ -81,6 +82,15 @@ export async function targetDrugsIterated(ensgId) {
   }
   return rows;
 }
+
+export const targetVariantsRare = ensgId =>
+  axios.get(
+    `${ROOT}public/evidence/filter?size=10000&datasource=eva&datasource=uniprot&target=${ensgId}&fields=target.gene_info&fields=disease.efo_info&fields=variant&fields=evidence&fields=type`
+  );
+export const targetVariantsCommon = ensgId =>
+  axios.get(
+    `${ROOT}public/evidence/filter?size=10000&datasource=gwas_catalog&datasource=phewas_catalog&target=${ensgId}&fields=target.gene_info&fields=disease.efo_info&fields=variant&fields=evidence&fields=type`
+  );
 
 export const targetSimilar = ensgId =>
   axios.get(`${ROOT}private/relation/target/${ensgId}?id=${ensgId}&size=10000`);
