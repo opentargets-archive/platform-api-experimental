@@ -1,9 +1,9 @@
-import axios from "axios";
-import _ from "lodash";
+import axios from 'axios';
+import _ from 'lodash';
 
-const PROTOCOL = "https";
-const HOST = "www.ebi.ac.uk";
-const STEM = "proteins/api";
+const PROTOCOL = 'https';
+const HOST = 'www.ebi.ac.uk';
+const STEM = 'proteins/api';
 const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
 
 export const secondaryStructure = uniprotId =>
@@ -12,7 +12,7 @@ export const secondaryStructure = uniprotId =>
       const { features, sequence } = response.data;
       const { mass, length } = sequence;
       const featuresStructural = features
-        .filter(d => d.category === "STRUCTURAL")
+        .filter(d => d.category === 'STRUCTURAL')
         .map(d => ({
           type: d.type,
           start: parseInt(d.begin),

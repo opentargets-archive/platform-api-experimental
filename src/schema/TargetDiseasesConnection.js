@@ -1,7 +1,7 @@
-import { gql } from "apollo-server-express";
-import _ from "lodash";
+import { gql } from 'apollo-server-express';
+import _ from 'lodash';
 
-import { targetAssociations } from "../apis/openTargets";
+import { targetAssociations } from '../apis/openTargets';
 
 export const typeDefs = [
   gql`
@@ -30,13 +30,13 @@ export const typeDefs = [
 ];
 
 const DATA_TYPE_MAP = {
-  genetic_association: "GENETIC",
-  somatic_mutation: "SOMATIC",
-  known_drug: "DRUG",
-  affected_pathway: "PATHWAY",
-  rna_expression: "EXPRESSION",
-  literature: "TEXT_MINING",
-  animal_model: "ANIMAL_MODEL",
+  genetic_association: 'GENETIC',
+  somatic_mutation: 'SOMATIC',
+  known_drug: 'DRUG',
+  affected_pathway: 'PATHWAY',
+  rna_expression: 'EXPRESSION',
+  literature: 'TEXT_MINING',
+  animal_model: 'ANIMAL_MODEL',
 };
 
 export const resolvers = _.merge(

@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   type TargetSummaryTractability {
@@ -29,8 +29,8 @@ export const resolvers = {
         ),
     sources: () => [
       {
-        name: "ChEMBL",
-        url: "https://www.ebi.ac.uk/chembl/",
+        name: 'ChEMBL',
+        url: 'https://www.ebi.ac.uk/chembl/',
       },
     ],
   },

@@ -1,6 +1,6 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
-import { targetSimilar } from "../../apis/openTargets";
+import { targetSimilar } from '../../apis/openTargets';
 
 export const typeDefs = gql`
   type TargetSummaryRelatedTargets {
@@ -15,8 +15,8 @@ export const resolvers = {
       targetSimilar(_ensgId).then(response => response.data.data.length),
     sources: () => [
       {
-        name: "Open Targets",
-        url: "https://docs.targetvalidation.org/getting-started/scoring",
+        name: 'Open Targets',
+        url: 'https://docs.targetvalidation.org/getting-started/scoring',
       },
     ],
   },

@@ -1,6 +1,6 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
-import { targetSimilar } from "../../apis/openTargets";
+import { targetSimilar } from '../../apis/openTargets';
 
 export const typeDefs = gql`
   type RowRelatedTarget {
