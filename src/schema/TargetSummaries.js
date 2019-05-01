@@ -61,6 +61,11 @@ import {
   resolvers as resolversTargetCancerHallmarks,
 } from './summaries/CancerHallmarks';
 
+import {
+  typeDefs as TargetSummaryVariation,
+  resolvers as resolversTargetVariation,
+} from "./summaries/Variation";
+
 export const typeDefs = [
   TargetSummaryMousePhenotypes,
   TargetSummaryGeneOntology,
@@ -74,6 +79,7 @@ export const typeDefs = [
   TargetSummaryProteinInteractions,
   TargetSummaryRNAAndProteinExpression,
   TargetSummaryCancerHallmarks,
+  TargetSummaryVariation,
   gql`
     type TargetSummaries {
       mousePhenotypes: TargetSummaryMousePhenotypes
@@ -88,6 +94,7 @@ export const typeDefs = [
       proteinInteractions: TargetSummaryProteinInteractions
       rnaAndProteinExpression: TargetSummaryRNAAndProteinExpression
       cancerHallmarks: TargetSummaryCancerHallmarks
+      variation: TargetSummaryVariation
     }
   `,
 ];
@@ -105,6 +112,7 @@ export const resolvers = _.merge(
   resolversTargetProteinInteractions,
   resolversTargetRNAAndProteinExpression,
   resolversTargetCancerHallmarks,
+  resolversTargetVariation,
   {
     TargetSummaries: {
       mousePhenotypes: _.identity,
@@ -119,6 +127,7 @@ export const resolvers = _.merge(
       proteinInteractions: _.identity,
       rnaAndProteinExpression: _.identity,
       cancerHallmarks: _.identity,
+      variation: _.identity,
     },
   }
 );
