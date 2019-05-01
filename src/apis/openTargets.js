@@ -1,8 +1,8 @@
-import axios from "axios";
+import axios from 'axios';
 
-const PROTOCOL = "https";
-const HOST = "api.opentargets.io";
-const STEM = "v3/platform";
+const PROTOCOL = 'https';
+const HOST = 'api.opentargets.io';
+const STEM = 'v3/platform';
 const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
 
 export const disease = efoId => axios.get(`${ROOT}private/disease/${efoId}`);
@@ -18,7 +18,8 @@ export const targets = ensgIds =>
     axios.post(`${ROOT}private/target`, { id: ensgIds }),
   ]);
 
-export const expressions = ensgIds => axios.post(`${ROOT}private/target/expression`, { gene: ensgIds });
+export const expressions = ensgIds =>
+  axios.post(`${ROOT}private/target/expression`, { gene: ensgIds });
 
 export const targetDrugs = (ensgId, next = null) =>
   next
@@ -33,8 +34,8 @@ export const targetDrugs = (ensgId, next = null) =>
 const targetsDrugsIteration = async (ensgIds, next = null) => {
   const props = {
     size: 10000,
-    datasource: ["chembl"],
-    fields: ["disease.efo_info", "drug", "evidence", "target", "access_level"],
+    datasource: ['chembl'],
+    fields: ['disease.efo_info', 'drug', 'evidence', 'target', 'access_level'],
     expandefo: true,
     target: ensgIds,
   };
@@ -90,8 +91,8 @@ export const targetAssociations = ensgId =>
     facets: false,
     direct: true,
     size: 10000,
-    sort: ["association_score.overall"],
-    search: "",
+    sort: ['association_score.overall'],
+    search: '',
     draw: 2,
   });
 export const targetAssociationsFacets = ensgId =>

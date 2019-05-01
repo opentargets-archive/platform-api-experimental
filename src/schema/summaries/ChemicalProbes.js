@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   type TargetSummaryChemicalProbes {
@@ -31,13 +31,13 @@ export const resolvers = {
         .load(_ensgId)
         .then(({ chemicalProbes }) => chemicalProbes.hasProbeMiner),
     sources: () => [
-      { name: "SGC", url: "https://www.thesgc.org/" },
-      { name: "Chemical Probes Portal", url: "http://www.chemicalprobes.org/" },
+      { name: 'SGC', url: 'https://www.thesgc.org/' },
+      { name: 'Chemical Probes Portal', url: 'http://www.chemicalprobes.org/' },
       {
-        name: "Open Science Probes",
-        url: "http://www.sgc-ffm.uni-frankfurt.de/",
+        name: 'Open Science Probes',
+        url: 'http://www.sgc-ffm.uni-frankfurt.de/',
       },
-      { name: "Probe Miner", url: "https://probeminer.icr.ac.uk/#/" },
+      { name: 'Probe Miner', url: 'https://probeminer.icr.ac.uk/#/' },
     ],
   },
 };

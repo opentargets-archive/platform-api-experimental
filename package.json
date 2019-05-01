@@ -11,7 +11,9 @@
     "start": "node dist/index.js",
     "build": "babel src -d dist && cp src/constants/uniprotSubCellularLocations.json src/constants/keywlist.txt src/constants/omnipathData.json dist/constants",
     "dev": "nodemon ./src/index.js --exec babel-node -e js",
-    "deploy": "now && now alias"
+    "deploy": "now && now alias",
+    "prettier": "prettier --write",
+    "prettier:all": "prettier --write 'src/**/*.js'"
   },
   "dependencies": {
     "apollo-server-express": "^2.1.0",
@@ -27,6 +29,20 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-latest": "^6.24.1",
-    "nodemon": "^1.18.7"
+    "husky": "^2.1.0",
+    "lint-staged": "^8.1.5",
+    "nodemon": "^1.18.7",
+    "prettier": "^1.17.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }

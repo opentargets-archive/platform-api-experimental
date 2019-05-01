@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import _ from "lodash";
+import { gql } from 'apollo-server-express';
+import _ from 'lodash';
 
 export const typeDefs = [
   gql`

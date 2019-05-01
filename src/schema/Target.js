@@ -1,20 +1,20 @@
-import { gql } from "apollo-server-express";
-import _ from "lodash";
+import { gql } from 'apollo-server-express';
+import _ from 'lodash';
 
 import {
   typeDefs as TargetSummaries,
   resolvers as resolversTargetSummaries,
-} from "./TargetSummaries";
+} from './TargetSummaries';
 
 import {
   typeDefs as TargetDetails,
   resolvers as resolversTargetDetails,
-} from "./TargetDetails";
+} from './TargetDetails';
 
 import {
   typeDefs as TargetDiseasesConnection,
   resolvers as resolversTargetDiseasesConnection,
-} from "./TargetDiseasesConnection";
+} from './TargetDiseasesConnection';
 
 export const typeDefs = [
   ...TargetSummaries,

@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   type TargetSummaryGeneOntology {
@@ -23,6 +23,6 @@ export const resolvers = {
       targetLoader
         .load(_ensgId)
         .then(({ geneOntology }) => geneOntology.cellularComponentTermsCount),
-    sources: () => [{ name: "GO", url: "http://geneontology.org/" }],
+    sources: () => [{ name: 'GO', url: 'http://geneontology.org/' }],
   },
 };

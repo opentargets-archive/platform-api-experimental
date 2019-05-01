@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   type TargetSummaryMousePhenotypes {
@@ -20,8 +20,8 @@ export const resolvers = {
         .then(({ mousePhenotypes }) => mousePhenotypes.categoryCount),
     sources: () => [
       {
-        name: "MGI",
-        url: "http://www.informatics.jax.org/",
+        name: 'MGI',
+        url: 'http://www.informatics.jax.org/',
       },
     ],
   },

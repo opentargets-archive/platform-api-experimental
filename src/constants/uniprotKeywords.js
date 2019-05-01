@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from 'fs';
 
 /*
   Each term in the file keywlist.txt is structured as below.
@@ -27,32 +27,32 @@ import fs from "fs";
 const lines = fs
   .readFileSync(`${__dirname}/keywlist.txt`)
   .toString()
-  .split("\n");
+  .split('\n');
 
 const start =
   lines.indexOf(
-    "___________________________________________________________________________"
+    '___________________________________________________________________________'
   ) + 1;
 const end =
   lines.indexOf(
-    "Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms"
+    'Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms'
   ) - 1;
 
 const relevantLines = lines.slice(start, end);
 const relevantLinesGroupedByTerm = relevantLines
-  .join("\n")
-  .split("//\n")
-  .map(t => t.split("\n"));
+  .join('\n')
+  .split('//\n')
+  .map(t => t.split('\n'));
 
 const keywords = relevantLinesGroupedByTerm
   .map(ls => {
-    const acLine = ls.find(l => l.startsWith("AC   "));
-    const idLine = ls.find(l => l.startsWith("ID   "));
-    const caLine = ls.find(l => l.startsWith("CA   "));
+    const acLine = ls.find(l => l.startsWith('AC   '));
+    const idLine = ls.find(l => l.startsWith('ID   '));
+    const caLine = ls.find(l => l.startsWith('CA   '));
     return {
-      id: acLine.split("AC   ")[1],
-      name: idLine ? idLine.split("ID   ")[1].slice(0, -1) : null,
-      category: caLine ? caLine.split("CA   ")[1].slice(0, -1) : null,
+      id: acLine.split('AC   ')[1],
+      name: idLine ? idLine.split('ID   ')[1].slice(0, -1) : null,
+      category: caLine ? caLine.split('CA   ')[1].slice(0, -1) : null,
     };
   })
   .filter(d => d.name && d.category);

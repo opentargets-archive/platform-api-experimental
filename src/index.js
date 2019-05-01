@@ -1,25 +1,25 @@
-import express from "express";
-import { ApolloServer } from "apollo-server-express";
-import _ from "lodash";
+import express from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import _ from 'lodash';
 
-import { typeDefs as Query, resolvers as resolversQuery } from "./schema/Query";
+import { typeDefs as Query, resolvers as resolversQuery } from './schema/Query';
 
 import {
   typeDefs as Target,
   resolvers as resolversTarget,
-} from "./schema/Target";
+} from './schema/Target';
 
 import {
   typeDefs as Disease,
   resolvers as resolversDisease,
-} from "./schema/Disease";
+} from './schema/Disease';
 
 import {
   createTargetLoader,
   createExpressionLoader,
   createTargetDrugsLoader,
   createDiseaseLoader,
-} from "./apis/dataloaders";
+} from './apis/dataloaders';
 
 const server = new ApolloServer({
   typeDefs: [...Query, ...Target, ...Disease],

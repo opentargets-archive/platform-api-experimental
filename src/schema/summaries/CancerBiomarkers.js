@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   type TargetSummaryCancerBiomarkers {
@@ -30,8 +30,8 @@ export const resolvers = {
         .then(({ cancerBiomarkers }) => cancerBiomarkers.drugCount),
     sources: () => [
       {
-        name: "Cancer Genome Interpreter",
-        url: "https://www.cancergenomeinterpreter.org/biomarkers",
+        name: 'Cancer Genome Interpreter',
+        url: 'https://www.cancergenomeinterpreter.org/biomarkers',
       },
     ],
   },
