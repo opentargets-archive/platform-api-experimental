@@ -603,7 +603,7 @@ export const createTargetDrugsLoader = () =>
         const phaseCounts = trials.reduce(
           (acc, t) => {
             const phase =
-              t.evidence.drug2clinic.max_phase_for_disease.numeric_index;
+              t.evidence.drug2clinic.clinical_trial_phase.numeric_index;
             acc[phase] += 1;
             return acc;
           },
@@ -631,7 +631,7 @@ export const createTargetDrugsLoader = () =>
               activity: MAP_ACTIVITY[r.target.activity].toUpperCase(),
             },
             clinicalTrial: {
-              phase: r.evidence.drug2clinic.max_phase_for_disease.numeric_index,
+              phase: r.evidence.drug2clinic.clinical_trial_phase.numeric_index,
               status: r.evidence.drug2clinic.status
                 ? r.evidence.drug2clinic.status
                     .replace(/\s+/g, '_')
