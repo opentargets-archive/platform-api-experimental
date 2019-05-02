@@ -10,7 +10,7 @@ export const typeDefs = gql`
     phenotypeLabel: String!
     subjectAllelicComposition: String!
     subjectBackground: String!
-    pmId: String!
+    pmIds: [String!]!
   }
   type MousePhenotypeCategory {
     id: String!

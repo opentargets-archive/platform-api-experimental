@@ -338,6 +338,7 @@ export const createTargetLoader = () =>
                         subject_allelic_composition: subjectAllelicComposition,
                         subject_background: subjectBackground,
                       } = phenotype;
+                      const pmIds = pmId.split(',');
                       acc.push({
                         mouseGeneId,
                         mouseGeneSymbol,
@@ -347,7 +348,7 @@ export const createTargetLoader = () =>
                         phenotypeLabel,
                         subjectAllelicComposition,
                         subjectBackground,
-                        pmId,
+                        pmIds,
                       });
                     });
                   });
@@ -545,7 +546,6 @@ export const createDiseaseLoader = () =>
             efo_synonyms: synonyms,
             path_codes: pathCodes,
             path_labels: pathLabels,
-
           } = d;
           const therapeuticAreas = _.uniqBy(
             _.zip(pathCodes.map(d => d[0]), pathLabels.map(d => d[0])).map(
