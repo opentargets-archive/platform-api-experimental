@@ -541,18 +541,23 @@ export const createDiseaseLoader = () =>
           const {
             id,
             label: name,
+            definition: description,
+            efo_synonyms: synonyms,
             path_codes: pathCodes,
             path_labels: pathLabels,
+
           } = d;
           const therapeuticAreas = _.uniqBy(
             _.zip(pathCodes.map(d => d[0]), pathLabels.map(d => d[0])).map(
-              l => ({ id: l[0], name: l[1] })
+              l => ({ _efoId: l[0], id: l[0], name: l[1] })
             ),
             'id'
           );
           return {
             id,
             name,
+            description,
+            synonyms: synonyms.length > 0 ? synonyms : [],
             therapeuticAreas:
               therapeuticAreas.length > 0 ? therapeuticAreas : [],
           };
