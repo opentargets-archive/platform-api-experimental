@@ -1,7 +1,7 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
-import { bestStructure } from "../../apis/pdb";
-import { secondaryStructure } from "../../apis/uniprot";
+import { bestStructure } from '../../apis/pdb';
+import { secondaryStructure } from '../../apis/uniprot';
 
 export const typeDefs = gql`
   type Pdb {

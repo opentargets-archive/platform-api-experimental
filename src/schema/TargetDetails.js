@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import _ from "lodash";
+import { gql } from 'apollo-server-express';
+import _ from 'lodash';
 
 import {
   typeDefs as TargetDetailHomology,
@@ -9,52 +9,52 @@ import {
 import {
   typeDefs as TargetDetailMousePhenotypes,
   resolvers as resolversTargetMousePhenotypes,
-} from "./details/MousePhenotypes";
+} from './details/MousePhenotypes';
 
 import {
   typeDefs as TargetDetailGeneOntology,
   resolvers as resolversTargetGeneOntology,
-} from "./details/GeneOntology";
+} from './details/GeneOntology';
 
 import {
   typeDefs as TargetDetailPathways,
   resolvers as resolversTargetPathways,
-} from "./details/Pathways";
+} from './details/Pathways';
 
 import {
   typeDefs as TargetDetailProtein,
   resolvers as resolversTargetProtein,
-} from "./details/Protein";
+} from './details/Protein';
 
 import {
   typeDefs as TargetDetailChemicalProbes,
   resolvers as resolversTargetChemicalProbes,
-} from "./details/ChemicalProbes";
+} from './details/ChemicalProbes';
 
 import {
   typeDefs as TargetDetailCancerBiomarkers,
   resolvers as resolversTargetCancerBiomarkers,
-} from "./details/CancerBiomarkers";
+} from './details/CancerBiomarkers';
 
 import {
   typeDefs as TargetDetailDrugs,
   resolvers as resolversTargetDrugs,
-} from "./details/Drugs";
+} from './details/Drugs';
 
 import {
   typeDefs as TargetDetailRelatedTargets,
   resolvers as resolversTargetRelatedTargets,
-} from "./details/RelatedTargets";
+} from './details/RelatedTargets';
 
 import {
   typeDefs as TargetDetailTractability,
   resolvers as resolversTargetTractability,
-} from "./details/Tractability";
+} from './details/Tractability';
 
 import {
   typeDefs as TargetDetailCancerHallmarks,
   resolvers as resolversTargetCancerHallmarks,
-} from "./details/CancerHallmarks";
+} from './details/CancerHallmarks';
 
 export const typeDefs = [
   TargetDetailHomology,

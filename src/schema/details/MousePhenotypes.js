@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   type MousePhenotypeRow {
@@ -10,7 +10,7 @@ export const typeDefs = gql`
     phenotypeLabel: String!
     subjectAllelicComposition: String!
     subjectBackground: String!
-    pmId: String!
+    pmIds: [String!]!
   }
   type MousePhenotypeCategory {
     id: String!

@@ -3,20 +3,20 @@ export default {
     SignaLink3: true,
     Signor: true,
     Reactome: true,
-    SPIKE: true
+    SPIKE: true,
   },
   EnzymeSubstrate: {
     PhosphoPoint: true,
     HPRD: true,
-    "HPRD-phos": true,
+    'HPRD-phos': true,
     MIMP: true,
-    HuPho: true
+    HuPho: true,
   },
   PPI: {
     BioGRID: true,
     InnateDB: true,
     IntAct: true,
     DIP: true,
-    STRING: true
-  }
+    STRING: true,
+  },
 };

@@ -1,6 +1,6 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
-import { bestStructure } from "../../apis/pdb";
+import { bestStructure } from '../../apis/pdb';
 
 export const typeDefs = gql`
   type TargetSummaryProtein {
@@ -57,8 +57,8 @@ export const resolvers = {
             : false
         ),
     sources: () => [
-      { name: "UniProt", url: "https://www.uniprot.org/" },
-      { name: "PDBe", url: "https://www.ebi.ac.uk/pdbe/" },
+      { name: 'UniProt', url: 'https://www.uniprot.org/' },
+      { name: 'PDBe', url: 'https://www.ebi.ac.uk/pdbe/' },
     ],
   },
 };

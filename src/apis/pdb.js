@@ -1,9 +1,9 @@
-import axios from "axios";
-import _ from "lodash";
+import axios from 'axios';
+import _ from 'lodash';
 
-const PROTOCOL = "https";
-const HOST = "www.ebi.ac.uk";
-const STEM = "pdbe/api";
+const PROTOCOL = 'https';
+const HOST = 'www.ebi.ac.uk';
+const STEM = 'pdbe/api';
 const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
 
 export const bestStructure = uniprotId =>
@@ -37,7 +37,7 @@ export const bestStructure = uniprotId =>
           return acc;
         }, {})
       ).reduce((acc, d) => {
-        acc.push({ ...d, chain: d.chain.join("/") });
+        acc.push({ ...d, chain: d.chain.join('/') });
         return acc;
       }, []);
 

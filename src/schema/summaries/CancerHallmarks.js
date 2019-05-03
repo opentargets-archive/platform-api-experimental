@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   type CancerHallmarkPromotionAndSuppression {
@@ -32,8 +32,8 @@ export const resolvers = {
         .then(({ cancerHallmarks }) => cancerHallmarks.roleInCancer),
     sources: () => [
       {
-        name: "Cancer Gene Census",
-        url: "https://cancer.sanger.ac.uk/census#cl_search",
+        name: 'Cancer Gene Census',
+        url: 'https://cancer.sanger.ac.uk/census#cl_search',
       },
     ],
   },
