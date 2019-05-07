@@ -6,6 +6,7 @@ export const typeDefs = gql`
   type HomologyRow {
     dNdS: Float
     species: String!
+    speciesId: String!
     homologyType: String!
     queryPercentageIdentity: Float!
     targetPercentageIdentity: Float!
