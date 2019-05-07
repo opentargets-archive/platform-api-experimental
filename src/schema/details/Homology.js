@@ -1,11 +1,12 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
-import { homologyTable } from "../../apis/ensembl";
+import { homologyTable } from '../../apis/ensembl';
 
 export const typeDefs = gql`
   type HomologyRow {
     dNdS: Float
     species: String!
+    homologyType: String!
     queryPercentageIdentity: Float!
     targetPercentageIdentity: Float!
     targetGeneId: String!
