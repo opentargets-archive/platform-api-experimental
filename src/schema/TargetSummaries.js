@@ -64,7 +64,12 @@ import {
 import {
   typeDefs as TargetSummaryVariation,
   resolvers as resolversTargetVariation,
-} from "./summaries/Variation";
+} from './summaries/Variation';
+
+import {
+  typeDefs as TargetSummaryHomology,
+  resolvers as resolversTargetHomology,
+} from './summaries/Homology';
 
 export const typeDefs = [
   TargetSummaryMousePhenotypes,
@@ -80,6 +85,7 @@ export const typeDefs = [
   TargetSummaryRNAAndProteinExpression,
   TargetSummaryCancerHallmarks,
   TargetSummaryVariation,
+  TargetSummaryHomology,
   gql`
     type TargetSummaries {
       mousePhenotypes: TargetSummaryMousePhenotypes
@@ -95,6 +101,7 @@ export const typeDefs = [
       rnaAndProteinExpression: TargetSummaryRNAAndProteinExpression
       cancerHallmarks: TargetSummaryCancerHallmarks
       variation: TargetSummaryVariation
+      homology: TargetSummaryHomology
     }
   `,
 ];
@@ -113,6 +120,7 @@ export const resolvers = _.merge(
   resolversTargetRNAAndProteinExpression,
   resolversTargetCancerHallmarks,
   resolversTargetVariation,
+  resolversTargetHomology,
   {
     TargetSummaries: {
       mousePhenotypes: _.identity,
@@ -128,6 +136,7 @@ export const resolvers = _.merge(
       rnaAndProteinExpression: _.identity,
       cancerHallmarks: _.identity,
       variation: _.identity,
+      homology: _.identity,
     },
   }
 );

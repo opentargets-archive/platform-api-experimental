@@ -2,6 +2,11 @@ import { gql } from 'apollo-server-express';
 import _ from 'lodash';
 
 import {
+  typeDefs as TargetDetailHomology,
+  resolvers as resolversTargetHomology,
+} from "./details/Homology";
+
+import {
   typeDefs as TargetDetailMousePhenotypes,
   resolvers as resolversTargetMousePhenotypes,
 } from './details/MousePhenotypes';
@@ -52,6 +57,7 @@ import {
 } from './details/CancerHallmarks';
 
 export const typeDefs = [
+  TargetDetailHomology,
   TargetDetailMousePhenotypes,
   TargetDetailGeneOntology,
   TargetDetailPathways,
@@ -64,6 +70,7 @@ export const typeDefs = [
   TargetDetailCancerHallmarks,
   gql`
     type TargetDetails {
+      homology: TargetDetailHomology
       mousePhenotypes: TargetDetailMousePhenotypes
       geneOntology: TargetDetailGeneOntology
       pathways: TargetDetailPathways
@@ -79,6 +86,7 @@ export const typeDefs = [
 ];
 
 export const resolvers = _.merge(
+  resolversTargetHomology,
   resolversTargetMousePhenotypes,
   resolversTargetGeneOntology,
   resolversTargetPathways,
@@ -91,6 +99,7 @@ export const resolvers = _.merge(
   resolversTargetCancerHallmarks,
   {
     TargetDetails: {
+      homology: _.identity,
       mousePhenotypes: _.identity,
       geneOntology: _.identity,
       pathways: _.identity,
