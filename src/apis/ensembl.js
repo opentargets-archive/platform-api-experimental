@@ -25,6 +25,24 @@ const scientificName2CommonName = {
   caenorhabditis_elegans_N2: 'Worm',
 };
 
+const speciesSubset = [
+  // 'homo_sapiens',
+  'pan_troglodytes',
+
+  'macaca_mulatta',
+  'sus_scrofa',
+  'canis_familiaris',
+  'oryctolagus_cuniculus',
+  'mus_musculus',
+
+  'rattus_norvegicus',
+  'cavia_porcellus',
+  'xenopus_tropicalis',
+  'danio_rerio',
+  'drosophila_melanogaster',
+  'caenorhabditis_elegans',
+];
+
 var homologyTypeDictionary = {
   ortholog_one2one: 'orthologue: 1 to 1',
   ortholog_one2many: 'orthologue: 1 to many',
@@ -58,7 +76,22 @@ export const homologyTable = ensgId =>
                 targetGeneId: d.target.id,
                 targetGeneSymbol: targetIdLookup[d.target.id].display_name,
               }));
-            return rows;
+            const orthologuesBySpecies = speciesSubset.map(speciesId => ({
+              speciesId,
+              species: scientificName2CommonName[speciesId],
+              orthologuesCount: rows.filter(
+                r =>
+                  r.speciesId === speciesId &&
+                  (r.homologyType ===
+                    homologyTypeDictionary['ortholog_one2one'] ||
+                    r.homologyType ===
+                      homologyTypeDictionary['ortholog_one2many'])
+              ).length,
+            }));
+            const paralogueCount = rows.filter(
+              r => r.homologyType === 'within_species_paralog'
+            ).length;
+            return { rows, orthologuesBySpecies, paralogueCount };
           });
       } else {
         return [];

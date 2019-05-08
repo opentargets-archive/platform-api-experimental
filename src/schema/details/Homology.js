@@ -11,7 +11,7 @@ export const typeDefs = gql`
     queryPercentageIdentity: Float!
     targetPercentageIdentity: Float!
     targetGeneId: String!
-    targetGeneSymbol: String!
+    targetGeneSymbol: String
   }
   type TargetDetailHomology {
     rows: [HomologyRow!]!
@@ -20,6 +20,7 @@ export const typeDefs = gql`
 
 export const resolvers = {
   TargetDetailHomology: {
-    rows: ({ _ensgId }, args, { targetLoader }) => homologyTable(_ensgId),
+    rows: ({ _ensgId }, args, { targetLoader }) =>
+      homologyTable(_ensgId).then(({ rows }) => rows),
   },
 };
