@@ -9,6 +9,7 @@ export const typeDefs = gql`
     orthologuesCount: Int!
   }
   type TargetSummaryHomology {
+    paraloguesCount: Int!
     orthologuesBySpecies: [OrthologuesBySpecies!]!
     sources: [Source!]!
   }
@@ -21,5 +22,7 @@ export const resolvers = {
       homologyTable(_ensgId).then(
         ({ orthologuesBySpecies }) => orthologuesBySpecies
       ),
+    paraloguesCount: ({ _ensgId }, args, { targetLoader }) =>
+      homologyTable(_ensgId).then(({ paraloguesCount }) => paraloguesCount),
   },
 };

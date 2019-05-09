@@ -88,10 +88,12 @@ export const homologyTable = ensgId =>
                       homologyTypeDictionary['ortholog_one2many'])
               ).length,
             }));
-            const paralogueCount = rows.filter(
-              r => r.homologyType === 'within_species_paralog'
+            const paraloguesCount = rows.filter(
+              r =>
+                r.homologyType ===
+                homologyTypeDictionary['within_species_paralog']
             ).length;
-            return { rows, orthologuesBySpecies, paralogueCount };
+            return { rows, orthologuesBySpecies, paraloguesCount };
           });
       } else {
         return [];
