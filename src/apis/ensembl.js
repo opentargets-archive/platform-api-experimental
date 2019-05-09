@@ -26,7 +26,7 @@ const scientificName2CommonName = {
 };
 
 const speciesSubset = [
-  // 'homo_sapiens',
+  'homo_sapiens',
   'pan_troglodytes',
 
   'macaca_mulatta',
