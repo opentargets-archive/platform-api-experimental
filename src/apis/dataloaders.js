@@ -104,21 +104,37 @@ const antibodyTractabilityLevels = [
   // }
 ];
 const transformTractability = rawTractability => {
-  return {
-    hasSmallMoleculeTractabilityAssessment:
-      rawTractability.smallmolecule.buckets.length !== 0,
-    hasAntibodyTractabilityAssessment:
-      rawTractability.antibody.buckets.length !== 0,
-    smallMolecule: smallMoleculeTractabilityLevels.map(d => ({
+  let hasSmallMoleculeTractabilityAssessment = false;
+  let hasAntibodyTractabilityAssessment = false;
+  let smallMolecule = null;
+  let antibody = null;
+
+  if (rawTractability.smallmolecule) {
+    hasSmallMoleculeTractabilityAssessment =
+      rawTractability.smallmolecule.buckets.length !== 0;
+    smallMolecule = smallMoleculeTractabilityLevels.map(d => ({
       chemblBucket: d.bucket,
       description: d.label,
       value: rawTractability.smallmolecule.buckets.indexOf(d.bucket) >= 0,
-    })),
-    antibody: antibodyTractabilityLevels.map(d => ({
+    }));
+  }
+
+  if (rawTractability.antibody) {
+    hasAntibodyTractabilityAssessment =
+      rawTractability.antibody.buckets.length !== 0;
+
+    antibody = antibodyTractabilityLevels.map(d => ({
       chemblBucket: d.bucket,
       description: d.label,
       value: rawTractability.antibody.buckets.indexOf(d.bucket) >= 0,
-    })),
+    }));
+  }
+
+  return {
+    hasSmallMoleculeTractabilityAssessment,
+    hasAntibodyTractabilityAssessment,
+    smallMolecule,
+    antibody,
   };
 };
 
