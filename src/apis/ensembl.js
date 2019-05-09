@@ -25,18 +25,18 @@ const scientificName2CommonName = {
   caenorhabditis_elegans_N2: 'Worm',
 };
 
+// ordered by https://github.com/opentargets/platform/issues/536#issuecomment-490911671
+// (see http://timetree.org/)
 const speciesSubset = [
   'homo_sapiens',
   'pan_troglodytes',
-
   'macaca_mulatta',
-  'sus_scrofa',
-  'canis_familiaris',
-  'oryctolagus_cuniculus',
   'mus_musculus',
-
   'rattus_norvegicus',
   'cavia_porcellus',
+  'oryctolagus_cuniculus',
+  'sus_scrofa',
+  'canis_familiaris',
   'xenopus_tropicalis',
   'danio_rerio',
   'drosophila_melanogaster',
