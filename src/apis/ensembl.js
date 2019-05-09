@@ -25,6 +25,24 @@ const scientificName2CommonName = {
   caenorhabditis_elegans_N2: 'Worm',
 };
 
+// ordered by https://github.com/opentargets/platform/issues/536#issuecomment-490911671
+// (see http://timetree.org/)
+const speciesSubset = [
+  'homo_sapiens',
+  'pan_troglodytes',
+  'macaca_mulatta',
+  'mus_musculus',
+  'rattus_norvegicus',
+  'cavia_porcellus',
+  'oryctolagus_cuniculus',
+  'sus_scrofa',
+  'canis_familiaris',
+  'xenopus_tropicalis',
+  'danio_rerio',
+  'drosophila_melanogaster',
+  'caenorhabditis_elegans',
+];
+
 var homologyTypeDictionary = {
   ortholog_one2one: 'orthologue: 1 to 1',
   ortholog_one2many: 'orthologue: 1 to many',
@@ -58,7 +76,24 @@ export const homologyTable = ensgId =>
                 targetGeneId: d.target.id,
                 targetGeneSymbol: targetIdLookup[d.target.id].display_name,
               }));
-            return rows;
+            const orthologuesBySpecies = speciesSubset.map(speciesId => ({
+              speciesId,
+              species: scientificName2CommonName[speciesId],
+              orthologuesCount: rows.filter(
+                r =>
+                  r.speciesId === speciesId &&
+                  (r.homologyType ===
+                    homologyTypeDictionary['ortholog_one2one'] ||
+                    r.homologyType ===
+                      homologyTypeDictionary['ortholog_one2many'])
+              ).length,
+            }));
+            const paraloguesCount = rows.filter(
+              r =>
+                r.homologyType ===
+                homologyTypeDictionary['within_species_paralog']
+            ).length;
+            return { rows, orthologuesBySpecies, paraloguesCount };
           });
       } else {
         return [];
