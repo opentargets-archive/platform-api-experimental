@@ -17,6 +17,7 @@ import {
 import {
   createTargetLoader,
   createExpressionLoader,
+  createAtlasLoader,
   createTargetDrugsLoader,
   createDiseaseLoader,
 } from './apis/dataloaders';
@@ -27,6 +28,7 @@ const server = new ApolloServer({
   context: ({ req }) => ({
     targetLoader: createTargetLoader(),
     expressionLoader: createExpressionLoader(),
+    atlasLoader: createAtlasLoader(),
     diseaseLoader: createDiseaseLoader(),
     targetDrugsLoader: createTargetDrugsLoader(),
   }),

@@ -2,6 +2,7 @@ import DataLoader from 'dataloader';
 import _ from 'lodash';
 
 import { targets, expressions, diseases, targetsDrugs } from './openTargets';
+import { expressionsAtlas } from './expressionAtlas';
 import reactomeTopLevel from '../constants/reactomeTopLevel';
 import mousePhenotypesTopLevel from '../constants/mousePhenotypesTopLevel';
 import uniprotSubCellularLocations from '../constants/uniprotSubCellularLocations';
@@ -208,6 +209,16 @@ export const createExpressionLoader = () => {
           proteinBaselineExpression,
         };
       });
+    })
+  );
+};
+
+export const createAtlasLoader = () => {
+  return new DataLoader(keys =>
+    expressionsAtlas(keys).then(data => {
+      return data.map(d => ({
+        atlasExperiment: d.data.profiles.rows.length > 0,
+      }));
     })
   );
 };

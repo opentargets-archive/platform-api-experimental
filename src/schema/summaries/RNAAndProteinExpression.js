@@ -4,6 +4,7 @@ export const typeDefs = gql`
   type TargetSummaryRNAAndProteinExpression {
     rnaBaselineExpression: Boolean!
     proteinBaselineExpression: Boolean!
+    expressionAtlasExperiment: Boolean!
   }
 `;
 
@@ -17,5 +18,7 @@ export const resolvers = {
       expressionLoader
         .load(_ensgId)
         .then(({ proteinBaselineExpression }) => proteinBaselineExpression),
+    expressionAtlasExperiment: ({ _ensgId }, args, { atlasLoader }) =>
+      atlasLoader.load(_ensgId).then(({ atlasExperiment }) => atlasExperiment),
   },
 };
