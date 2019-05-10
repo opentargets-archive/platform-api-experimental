@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import { targets, expressions, diseases, targetsDrugs } from './openTargets';
 import { expressionsAtlas } from './expressionAtlas';
+import { gtexs } from './gtex';
 import reactomeTopLevel from '../constants/reactomeTopLevel';
 import mousePhenotypesTopLevel from '../constants/mousePhenotypesTopLevel';
 import uniprotSubCellularLocations from '../constants/uniprotSubCellularLocations';
@@ -220,6 +221,12 @@ export const createAtlasLoader = () => {
         atlasExperiment: d.data.profiles.rows.length > 0,
       }));
     })
+  );
+};
+
+export const createGtexLoader = () => {
+  return new DataLoader(keys =>
+    gtexs(keys).then(res => res.map(d => ({ gtexData: d })))
   );
 };
 

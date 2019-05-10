@@ -18,6 +18,7 @@ import {
   createTargetLoader,
   createExpressionLoader,
   createAtlasLoader,
+  createGtexLoader,
   createTargetDrugsLoader,
   createDiseaseLoader,
 } from './apis/dataloaders';
@@ -29,6 +30,7 @@ const server = new ApolloServer({
     targetLoader: createTargetLoader(),
     expressionLoader: createExpressionLoader(),
     atlasLoader: createAtlasLoader(),
+    gtexLoader: createGtexLoader(),
     diseaseLoader: createDiseaseLoader(),
     targetDrugsLoader: createTargetDrugsLoader(),
   }),
