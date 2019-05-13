@@ -205,9 +205,25 @@ export const createExpressionLoader = () => {
           tissue => tissue.protein.level >= 0
         );
 
+        const rows = tissues.map(tissue => {
+          return {
+            uberonId: tissue.efo_code,
+            rna: tissue.rna,
+            label: tissue.label,
+            anatomicalSystems: tissue.anatomical_systems,
+            protein: {
+              cellType: tissue.protein.cell_type,
+              reliability: tissue.protein.reliability,
+              level: tissue.protein.level,
+            },
+            organs: tissue.organs,
+          };
+        });
+
         return {
           rnaBaselineExpression,
           proteinBaselineExpression,
+          rows,
         };
       });
     })
