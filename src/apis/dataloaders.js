@@ -343,6 +343,15 @@ export const createTargetLoader = () =>
             roleInCancer: (hallmarks ? hallmarks.attributes : [])
               .filter(d => d.attribute_name === 'role in cancer')
               .map(d => ({ name: d.description, pmId: d.pmid })),
+            rows: (hallmarks ? hallmarks.cancer_hallmarks : [])
+              .map(d => ({
+                name: d.label,
+                description: d.description,
+                promotes: d.promote,
+                suppresses: d.suppress,
+                activity: d.promote ? 'promotes' : (d.suppress ? 'suppresses' : ''),
+                pmId: d.pmid,
+              }))
           };
 
           const interactions = omnipathData.filter(
