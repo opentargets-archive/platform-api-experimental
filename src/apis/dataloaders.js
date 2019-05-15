@@ -207,16 +207,16 @@ export const createExpressionLoader = () => {
 
         const rows = tissues.map(tissue => {
           return {
-            uberonId: tissue.efo_code,
-            rna: tissue.rna,
             label: tissue.label,
+            organs: tissue.organs,
             anatomicalSystems: tissue.anatomical_systems,
+            rna: {
+              value: tissue.rna.value,
+              level: tissue.rna.level,
+            },
             protein: {
-              cellType: tissue.protein.cell_type,
-              reliability: tissue.protein.reliability,
               level: tissue.protein.level,
             },
-            organs: tissue.organs,
           };
         });
 
