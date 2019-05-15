@@ -205,9 +205,25 @@ export const createExpressionLoader = () => {
           tissue => tissue.protein.level >= 0
         );
 
+        const rows = tissues.map(tissue => {
+          return {
+            label: tissue.label,
+            organs: tissue.organs,
+            anatomicalSystems: tissue.anatomical_systems,
+            rna: {
+              value: tissue.rna.value,
+              level: tissue.rna.level,
+            },
+            protein: {
+              level: tissue.protein.level,
+            },
+          };
+        });
+
         return {
           rnaBaselineExpression,
           proteinBaselineExpression,
+          rows,
         };
       });
     })

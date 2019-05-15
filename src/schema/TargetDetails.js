@@ -4,7 +4,7 @@ import _ from 'lodash';
 import {
   typeDefs as TargetDetailHomology,
   resolvers as resolversTargetHomology,
-} from "./details/Homology";
+} from './details/Homology';
 
 import {
   typeDefs as TargetDetailMousePhenotypes,
@@ -56,6 +56,11 @@ import {
   resolvers as resolversTargetCancerHallmarks,
 } from './details/CancerHallmarks';
 
+import {
+  typeDefs as TargetDetailExpression,
+  resolvers as resolversTargetExpression,
+} from './details/Expression';
+
 export const typeDefs = [
   TargetDetailHomology,
   TargetDetailMousePhenotypes,
@@ -68,6 +73,7 @@ export const typeDefs = [
   TargetDetailRelatedTargets,
   TargetDetailTractability,
   TargetDetailCancerHallmarks,
+  TargetDetailExpression,
   gql`
     type TargetDetails {
       homology: TargetDetailHomology
@@ -81,6 +87,7 @@ export const typeDefs = [
       relatedTargets: TargetDetailRelatedTargets
       tractability: TargetDetailTractability
       cancerHallmarks: TargetDetailCancerHallmarks
+      expression: TargetDetailExpression
     }
   `,
 ];
@@ -97,6 +104,7 @@ export const resolvers = _.merge(
   resolversTargetRelatedTargets,
   resolversTargetTractability,
   resolversTargetCancerHallmarks,
+  resolversTargetExpression,
   {
     TargetDetails: {
       homology: _.identity,
@@ -110,6 +118,7 @@ export const resolvers = _.merge(
       relatedTargets: _.identity,
       tractability: _.identity,
       cancerHallmarks: _.identity,
+      expression: _.identity,
     },
   }
 );
