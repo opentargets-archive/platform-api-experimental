@@ -15,14 +15,13 @@ export const typeDefs = gql`
     name: String!
     promotes: Boolean!
     suppresses: Boolean!
-    activity: String!
     description: String!
     pmId: String!
   }
   type TargetDetailCancerHallmarks {
     publicationsByHallmark: [CancerHallmarkPublicationsByHallmark!]!
     roleInCancer: [CancerHallmarkRoleInCancer!]!
-    rows: [CancerHallmarkPublicationFullDetails!]
+    rows: [CancerHallmarkPublicationFullDetails!]!
   }
 `;
 

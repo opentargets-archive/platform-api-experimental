@@ -349,7 +349,6 @@ export const createTargetLoader = () =>
                 description: d.description,
                 promotes: d.promote,
                 suppresses: d.suppress,
-                activity: d.promote ? 'promotes' : (d.suppress ? 'suppresses' : ''),
                 pmId: d.pmid,
               }))
           };
