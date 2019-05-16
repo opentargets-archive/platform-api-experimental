@@ -11,9 +11,17 @@ export const typeDefs = gql`
     suppresses: Boolean!
     publications: [CancerHallmarkPublication!]!
   }
+  type CancerHallmarkPublicationFullDetails {
+    name: String!
+    promotes: Boolean!
+    suppresses: Boolean!
+    description: String!
+    pmId: String!
+  }
   type TargetDetailCancerHallmarks {
     publicationsByHallmark: [CancerHallmarkPublicationsByHallmark!]!
     roleInCancer: [CancerHallmarkRoleInCancer!]!
+    rows: [CancerHallmarkPublicationFullDetails!]!
   }
 `;
 
@@ -27,5 +35,9 @@ export const resolvers = {
       targetLoader
         .load(_ensgId)
         .then(({ cancerHallmarks }) => cancerHallmarks.roleInCancer),
+    rows: ({ _ensgId }, args, { targetLoader }) =>
+      targetLoader
+        .load(_ensgId)
+        .then(({ cancerHallmarks }) => cancerHallmarks.rows),
   },
 };
