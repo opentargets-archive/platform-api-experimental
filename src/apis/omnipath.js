@@ -89,13 +89,11 @@ export const omnipathInteractionsSubGraph = uniprotId => {
     isInhibition: d.is_inhibition === 1 ? true : false,
     pmIds: d.references.map(r => `${r}`),
     sources: d.sources,
-    sourcesByType: {
-      pathways: d.sources.some(s => omnipathCategories.Pathways[s]),
-      enzymeSubstrate: d.sources.some(
-        s => omnipathCategories.EnzymeSubstrate[s]
-      ),
-      ppi: d.sources.some(s => omnipathCategories.PPI[s]),
-    },
+    pathwaysSources: d.sources.filter(s => omnipathCategories.Pathways[s]),
+    enzymeSubstrateSources: d.sources.filter(
+      s => omnipathCategories.EnzymeSubstrate[s]
+    ),
+    ppiSources: d.sources.filter(s => omnipathCategories.PPI[s]),
   }));
 
   return { nodes, edges };

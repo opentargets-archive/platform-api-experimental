@@ -6,11 +6,6 @@ export const typeDefs = gql`
     ensgId: String!
     symbol: String!
   }
-  type ProteinInteractionsGraphEdgeSourceTypes {
-    pathways: Boolean!
-    enzymeSubstrate: Boolean!
-    ppi: Boolean!
-  }
   type ProteinInteractionsGraphEdge {
     source: String!
     target: String!
@@ -19,7 +14,9 @@ export const typeDefs = gql`
     isInhibition: Boolean!
     pmIds: [String!]!
     sources: [String!]!
-    sourcesByType: ProteinInteractionsGraphEdgeSourceTypes!
+    pathwaysSources: [String!]!
+    enzymeSubstrateSources: [String!]!
+    ppiSources: [String!]!
   }
   type TargetDetailProteinInteractions {
     nodes: [ProteinInteractionsGraphNode!]!
