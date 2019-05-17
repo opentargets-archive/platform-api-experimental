@@ -51,6 +51,7 @@ export const omnipathInteractionCountsByType = uniprotId => {
 
 export const omnipathInteractionsSubGraph = uniprotId => {
   const omnipathFiltered = getInteractionsForUniprotId(uniprotId);
+  const acceptedUniprotIds = Object.keys(uniprotLUT); // omnipath contains eg. Q9Y6C7 which is not mapped to ensembl
 
   // get neighbours
   const neighboursObj = {};
@@ -61,7 +62,9 @@ export const omnipathInteractionsSubGraph = uniprotId => {
     .filter(d => d.target === uniprotId)
     .forEach(d => (neighboursObj[d.source] = true));
   const neighbours = Object.keys(neighboursObj);
-  const selfAndNeighbours = [uniprotId, ...neighbours];
+  const selfAndNeighbours = [uniprotId, ...neighbours].filter(
+    d => acceptedUniprotIds.indexOf(d) >= 0
+  );
 
   // get nodes
   const nodes = uniprotId
