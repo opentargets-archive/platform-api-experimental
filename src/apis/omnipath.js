@@ -64,11 +64,13 @@ export const omnipathInteractionsSubGraph = uniprotId => {
   const selfAndNeighbours = [uniprotId, ...neighbours];
 
   // get nodes
-  const nodes = selfAndNeighbours.map(d => ({
-    uniprotId: d,
-    ensgId: uniprotLUT[d].ensgId,
-    symbol: uniprotLUT[d].symbol,
-  }));
+  const nodes = uniprotId
+    ? selfAndNeighbours.map(d => ({
+        uniprotId: d,
+        ensgId: uniprotLUT[d].ensgId,
+        symbol: uniprotLUT[d].symbol,
+      }))
+    : [];
 
   // get edges
   const interactions = omnipathData.filter(
