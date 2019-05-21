@@ -61,6 +61,11 @@ import {
   resolvers as resolversTargetExpression,
 } from './details/Expression';
 
+import {
+  typeDefs as TargetDetailProteinInteractions,
+  resolvers as resolversTargetProteinInteractions,
+} from './details/ProteinInteractions';
+
 export const typeDefs = [
   TargetDetailHomology,
   TargetDetailMousePhenotypes,
@@ -74,6 +79,7 @@ export const typeDefs = [
   TargetDetailTractability,
   TargetDetailCancerHallmarks,
   TargetDetailExpression,
+  TargetDetailProteinInteractions,
   gql`
     type TargetDetails {
       homology: TargetDetailHomology
@@ -88,6 +94,7 @@ export const typeDefs = [
       tractability: TargetDetailTractability
       cancerHallmarks: TargetDetailCancerHallmarks
       expression: TargetDetailExpression
+      proteinInteractions: TargetDetailProteinInteractions
     }
   `,
 ];
@@ -105,6 +112,7 @@ export const resolvers = _.merge(
   resolversTargetTractability,
   resolversTargetCancerHallmarks,
   resolversTargetExpression,
+  resolversTargetProteinInteractions,
   {
     TargetDetails: {
       homology: _.identity,
@@ -119,6 +127,7 @@ export const resolvers = _.merge(
       tractability: _.identity,
       cancerHallmarks: _.identity,
       expression: _.identity,
+      proteinInteractions: _.identity,
     },
   }
 );

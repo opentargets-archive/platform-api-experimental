@@ -4,12 +4,14 @@ import _ from 'lodash';
 import { targets, expressions, diseases, targetsDrugs } from './openTargets';
 import { expressionsAtlas } from './expressionAtlas';
 import { gtexs } from './gtex';
+import {
+  omnipathInteractionCountsByType,
+  omnipathInteractionsSubGraph,
+} from './omnipath';
 import reactomeTopLevel from '../constants/reactomeTopLevel';
 import mousePhenotypesTopLevel from '../constants/mousePhenotypesTopLevel';
 import uniprotSubCellularLocations from '../constants/uniprotSubCellularLocations';
 import uniprotKeywordsLookup from '../constants/uniprotKeywords';
-import omnipathData from '../constants/omnipathData';
-import omnipathCategories from '../constants/omnipathCategories';
 import getMultiplePublicationsSource from '../utils/getMultiplePublicationsSource';
 
 // Note: dataloader assumes that the response array is in the same
@@ -152,45 +154,6 @@ const cancerHallmarkNames = [
   'escaping programmed cell death',
   'change of cellular energetics',
 ];
-
-const countInteractions = interactions => {
-  let ppi = 0;
-  let pathways = 0;
-  let enzymeSubstrate = 0;
-
-  interactions.forEach(interaction => {
-    let hasContributedToPathways = false;
-    let hasContributedToPPI = false;
-    let hasContributedToEnzymeSubstrate = false;
-
-    const { sources } = interaction;
-
-    sources.forEach(source => {
-      if (omnipathCategories.Pathways[source]) {
-        if (!hasContributedToPathways) {
-          pathways++;
-          hasContributedToPathways = true;
-        }
-      } else if (omnipathCategories.PPI[source]) {
-        if (!hasContributedToPPI) {
-          ppi++;
-          hasContributedToPPI = true;
-        }
-      } else if (omnipathCategories.EnzymeSubstrate[source]) {
-        if (!hasContributedToEnzymeSubstrate) {
-          enzymeSubstrate++;
-          hasContributedToEnzymeSubstrate = true;
-        }
-      }
-    });
-  });
-
-  return {
-    ppi,
-    pathways,
-    enzymeSubstrate,
-  };
-};
 
 export const createExpressionLoader = () => {
   return new DataLoader(keys =>
@@ -359,20 +322,19 @@ export const createTargetLoader = () =>
             roleInCancer: (hallmarks ? hallmarks.attributes : [])
               .filter(d => d.attribute_name === 'role in cancer')
               .map(d => ({ name: d.description, pmId: d.pmid })),
-            rows: (hallmarks ? hallmarks.cancer_hallmarks : [])
-              .map(d => ({
-                name: d.label,
-                description: d.description,
-                promotes: d.promote,
-                suppresses: d.suppress,
-                pmId: d.pmid,
-              }))
+            rows: (hallmarks ? hallmarks.cancer_hallmarks : []).map(d => ({
+              name: d.label,
+              description: d.description,
+              promotes: d.promote,
+              suppresses: d.suppress,
+              pmId: d.pmid,
+            })),
           };
 
-          const interactions = omnipathData.filter(
-            d => d.source === uniprotId || d.target === uniprotId
-          );
-          const proteinInteractions = countInteractions(interactions);
+          const proteinInteractions = {
+            counts: omnipathInteractionCountsByType(uniprotId),
+            subGraph: omnipathInteractionsSubGraph(uniprotId),
+          };
 
           const mousePhenotypesRows =
             mousePhenotypesGenes && Array.isArray(mousePhenotypesGenes)
