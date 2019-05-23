@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
-  type TargetSummaryRNAAndProteinExpression {
+  type TargetSummaryExpression {
     rnaBaselineExpression: Boolean!
     proteinBaselineExpression: Boolean!
     expressionAtlasExperiment: Boolean!
@@ -10,7 +10,7 @@ export const typeDefs = gql`
 `;
 
 export const resolvers = {
-  TargetSummaryRNAAndProteinExpression: {
+  TargetSummaryExpression: {
     rnaBaselineExpression: ({ _ensgId }, args, { expressionLoader }) =>
       expressionLoader
         .load(_ensgId)

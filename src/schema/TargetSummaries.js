@@ -52,9 +52,9 @@ import {
 } from './summaries/ProteinInteractions';
 
 import {
-  typeDefs as TargetSummaryRNAAndProteinExpression,
-  resolvers as resolversTargetRNAAndProteinExpression,
-} from './summaries/RNAAndProteinExpression';
+  typeDefs as TargetSummaryExpression,
+  resolvers as resolversTargetExpression,
+} from './summaries/Expression';
 
 import {
   typeDefs as TargetSummaryCancerHallmarks,
@@ -82,7 +82,7 @@ export const typeDefs = [
   TargetSummaryRelatedTargets,
   TargetSummaryTractability,
   TargetSummaryProteinInteractions,
-  TargetSummaryRNAAndProteinExpression,
+  TargetSummaryExpression,
   TargetSummaryCancerHallmarks,
   TargetSummaryVariation,
   TargetSummaryHomology,
@@ -98,7 +98,7 @@ export const typeDefs = [
       relatedTargets: TargetSummaryRelatedTargets
       tractability: TargetSummaryTractability
       proteinInteractions: TargetSummaryProteinInteractions
-      rnaAndProteinExpression: TargetSummaryRNAAndProteinExpression
+      expression: TargetSummaryExpression
       cancerHallmarks: TargetSummaryCancerHallmarks
       variation: TargetSummaryVariation
       homology: TargetSummaryHomology
@@ -117,7 +117,7 @@ export const resolvers = _.merge(
   resolversTargetRelatedTargets,
   resolversTargetTractability,
   resolversTargetProteinInteractions,
-  resolversTargetRNAAndProteinExpression,
+  resolversTargetExpression,
   resolversTargetCancerHallmarks,
   resolversTargetVariation,
   resolversTargetHomology,
@@ -133,7 +133,7 @@ export const resolvers = _.merge(
       relatedTargets: _.identity,
       tractability: _.identity,
       proteinInteractions: _.identity,
-      rnaAndProteinExpression: _.identity,
+      expression: _.identity,
       cancerHallmarks: _.identity,
       variation: _.identity,
       homology: _.identity,
