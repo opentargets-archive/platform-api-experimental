@@ -42,7 +42,16 @@ const getInteractionCountsByType = interactions => {
 };
 
 const getInteractionsForUniprotId = uniprotId =>
-  omnipathData.filter(d => d.source === uniprotId || d.target === uniprotId);
+  omnipathData
+    .filter(d => d.source === uniprotId || d.target === uniprotId)
+    .filter(d =>
+      d.sources.some(
+        s =>
+          omnipathCategories.Pathways[s] ||
+          omnipathCategories.PPI[s] ||
+          omnipathCategories.EnzymeSubstrate[s]
+      )
+    );
 
 export const omnipathInteractionCountsByType = uniprotId => {
   const omnipathFiltered = getInteractionsForUniprotId(uniprotId);
