@@ -31,7 +31,8 @@ export const resolvers = {
       targetLoader
         .load(_ensgId)
         .then(
-          ({ proteinInteractions }) => proteinInteractions.subGraph.nodes.length
+          ({ proteinInteractions }) =>
+            proteinInteractions.subGraph.nodes.length - 1
         ),
     sources: () => [{ name: 'OmniPath DB', url: 'http://omnipathdb.org/' }],
   },
