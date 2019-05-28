@@ -5,6 +5,7 @@ export const typeDefs = gql`
     ppi: Int!
     pathways: Int!
     enzymeSubstrate: Int!
+    interactorsCount: Int!
     sources: [Source!]!
   }
 `;
@@ -25,6 +26,12 @@ export const resolvers = {
         .then(
           ({ proteinInteractions }) =>
             proteinInteractions.counts.enzymeSubstrate
+        ),
+    interactorsCount: ({ _ensgId }, args, { targetLoader }) =>
+      targetLoader
+        .load(_ensgId)
+        .then(
+          ({ proteinInteractions }) => proteinInteractions.subGraph.nodes.length
         ),
     sources: () => [{ name: 'OmniPath DB', url: 'http://omnipathdb.org/' }],
   },
