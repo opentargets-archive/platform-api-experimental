@@ -162,7 +162,7 @@ export const createExpressionLoader = () => {
         const { tissues } = data.data[key];
 
         const rnaBaselineExpression = tissues.some(
-          tissue => tissue.rna.value > 0
+          tissue => tissue.rna.level >= 0
         );
         const proteinBaselineExpression = tissues.some(
           tissue => tissue.protein.level >= 0
