@@ -39,7 +39,7 @@ const server = new ApolloServer({
 const app = express();
 server.applyMiddleware({ app });
 
-const port = 4000;
+const port = process.env.PLATFORM_API_PORT || 8080;
 
 app.listen({ port }, () =>
   console.log(
