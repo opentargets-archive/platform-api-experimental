@@ -7,22 +7,9 @@ const API_URL = 'https://www.ebi.ac.uk/gxa/';
 // is application/x-www-form-urlencoded.
 // See https://github.com/axios/axios/issues/362
 const expressionAtlas = ensgId => {
-  return (
-    axios
-      .post(
-        `${API_URL}json/baseline_experiments`,
-        `species=homo sapiens&geneQuery=${ensgId}`
-      )
-      // TODO: figure out a better way to handle errors from third party APIs
-      .catch(() => {
-        return {
-          data: {
-            profiles: {
-              rows: [],
-            },
-          },
-        };
-      })
+  return axios.post(
+    `${API_URL}json/baseline_experiments`,
+    `species=homo sapiens&geneQuery=${ensgId}`
   );
 };
 
