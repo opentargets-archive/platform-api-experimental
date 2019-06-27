@@ -17,9 +17,14 @@ export const hasGtexData = symbol => {
         .then(res => {
           return res.data.geneExpression.length > 0;
         });
+    })
+    .catch(e => {
+      throw new Error('Error using GTEx API');
     });
 };
 
 export const gtexs = symbols => {
-  return Promise.all(symbols.map(symbol => hasGtexData(symbol)));
+  return Promise.all(symbols.map(symbol => hasGtexData(symbol))).catch(e => {
+    throw new Error('Error using GTEx API');
+  });
 };

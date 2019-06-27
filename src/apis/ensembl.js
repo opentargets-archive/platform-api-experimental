@@ -74,7 +74,9 @@ export const homologyTable = ensgId =>
                 queryPercentageIdentity: d.source.perc_id,
                 targetPercentageIdentity: d.target.perc_id,
                 targetGeneId: d.target.id,
-                targetGeneSymbol: targetIdLookup[d.target.id].display_name,
+                targetGeneSymbol: targetIdLookup[d.target.id]
+                  ? targetIdLookup[d.target.id].display_name
+                  : null,
               }));
             const orthologuesBySpecies = speciesSubset.map(speciesId => ({
               speciesId,
@@ -98,4 +100,7 @@ export const homologyTable = ensgId =>
       } else {
         return [];
       }
+    })
+    .catch(e => {
+      throw new Error('Error using Ensembl API');
     });
