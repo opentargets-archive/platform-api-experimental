@@ -28,9 +28,13 @@ export const resolvers = _.merge(
       name: ({ _efoId, name }, args, { diseaseLoader }) =>
         name ? name : diseaseLoader.load(_efoId).then(({ name }) => name),
       description: ({ _efoId, description }, args, { diseaseLoader }) =>
-        description ? description : diseaseLoader.load(_efoId).then(({ description }) => description),
+        description
+          ? description
+          : diseaseLoader.load(_efoId).then(({ description }) => description),
       synonyms: ({ _efoId, synonyms }, args, { diseaseLoader }) =>
-        synonyms ? synonyms : diseaseLoader.load(_efoId).then(({ synonyms }) => synonyms),
+        synonyms
+          ? synonyms
+          : diseaseLoader.load(_efoId).then(({ synonyms }) => synonyms),
       therapeuticAreas: (
         { _efoId, therapeuticAreas },
         args,
