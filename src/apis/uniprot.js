@@ -7,20 +7,25 @@ const STEM = 'proteins/api';
 const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
 
 export const secondaryStructure = uniprotId =>
-  axios.get(`${ROOT}proteins/${uniprotId}`).then(response => {
-    if (response.data) {
-      const { features, sequence } = response.data;
-      const { mass, length } = sequence;
-      const featuresStructural = features
-        .filter(d => d.category === 'STRUCTURAL')
-        .map(d => ({
-          type: d.type,
-          start: parseInt(d.begin),
-          end: parseInt(d.end),
-        }));
+  axios
+    .get(`${ROOT}proteins/${uniprotId}`)
+    .then(response => {
+      if (response.data) {
+        const { features, sequence } = response.data;
+        const { mass, length } = sequence;
+        const featuresStructural = features
+          .filter(d => d.category === 'STRUCTURAL')
+          .map(d => ({
+            type: d.type,
+            start: parseInt(d.begin),
+            end: parseInt(d.end),
+          }));
 
-      return { mass, length, features: featuresStructural };
-    } else {
-      return { mass: null, length: null, features: [] };
-    }
-  });
+        return { mass, length, features: featuresStructural };
+      } else {
+        return { mass: null, length: null, features: [] };
+      }
+    })
+    .catch(e => {
+      throw new Error('Error using UniProt API');
+    });
