@@ -7,10 +7,7 @@ import {
   resolvers as resolversTarget,
 } from './target/Target';
 
-import {
-  typeDefs as Disease,
-  resolvers as resolversDisease,
-} from './disease/Disease';
+import { typeDefs as Disease, resolvers as resolversDisease } from './disease';
 
 export const typeDefs = [...Query, ...Target, ...Disease];
 export const resolvers = _.merge(

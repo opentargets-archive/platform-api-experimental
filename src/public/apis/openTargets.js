@@ -108,3 +108,6 @@ export const targetAssociationsFacets = ensgId =>
   axios.get(
     `${ROOT}public/association/filter?target=${ensgId}&outputstructure=flat&facets=true&direct=true&size=1`
   );
+
+export const diseaseSimilar = efoId =>
+  axios.get(`${ROOT}private/relation/disease/${efoId}?id=${efoId}&size=10000`);
