@@ -1,17 +1,6 @@
 import express from 'express';
-import _ from 'lodash';
 
-import { typeDefs as Query, resolvers as resolversQuery } from './schema/Query';
-
-import {
-  typeDefs as Target,
-  resolvers as resolversTarget,
-} from './schema/target/Target';
-
-import {
-  typeDefs as Disease,
-  resolvers as resolversDisease,
-} from './schema/disease/Disease';
+import { typeDefs, resolvers } from './schema';
 
 import {
   createTargetLoader,
@@ -23,8 +12,8 @@ import {
 } from './apis/dataloaders';
 
 const apolloServerConfig = {
-  typeDefs: [...Query, ...Target, ...Disease],
-  resolvers: _.merge(resolversQuery, resolversTarget, resolversDisease),
+  typeDefs,
+  resolvers,
   context: ({ req }) => ({
     targetLoader: createTargetLoader(),
     expressionLoader: createExpressionLoader(),
