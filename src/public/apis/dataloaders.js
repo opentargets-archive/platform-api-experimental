@@ -6,6 +6,7 @@ import {
   expressions,
   diseases,
   targetsDrugs,
+  diseasesDrugs,
   drugs,
 } from './openTargets';
 import { expressionsAtlas } from './expressionAtlas';
@@ -731,6 +732,66 @@ export const createTargetDrugsLoader = () =>
           drugCount,
           drugModalities,
           trialsByPhase,
+          rows,
+        };
+      });
+    })
+  );
+
+export const createDiseaseDrugsLoader = () =>
+  new DataLoader(keys =>
+    diseasesDrugs(keys).then(([efoIds, data]) => {
+      return efoIds.map((efoId, i) => {
+        const relevantRows = data[i];
+        const drugs = _.uniqBy(relevantRows, 'drug.molecule_name');
+        const drugCount = drugs.length;
+        const rows = relevantRows.map(r => {
+          return {
+            target: {
+              id: r.target.id,
+              symbol: r.target.gene_info.symbol,
+              class: r.target.target_class[0],
+            },
+            disease: {
+              id: r.disease.efo_info.efo_id.split('/').pop(),
+              name: r.disease.efo_info.label,
+            },
+            drug: {
+              id: r.drug.id.split('/').pop(),
+              name: r.drug.molecule_name,
+              type: r.drug.molecule_type.replace(' ', '_').toUpperCase(),
+              activity: MAP_ACTIVITY[r.target.activity].toUpperCase(),
+            },
+            clinicalTrial: {
+              phase: r.evidence.drug2clinic.clinical_trial_phase.numeric_index,
+              status: r.evidence.drug2clinic.status
+                ? r.evidence.drug2clinic.status
+                    .replace(/\s+/g, '_')
+                    .replace(',', '')
+                    .toUpperCase()
+                : null,
+              sourceName: r.evidence.drug2clinic.urls[0].nice_name.replace(
+                ' Information',
+                ''
+              ),
+              sourceUrl: r.evidence.drug2clinic.urls[0].url,
+            },
+            mechanismOfAction: {
+              name: r.evidence.target2drug.mechanism_of_action,
+              sourceName:
+                r.evidence.target2drug.urls.length === 3
+                  ? r.evidence.target2drug.urls[2].nice_name
+                  : null,
+              sourceUrl:
+                r.evidence.target2drug.urls.length === 3
+                  ? r.evidence.target2drug.urls[2].url
+                  : null,
+            },
+          };
+        });
+
+        return {
+          drugCount,
           rows,
         };
       });

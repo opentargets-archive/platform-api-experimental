@@ -8,6 +8,7 @@ import {
   createAtlasLoader,
   createGtexLoader,
   createTargetDrugsLoader,
+  createDiseaseDrugsLoader,
   createDiseaseLoader,
   createDrugLoader,
 } from './apis/dataloaders';
@@ -23,6 +24,7 @@ const apolloServerConfig = {
     diseaseLoader: createDiseaseLoader(),
     drugLoader: createDrugLoader(),
     targetDrugsLoader: createTargetDrugsLoader(),
+    diseaseDrugsLoader: createDiseaseDrugsLoader(),
   }),
 };
 

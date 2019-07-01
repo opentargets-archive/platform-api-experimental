@@ -29,16 +29,6 @@ export const targets = ensgIds =>
 export const expressions = ensgIds =>
   axios.post(`${ROOT}private/target/expression`, { gene: ensgIds });
 
-export const targetDrugs = (ensgId, next = null) =>
-  next
-    ? axios.get(
-        `${ROOT}public/evidence/filter?size=1000&datasource=chembl&fields=disease.efo_info&fields=drug&fields=evidence&fields=target&fields=access_level&target=${ensgId}&expandefo=true&next=${
-          next[0]
-        }&next=${next[1]}`
-      )
-    : axios.get(
-        `${ROOT}public/evidence/filter?size=1000&datasource=chembl&fields=disease.efo_info&fields=drug&fields=evidence&fields=target&fields=access_level&target=${ensgId}&expandefo=true`
-      );
 const targetsDrugsIteration = async (ensgIds, next = null) => {
   const props = {
     size: 10000,
@@ -119,3 +109,58 @@ export const targetAssociationsFacets = ensgId =>
 
 export const diseaseSimilar = efoId =>
   axios.get(`${ROOT}private/relation/disease/${efoId}?id=${efoId}&size=10000`);
+
+const diseasesDrugsIteration = async (efoIds, next = null) => {
+  const props = {
+    size: 10000,
+    datasource: ['chembl'],
+    fields: ['disease.efo_info', 'drug', 'evidence', 'target', 'access_level'],
+    expandefo: true,
+    disease: efoIds,
+  };
+  return next
+    ? axios.post(`${ROOT}public/evidence/filter`, { ...props, next })
+    : axios.post(`${ROOT}public/evidence/filter`, props);
+};
+async function diseasesDrugsIterated(efoIds) {
+  const first = diseasesDrugsIteration(efoIds);
+  let prev = await first;
+  let rows = [];
+  while (true) {
+    const next = prev ? prev.data.next : null;
+    rows = [...rows, ...prev.data.data];
+    if (next) {
+      prev = await diseasesDrugsIteration(efoIds, next);
+    } else {
+      break;
+    }
+  }
+  return rows;
+}
+
+export async function diseaseDrugsIterated(efoId) {
+  const first = axios.get(
+    `${ROOT}public/evidence/filter?size=10000&datasource=chembl&fields=disease.efo_info&fields=drug&fields=evidence&fields=target&fields=access_level&disease=${efoId}&expandefo=true`
+  );
+  let prev = await first;
+  let rows = [];
+  while (true) {
+    const next = prev ? prev.data.next : null;
+    rows = [...rows, ...prev.data.data];
+    if (next) {
+      prev = await axios.get(
+        `${ROOT}public/evidence/filter?size=10000&datasource=chembl&fields=disease.efo_info&fields=drug&fields=evidence&fields=target&fields=access_level&disease=${efoId}&expandefo=true&next=${
+          next[0]
+        }&next=${next[1]}`
+      );
+    } else {
+      break;
+    }
+  }
+  return rows;
+}
+export const diseasesDrugs = efoIds =>
+  Promise.all([
+    Promise.resolve(efoIds),
+    Promise.all(efoIds.map(efoId => diseaseDrugsIterated(efoId))),
+  ]);
