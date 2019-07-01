@@ -43,17 +43,6 @@ const mousePhenotypesTopLevel = _.sortBy(
   'name'
 );
 
-// export default _.sortBy(
-//   mousePhenotypesTopLevel.map(d => ({
-//     id: d.iri
-//       .split('/')
-//       .pop()
-//       .replace('_', ':'),
-//     name: d.text.replace(' phenotype', ''),
-//   })),
-//   'name'
-// );
-
 // Note: dataloader assumes that the response array is in the same
 //       order as the passed keys - this must be checked in the
 //       batch function
