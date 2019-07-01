@@ -1,6 +1,35 @@
 import { gql } from 'apollo-server-express';
 
-export const typeDefs = gql`
+export const id = 'mousePhenotypes';
+
+export const summaryTypeDefs = gql`
+  type TargetSummaryMousePhenotypes {
+    phenotypeCount: Int!
+    categoryCount: Int!
+    sources: [Source!]!
+  }
+`;
+
+export const summaryResolvers = {
+  TargetSummaryMousePhenotypes: {
+    phenotypeCount: ({ _ensgId }, args, { targetLoader }) =>
+      targetLoader
+        .load(_ensgId)
+        .then(({ mousePhenotypes }) => mousePhenotypes.phenotypeCount),
+    categoryCount: ({ _ensgId }, args, { targetLoader }) =>
+      targetLoader
+        .load(_ensgId)
+        .then(({ mousePhenotypes }) => mousePhenotypes.categoryCount),
+    sources: () => [
+      {
+        name: 'MGI',
+        url: 'http://www.informatics.jax.org/',
+      },
+    ],
+  },
+};
+
+export const sectionTypeDefs = gql`
   type MousePhenotypeRow {
     mouseGeneId: String!
     mouseGeneSymbol: String!
@@ -23,7 +52,7 @@ export const typeDefs = gql`
   }
 `;
 
-export const resolvers = {
+export const sectionResolvers = {
   TargetDetailMousePhenotypes: {
     categories: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader

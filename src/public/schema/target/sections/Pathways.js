@@ -1,6 +1,23 @@
 import { gql } from 'apollo-server-express';
 
-export const typeDefs = gql`
+export const id = 'pathways';
+
+export const summaryTypeDefs = gql`
+  type TargetSummaryPathways {
+    count: Int!
+    sources: [Source!]!
+  }
+`;
+
+export const summaryResolvers = {
+  TargetSummaryPathways: {
+    count: ({ _ensgId }, args, { targetLoader }) =>
+      targetLoader.load(_ensgId).then(({ pathways }) => pathways.count),
+    sources: () => [{ name: 'Reactome', url: 'https://reactome.org/' }],
+  },
+};
+
+export const sectionTypeDefs = gql`
   type ReactomePathway {
     id: String!
     name: String!
@@ -21,7 +38,7 @@ export const typeDefs = gql`
   }
 `;
 
-export const resolvers = {
+export const sectionResolvers = {
   TargetDetailPathways: {
     topLevelPathways: ({ _ensgId }, args, { targetLoader }) =>
       targetLoader

@@ -2,7 +2,29 @@ import { gql } from 'apollo-server-express';
 
 import { targetSimilar } from '../../../apis/openTargets';
 
-export const typeDefs = gql`
+export const id = 'relatedTargets';
+
+export const summaryTypeDefs = gql`
+  type TargetSummaryRelatedTargets {
+    relatedTargetsCount: Int!
+    sources: [Source!]!
+  }
+`;
+
+export const summaryResolvers = {
+  TargetSummaryRelatedTargets: {
+    relatedTargetsCount: ({ _ensgId }) =>
+      targetSimilar(_ensgId).then(response => response.data.data.length),
+    sources: () => [
+      {
+        name: 'Open Targets',
+        url: 'https://docs.targetvalidation.org/getting-started/scoring',
+      },
+    ],
+  },
+};
+
+export const sectionTypeDefs = gql`
   type RowRelatedTarget {
     A: Target!
     B: Target!
@@ -16,7 +38,7 @@ export const typeDefs = gql`
   }
 `;
 
-export const resolvers = {
+export const sectionResolvers = {
   TargetDetailRelatedTargets: {
     rows: ({ _ensgId }) =>
       targetSimilar(_ensgId).then(response =>

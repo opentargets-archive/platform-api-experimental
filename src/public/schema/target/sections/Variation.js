@@ -1,11 +1,8 @@
 import { gql } from 'apollo-server-express';
 
-import {
-  targetVariantsCommon,
-  targetVariantsRare,
-} from '../../../apis/openTargets';
+export const id = 'variation';
 
-export const typeDefs = gql`
+export const summaryTypeDefs = gql`
   type VariationCommon {
     variantsCount: Int!
     diseasesCount: Int!
@@ -21,7 +18,7 @@ export const typeDefs = gql`
   }
 `;
 
-export const resolvers = {
+export const summaryResolvers = {
   TargetSummaryVariation: {
     common: ({ _ensgId }) =>
       targetVariantsCommon(_ensgId).then(response => {
