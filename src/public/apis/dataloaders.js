@@ -566,6 +566,7 @@ export const createDiseaseLoader = () =>
             efo_synonyms: synonyms,
             path_codes: pathCodes,
             path_labels: pathLabels,
+            phenotypes: phenotypesRaw,
           } = d;
           const therapeuticAreas = _.uniqBy(
             _.zip(pathCodes.map(d => d[0]), pathLabels.map(d => d[0])).map(
@@ -573,6 +574,11 @@ export const createDiseaseLoader = () =>
             ),
             'id'
           );
+          const phenotypes = phenotypesRaw.map(d => ({
+            id: d.uri.split('/').pop(),
+            name: d.label,
+            url: d.uri,
+          }));
           return {
             id,
             name,
@@ -580,6 +586,7 @@ export const createDiseaseLoader = () =>
             synonyms: synonyms.length > 0 ? synonyms : [],
             therapeuticAreas:
               therapeuticAreas.length > 0 ? therapeuticAreas : [],
+            phenotypes,
           };
         });
     })
