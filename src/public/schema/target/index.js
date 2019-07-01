@@ -7,11 +7,16 @@ import * as sectionsObject from './sectionIndex';
 const sections = Object.values(sectionsObject);
 
 // combine type defs
-const summaryTypeDefs = sections.map(d => d.summaryTypeDefs);
-const sectionTypeDefs = sections.map(d => d.sectionTypeDefs);
+const summaryTypeDefs = sections
+  .filter(d => d.summaryTypeDefs)
+  .map(d => d.summaryTypeDefs);
+const sectionTypeDefs = sections
+  .filter(d => d.sectionTypeDefs)
+  .map(d => d.sectionTypeDefs);
 const summariesTypeDef = gql`
   type TargetSummaries {
     ${sections
+      .filter(d => d.summaryTypeDefs)
       .map(d => `${d.id}: TargetSummary${_.upperFirst(d.id)}`)
       .join('\n')}
   }
@@ -19,6 +24,7 @@ const summariesTypeDef = gql`
 const sectionsTypeDef = gql`
   type TargetDetails {
     ${sections
+      .filter(d => d.sectionTypeDefs)
       .map(d => `${d.id}: TargetDetail${_.upperFirst(d.id)}`)
       .join('\n')}
   }
@@ -44,19 +50,27 @@ export const typeDefs = [
 ];
 
 // merge resolvers
-const summariesResolvers = sections.map(d => d.summaryResolvers);
-const sectionsResolvers = sections.map(d => d.sectionResolvers);
+const summariesResolvers = sections
+  .filter(d => d.summaryResolvers)
+  .map(d => d.summaryResolvers);
+const sectionsResolvers = sections
+  .filter(d => d.sectionResolvers)
+  .map(d => d.sectionResolvers);
 const summariesResolver = {
-  TargetSummaries: sections.reduce((acc, d) => {
-    acc[d.id] = _.identity;
-    return acc;
-  }, {}),
+  TargetSummaries: sections
+    .filter(d => d.summaryResolvers)
+    .reduce((acc, d) => {
+      acc[d.id] = _.identity;
+      return acc;
+    }, {}),
 };
 const sectionsResolver = {
-  TargetDetails: sections.reduce((acc, d) => {
-    acc[d.id] = _.identity;
-    return acc;
-  }, {}),
+  TargetDetails: sections
+    .filter(d => d.sectionResolvers)
+    .reduce((acc, d) => {
+      acc[d.id] = _.identity;
+      return acc;
+    }, {}),
 };
 const targetResolver = {
   Target: {
