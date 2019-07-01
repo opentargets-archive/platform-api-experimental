@@ -5,6 +5,14 @@ const HOST = 'api.opentargets.io';
 const STEM = 'v3/platform';
 const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
 
+export const drug = chemblId => axios.get(`${ROOT}private/drug/${chemblId}`);
+// TODO: REST API currently does not support POST for private/drug endpoint (needed for dataloader)
+//       (this is currently making one call per drug, not scalable)
+export const drugs = chemblIds =>
+  Promise.all([
+    Promise.resolve(chemblIds),
+    Promise.all(chemblIds.map(chemblId => drug(chemblId))),
+  ]);
 export const disease = efoId => axios.get(`${ROOT}private/disease/${efoId}`);
 export const diseases = efoIds =>
   Promise.all([

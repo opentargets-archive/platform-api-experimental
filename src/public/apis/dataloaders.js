@@ -1,7 +1,13 @@
 import DataLoader from 'dataloader';
 import _ from 'lodash';
 
-import { targets, expressions, diseases, targetsDrugs } from './openTargets';
+import {
+  targets,
+  expressions,
+  diseases,
+  targetsDrugs,
+  drugs,
+} from './openTargets';
 import { expressionsAtlas } from './expressionAtlas';
 import { gtexs } from './gtex';
 import {
@@ -540,6 +546,37 @@ export const createTargetLoader = () =>
             proteinInteractions,
           };
         });
+    })
+  );
+
+export const createDrugLoader = () =>
+  new DataLoader(keys =>
+    drugs(keys).then(([chemblIds, data]) => {
+      // data here is an array aligned with chemblIds
+      return chemblIds.map((chemblId, i) => {
+        const d = data[i];
+
+        if (!d.data) {
+          console.log(`No drug info for ${chemblId}`);
+          return null;
+        }
+
+        const {
+          id,
+          pref_name: name,
+          synonyms,
+          yearOfFirstApproval,
+          type,
+        } = d.data;
+
+        return {
+          id,
+          name,
+          synonyms,
+          yearOfFirstApproval,
+          type,
+        };
+      });
     })
   );
 
