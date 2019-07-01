@@ -23,9 +23,9 @@ import fs from 'fs';
     CA   Biological process.
     //
 */
-
+console.log(__dirname);
 const lines = fs
-  .readFileSync(`${__dirname}/keywlist.txt`)
+  .readFileSync(`${__dirname}/../data/uniprot/keywlist.txt`)
   .toString()
   .split('\n');
 

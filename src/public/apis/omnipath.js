@@ -1,6 +1,6 @@
-import omnipathData from '../constants/omnipathData';
-import omnipathCategories from '../constants/omnipathCategories';
-import uniprotLUT from '../constants/uniprotLUT';
+import omnipathData from '../data/omnipath/interactions.json';
+import omnipathCategories from '../data/omnipath/interactionCategories.json';
+import uniprotToGene from '../data/uniprot/uniprotIdToGene.json';
 
 const getInteractionCountsByType = interactions => {
   let ppi = 0;
@@ -60,7 +60,7 @@ export const omnipathInteractionCountsByType = uniprotId => {
 
 export const omnipathInteractionsSubGraph = uniprotId => {
   const omnipathFiltered = getInteractionsForUniprotId(uniprotId);
-  const acceptedUniprotIds = Object.keys(uniprotLUT); // omnipath contains eg. Q9Y6C7 which is not mapped to ensembl
+  const acceptedUniprotIds = Object.keys(uniprotToGene); // omnipath contains eg. Q9Y6C7 which is not mapped to ensembl
 
   // get neighbours
   const neighboursObj = {};
@@ -79,8 +79,8 @@ export const omnipathInteractionsSubGraph = uniprotId => {
   const nodes = uniprotId
     ? selfAndNeighbours.map(d => ({
         uniprotId: d,
-        ensgId: uniprotLUT[d].ensgId,
-        symbol: uniprotLUT[d].symbol,
+        ensgId: uniprotToGene[d].ensgId,
+        symbol: uniprotToGene[d].symbol,
       }))
     : [];
 

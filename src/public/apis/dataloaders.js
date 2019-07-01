@@ -15,11 +15,44 @@ import {
   omnipathInteractionCountsByType,
   omnipathInteractionsSubGraph,
 } from './omnipath';
-import reactomeTopLevel from '../constants/reactomeTopLevel';
-import mousePhenotypesTopLevel from '../constants/mousePhenotypesTopLevel';
-import uniprotSubCellularLocations from '../constants/uniprotSubCellularLocations';
-import uniprotKeywordsLookup from '../constants/uniprotKeywords';
+import reactomeTopLevelRaw from '../data/reactome/topLevel.json';
+import mousePhenotypesTopLevelRaw from '../data/mousePhenotypes/topLevel.json';
+import uniprotSubCellularLocationsRaw from '../data/uniprot/subcellularLocations.json';
+import uniprotKeywordsLookup from '../utils/getUniprotKeywords';
 import getMultiplePublicationsSource from '../utils/getMultiplePublicationsSource';
+
+const uniprotSubCellularLocations = uniprotSubCellularLocationsRaw.reduce(
+  (acc, d) => {
+    acc[d.name] = d;
+    return acc;
+  },
+  {}
+);
+const reactomeTopLevel = reactomeTopLevelRaw.map(d => ({
+  id: d.stId,
+  name: d.displayName,
+}));
+const mousePhenotypesTopLevel = _.sortBy(
+  mousePhenotypesTopLevelRaw.map(d => ({
+    id: d.iri
+      .split('/')
+      .pop()
+      .replace('_', ':'),
+    name: d.text.replace(' phenotype', ''),
+  })),
+  'name'
+);
+
+// export default _.sortBy(
+//   mousePhenotypesTopLevel.map(d => ({
+//     id: d.iri
+//       .split('/')
+//       .pop()
+//       .replace('_', ':'),
+//     name: d.text.replace(' phenotype', ''),
+//   })),
+//   'name'
+// );
 
 // Note: dataloader assumes that the response array is in the same
 //       order as the passed keys - this must be checked in the
