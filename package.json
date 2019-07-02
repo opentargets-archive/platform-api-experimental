@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "start": "node dist/index.js",
-    "build": "babel src -d dist && cp src/constants/uniprotLUT.json src/constants/uniprotSubCellularLocations.json src/constants/keywlist.txt src/constants/omnipathData.json dist/constants",
+    "build": "babel src -d dist && cp -R src/public/data dist/public",
     "dev": "nodemon ./src/index.js --exec babel-node -e js",
     "deploy": "now && now alias",
     "prettier": "prettier --write",
