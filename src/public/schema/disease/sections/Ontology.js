@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server-express';
 
 import efo from '../../../data/efo/efo2.1904.json';
-import therapeuticAreaIds from '../../../data/efo/efo2.1904.json';
+import therapeuticAreaIds from '../../../data/efo/efo2.therapeuticAreas.json';
 
 export const id = 'ontology';
 
@@ -16,7 +16,7 @@ export const summaryTypeDefs = gql`
 export const summaryResolvers = {
   DiseaseSummaryOntology: {
     isTherapeuticArea: ({ _efoId }) => therapeuticAreaIds.indexOf(_efoId) >= 0,
-    isLeaf: ({ _efoId }) => false,
+    isLeaf: ({ _efoId }) => !efo.find(d => d.parentIds.indexOf(_efoId) >= 0),
     sources: () => [
       {
         name: 'EFO',
@@ -39,6 +39,6 @@ export const sectionTypeDefs = gql`
 
 export const sectionResolvers = {
   DiseaseDetailOntology: {
-    nodes: ({ _efoId }) => efo,
+    nodes: () => efo,
   },
 };
