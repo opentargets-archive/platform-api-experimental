@@ -16,6 +16,7 @@ const scientificName2CommonName = {
   oryctolagus_cuniculus: 'Rabbit',
   rattus_norvegicus: 'Rat',
   sus_scrofa: 'Pig',
+  sus_scrofa_usmarc: 'Pig',
   xenopus_tropicalis: 'Frog',
   danio_rerio: 'Zebrafish',
   drosophila_melanogaster: 'Fly',
@@ -56,7 +57,10 @@ export const homologyTable = ensgId =>
     )
     .then(response => {
       if (response.data.data && response.data.data.length === 1) {
-        const { homologies } = response.data.data[0];
+        const { homologies: homologiesRaw } = response.data.data[0];
+        const homologies = homologiesRaw.filter(
+          d => scientificName2CommonName[d.target.species]
+        );
         const targetIds = homologies.map(d => d.target.id);
         return axios
           .post(`${ROOT}lookup/id/`, { ids: targetIds })

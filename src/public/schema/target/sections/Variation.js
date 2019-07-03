@@ -1,5 +1,10 @@
 import { gql } from 'apollo-server-express';
 
+import {
+  targetVariantsCommon,
+  targetVariantsRare,
+} from '../../../apis/openTargets';
+
 export const id = 'variation';
 
 export const summaryTypeDefs = gql`
