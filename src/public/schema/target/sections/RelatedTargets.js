@@ -32,6 +32,7 @@ export const sectionTypeDefs = gql`
     diseaseCountB: Int!
     diseaseCountAAndB: Int!
     diseaseCountAOrB: Int!
+    score: Float!
   }
   type TargetDetailRelatedTargets {
     rows: [RowRelatedTarget!]!
@@ -49,6 +50,7 @@ export const sectionResolvers = {
           diseaseCountB: d.object.links.diseases_count,
           diseaseCountAAndB: d.counts.shared_count,
           diseaseCountAOrB: d.counts.union_count,
+          score: d.value,
         }))
       ),
   },
