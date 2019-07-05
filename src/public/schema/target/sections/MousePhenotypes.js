@@ -37,7 +37,7 @@ export const sectionTypeDefs = gql`
     categoryLabel: String!
     phenotypeId: String!
     phenotypeLabel: String!
-    subjectAllelicComposition: String!
+    subjectAllelicComposition: [String!]!
     subjectBackground: String!
     pmIds: [String!]!
   }

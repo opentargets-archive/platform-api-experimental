@@ -395,7 +395,9 @@ export const createTargetLoader = () =>
                         categoryLabel,
                         phenotypeId,
                         phenotypeLabel,
-                        subjectAllelicComposition,
+                        subjectAllelicComposition: subjectAllelicComposition.split(
+                          ','
+                        ),
                         subjectBackground,
                         pmIds,
                       });
