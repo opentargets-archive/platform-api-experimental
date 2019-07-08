@@ -1,4 +1,5 @@
 import axios from 'axios';
+import _ from 'lodash';
 
 const PROTOCOL = 'https';
 const HOST = 'api.opentargets.io';
@@ -164,3 +165,178 @@ export const diseasesDrugs = efoIds =>
     Promise.resolve(efoIds),
     Promise.all(efoIds.map(efoId => diseaseDrugsIterated(efoId))),
   ]);
+
+// export const evidenceDrugsCount = (ensgId, efoId) =>
+//   axios
+//     .get(
+//       `${ROOT}public/evidence/filter?size=0&datasource=chembl&fields=disease.efo_info&fields=drug&fields=evidence&fields=target&fields=access_level&target=${ensgId}&disease=${efoId}&expandefo=true`
+//     )
+//     .then(response => {
+//       console.log(response.data);
+//       const
+//       return response.data.total;
+//     });
+const MAP_ACTIVITY = {
+  drug_positive_modulator: 'agonist',
+  drug_negative_modulator: 'antagonist',
+  up_or_down: 'up_or_down',
+};
+export const evidenceDrugsRowTransformer = r => {
+  return {
+    target: {
+      id: r.target.id,
+      symbol: r.target.gene_info.symbol,
+      class: r.target.target_class[0],
+    },
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    drug: {
+      id: r.drug.id.split('/').pop(),
+      name: r.drug.molecule_name,
+      type: r.drug.molecule_type.replace(' ', '_').toUpperCase(),
+      activity: MAP_ACTIVITY[r.target.activity].toUpperCase(),
+    },
+    clinicalTrial: {
+      phase: r.evidence.drug2clinic.clinical_trial_phase.numeric_index,
+      status: r.evidence.drug2clinic.status
+        ? r.evidence.drug2clinic.status
+            .replace(/\s+/g, '_')
+            .replace(',', '')
+            .toUpperCase()
+        : null,
+      sourceName: r.evidence.drug2clinic.urls[0].nice_name.replace(
+        ' Information',
+        ''
+      ),
+      sourceUrl: r.evidence.drug2clinic.urls[0].url,
+    },
+    mechanismOfAction: {
+      name: r.evidence.target2drug.mechanism_of_action,
+      sourceName:
+        r.evidence.target2drug.urls.length === 3
+          ? r.evidence.target2drug.urls[2].nice_name
+          : null,
+      sourceUrl:
+        r.evidence.target2drug.urls.length === 3
+          ? r.evidence.target2drug.urls[2].url
+          : null,
+    },
+  };
+};
+export async function evidenceDrugsIterated(ensgId, efoId) {
+  const first = axios.get(
+    `${ROOT}public/evidence/filter?size=10000&datasource=chembl&fields=disease.efo_info&fields=drug&fields=evidence&fields=target&fields=access_level&target=${ensgId}&disease=${efoId}&expandefo=true`
+  );
+  let prev = await first;
+  let rows = [];
+  while (true) {
+    const next = prev ? prev.data.next : null;
+    rows = [...rows, ...prev.data.data];
+    if (next) {
+      prev = await axios.get(
+        `${ROOT}public/evidence/filter?size=10000&datasource=chembl&fields=disease.efo_info&fields=drug&fields=evidence&fields=target&fields=access_level&target=${ensgId}&disease=${efoId}&expandefo=true&next=${
+          next[0]
+        }&next=${next[1]}`
+      );
+    } else {
+      break;
+    }
+  }
+  return rows;
+}
+export const evidenceDrugs = (ensgId, efoId) =>
+  evidenceDrugsIterated(ensgId, efoId).then(rowsRaw => {
+    const rows = rowsRaw.map(evidenceDrugsRowTransformer);
+    const drugCount = _.uniqBy(rowsRaw, 'drug.molecule_name').length;
+    return { rows, drugCount };
+  });
+
+// export const evidenceSomatic = (ensgId, efoId) =>
+// axios.get(
+//   `${ROOT}public/evidence/filter?size=1000&datasource=cancer_gene_census&datasource=uniprot_somatic&datasource=eva_somatic&datasource=intogen&fields=disease.efo_info&fields=evidence.evidence_codes_info&fields=evidence.urls&fields=evidence.known_mutations&fields=evidence.provenance_type&fields=evidence.known_mutations&fields=access_level&fields=unique_association_fields.mutation_type&fields=target.activity&fields=sourceID&target=${ensgId}&disease=${efoId}&expandefo=true`
+// ).then(response => {
+//   const rows = response.data.map(r => )
+// })
+// https://platform-api.opentargets.io/v3/platform/public/evidence/filter?size=1000&datasource=cancer_gene_census&datasource=uniprot_somatic&datasource=eva_somatic&datasource=intogen&fields=disease.efo_info&fields=evidence.evidence_codes_info&fields=evidence.urls&fields=evidence.known_mutations&fields=evidence.provenance_type&fields=evidence.known_mutations&fields=access_level&fields=unique_association_fields.mutation_type&fields=target.activity&fields=sourceID&target=ENSG00000121879&disease=EFO_0000305&expandefo=true
+
+const MAP_PATHWAYS_SOURCE = {
+  reactome: 'Reactome',
+  slapenrich: 'SLAPenrich',
+  progeny: 'PROGENy',
+};
+const MAP_PATHWAYS_REACTOME_ACTIVITY = {
+  gain_of_function: 'GAIN_OF_FUNCTION',
+};
+const evidencePathwaysRowTransformer = r => {
+  return {
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    activity: r.target.activity
+      ? MAP_PATHWAYS_REACTOME_ACTIVITY[r.target.activity]
+      : null, // only for reactome
+    pathway: {
+      id: r.evidence.urls[0].url.split('/#').pop(),
+      name: r.evidence.urls[0].nice_name,
+    },
+    source: {
+      name: MAP_PATHWAYS_SOURCE[r.sourceID],
+      url: r.evidence.provenance_type.literature.references[0].lit_id,
+    },
+  };
+};
+export const evidencePathways = (ensgId, efoId) =>
+  Promise.all([
+    axios.get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=reactome&datasource=slapenrich&datasource=progeny&fields=target.activity&fields=disease.efo_info&fields=evidence&fields=access_level&fields=sourceID&target=${ensgId}&disease=${efoId}&expandefo=true`
+    ),
+    axios.get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=crispr&fields=access_level&fields=disease.name&fields=disease.id&fields=scores&fields=evidence.resource_score.method&target=${ensgId}&disease=${efoId}&expandefo=true`
+    ),
+  ]).then(([responsePathways, responseCrispr]) => {
+    const pathwaysRaw = responsePathways.data.data;
+    const rowsPathways = pathwaysRaw.map(evidencePathwaysRowTransformer);
+    const pathwayCount = _.uniqBy(rowsPathways, 'pathway.id').length;
+    return { rowsPathways, pathwayCount };
+  });
+
+const evidenceDifferentialExpressionRowTransformer = r => {
+  return {
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    tissue: {
+      id: r.disease.biosample.id.split('/').pop(),
+      name: r.disease.biosample.name,
+    },
+    activity: {
+      url: r.evidence.urls[0].url,
+      name: r.target.activity.split('_').shift(),
+    },
+    comparison: r.evidence.comparison_name,
+    evidenceSource: r.evidence.evidence_codes_info[0][0].label,
+    log2FoldChange: r.evidence.log2_fold_change.value,
+    percentileRank: r.evidence.log2_fold_change.percentile_rank,
+    pval: r.evidence.resource_score.value,
+    experiment: {
+      name:
+        r.evidence.experiment_overview || 'Experiment overview and raw data',
+      url: (r.evidence.urls[2] || r.evidence.urls[0]).url,
+    },
+  };
+};
+export const evidenceDifferentialExpression = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=expression_atlas&fields=disease&fields=evidence&fields=target&fields=literature&fields=access_level&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceDifferentialExpressionRowTransformer);
+      const experimentCount = _.uniqBy(rows, 'experiment.name').length;
+      return { rows, experimentCount };
+    });

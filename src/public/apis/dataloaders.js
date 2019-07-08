@@ -8,6 +8,7 @@ import {
   targetsDrugs,
   diseasesDrugs,
   drugs,
+  evidenceDrugsRowTransformer,
 } from './openTargets';
 import { expressionsAtlas } from './expressionAtlas';
 import { gtexs } from './gtex';
@@ -654,108 +655,17 @@ export const createDiseaseLoader = () =>
     })
   );
 
-const MAP_ACTIVITY = {
-  drug_positive_modulator: 'agonist',
-  drug_negative_modulator: 'antagonist',
-  up_or_down: 'up_or_down',
-};
-
 export const createTargetDrugsLoader = () =>
   new DataLoader(keys =>
     targetsDrugs(keys).then(([ensgIds, data]) => {
       return ensgIds.map(ensgId => {
         const relevantRows = data.filter(d => d.target.id === ensgId);
         const drugs = _.uniqBy(relevantRows, 'drug.molecule_name');
-        const trials = _.uniqBy(
-          relevantRows,
-          d => d.evidence.drug2clinic.urls[0].url
-        );
         const drugCount = drugs.length;
-        const drugModalities = {
-          antibody: drugs.filter(
-            r => r.drug.molecule_type.toLowerCase() === 'antibody'
-          ).length,
-          enzyme: drugs.filter(
-            r => r.drug.molecule_type.toLowerCase() === 'enzyme'
-          ).length,
-          oligonucleotide: drugs.filter(
-            r => r.drug.molecule_type.toLowerCase() === 'oligonucleotide'
-          ).length,
-          oligosaccharide: drugs.filter(
-            r => r.drug.molecule_type.toLowerCase() === 'oligosaccharide'
-          ).length,
-          protein: drugs.filter(
-            r => r.drug.molecule_type.toLowerCase() === 'protein'
-          ).length,
-          smallMolecule: drugs.filter(
-            r => r.drug.molecule_type.toLowerCase() === 'small molecule'
-          ).length,
-          other: drugs.filter(
-            r => r.drug.molecule_type.toLowerCase() === 'other'
-          ).length,
-        };
-        const phaseCounts = trials.reduce(
-          (acc, t) => {
-            const phase =
-              t.evidence.drug2clinic.clinical_trial_phase.numeric_index;
-            acc[phase] += 1;
-            return acc;
-          },
-          { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
-        );
-        const trialsByPhase = Object.keys(phaseCounts).map(p => ({
-          phase: p,
-          trialCount: phaseCounts[p],
-        }));
-        const rows = relevantRows.map(r => {
-          return {
-            target: {
-              id: r.target.id,
-              symbol: r.target.gene_info.symbol,
-              class: r.target.target_class[0],
-            },
-            disease: {
-              id: r.disease.efo_info.efo_id.split('/').pop(),
-              name: r.disease.efo_info.label,
-            },
-            drug: {
-              id: r.drug.id.split('/').pop(),
-              name: r.drug.molecule_name,
-              type: r.drug.molecule_type.replace(' ', '_').toUpperCase(),
-              activity: MAP_ACTIVITY[r.target.activity].toUpperCase(),
-            },
-            clinicalTrial: {
-              phase: r.evidence.drug2clinic.clinical_trial_phase.numeric_index,
-              status: r.evidence.drug2clinic.status
-                ? r.evidence.drug2clinic.status
-                    .replace(/\s+/g, '_')
-                    .replace(',', '')
-                    .toUpperCase()
-                : null,
-              sourceName: r.evidence.drug2clinic.urls[0].nice_name.replace(
-                ' Information',
-                ''
-              ),
-              sourceUrl: r.evidence.drug2clinic.urls[0].url,
-            },
-            mechanismOfAction: {
-              name: r.evidence.target2drug.mechanism_of_action,
-              sourceName:
-                r.evidence.target2drug.urls.length === 3
-                  ? r.evidence.target2drug.urls[2].nice_name
-                  : null,
-              sourceUrl:
-                r.evidence.target2drug.urls.length === 3
-                  ? r.evidence.target2drug.urls[2].url
-                  : null,
-            },
-          };
-        });
+        const rows = relevantRows.map(evidenceDrugsRowTransformer);
 
         return {
           drugCount,
-          drugModalities,
-          trialsByPhase,
           rows,
         };
       });
@@ -769,50 +679,7 @@ export const createDiseaseDrugsLoader = () =>
         const relevantRows = data[i];
         const drugs = _.uniqBy(relevantRows, 'drug.molecule_name');
         const drugCount = drugs.length;
-        const rows = relevantRows.map(r => {
-          return {
-            target: {
-              id: r.target.id,
-              symbol: r.target.gene_info.symbol,
-              class: r.target.target_class[0],
-            },
-            disease: {
-              id: r.disease.efo_info.efo_id.split('/').pop(),
-              name: r.disease.efo_info.label,
-            },
-            drug: {
-              id: r.drug.id.split('/').pop(),
-              name: r.drug.molecule_name,
-              type: r.drug.molecule_type.replace(' ', '_').toUpperCase(),
-              activity: MAP_ACTIVITY[r.target.activity].toUpperCase(),
-            },
-            clinicalTrial: {
-              phase: r.evidence.drug2clinic.clinical_trial_phase.numeric_index,
-              status: r.evidence.drug2clinic.status
-                ? r.evidence.drug2clinic.status
-                    .replace(/\s+/g, '_')
-                    .replace(',', '')
-                    .toUpperCase()
-                : null,
-              sourceName: r.evidence.drug2clinic.urls[0].nice_name.replace(
-                ' Information',
-                ''
-              ),
-              sourceUrl: r.evidence.drug2clinic.urls[0].url,
-            },
-            mechanismOfAction: {
-              name: r.evidence.target2drug.mechanism_of_action,
-              sourceName:
-                r.evidence.target2drug.urls.length === 3
-                  ? r.evidence.target2drug.urls[2].nice_name
-                  : null,
-              sourceUrl:
-                r.evidence.target2drug.urls.length === 3
-                  ? r.evidence.target2drug.urls[2].url
-                  : null,
-            },
-          };
-        });
+        const rows = relevantRows.map(evidenceDrugsRowTransformer);
 
         return {
           drugCount,
