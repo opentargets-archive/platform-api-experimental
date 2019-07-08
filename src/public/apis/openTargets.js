@@ -252,3 +252,53 @@ export const evidenceDrugs = (ensgId, efoId) =>
     const drugCount = _.uniqBy(rowsRaw, 'drug.molecule_name').length;
     return { rows, drugCount };
   });
+
+// export const evidenceSomatic = (ensgId, efoId) =>
+// axios.get(
+//   `${ROOT}public/evidence/filter?size=1000&datasource=cancer_gene_census&datasource=uniprot_somatic&datasource=eva_somatic&datasource=intogen&fields=disease.efo_info&fields=evidence.evidence_codes_info&fields=evidence.urls&fields=evidence.known_mutations&fields=evidence.provenance_type&fields=evidence.known_mutations&fields=access_level&fields=unique_association_fields.mutation_type&fields=target.activity&fields=sourceID&target=${ensgId}&disease=${efoId}&expandefo=true`
+// ).then(response => {
+//   const rows = response.data.map(r => )
+// })
+// https://platform-api.opentargets.io/v3/platform/public/evidence/filter?size=1000&datasource=cancer_gene_census&datasource=uniprot_somatic&datasource=eva_somatic&datasource=intogen&fields=disease.efo_info&fields=evidence.evidence_codes_info&fields=evidence.urls&fields=evidence.known_mutations&fields=evidence.provenance_type&fields=evidence.known_mutations&fields=access_level&fields=unique_association_fields.mutation_type&fields=target.activity&fields=sourceID&target=ENSG00000121879&disease=EFO_0000305&expandefo=true
+
+const MAP_PATHWAYS_SOURCE = {
+  reactome: 'Reactome',
+  slapenrich: 'SLAPenrich',
+  progeny: 'PROGENy',
+};
+const MAP_PATHWAYS_REACTOME_ACTIVITY = {
+  gain_of_function: 'GAIN_OF_FUNCTION',
+};
+const evidencePathwaysRowTransformer = r => {
+  return {
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    activity: r.target.activity
+      ? MAP_PATHWAYS_REACTOME_ACTIVITY[r.target.activity]
+      : null, // only for reactome
+    pathway: {
+      id: r.evidence.urls[0].url.split('/#').pop(),
+      name: r.evidence.urls[0].nice_name,
+    },
+    source: {
+      name: MAP_PATHWAYS_SOURCE[r.sourceID],
+      url: r.evidence.provenance_type.literature.references[0].lit_id,
+    },
+  };
+};
+export const evidencePathways = (ensgId, efoId) =>
+  Promise.all([
+    axios.get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=reactome&datasource=slapenrich&datasource=progeny&fields=target.activity&fields=disease.efo_info&fields=evidence&fields=access_level&fields=sourceID&target=${ensgId}&disease=${efoId}&expandefo=true`
+    ),
+    axios.get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=crispr&fields=access_level&fields=disease.name&fields=disease.id&fields=scores&fields=evidence.resource_score.method&target=${ensgId}&disease=${efoId}&expandefo=true`
+    ),
+  ]).then(([responsePathways, responseCrispr]) => {
+    const pathwaysRaw = responsePathways.data.data;
+    const rowsPathways = pathwaysRaw.map(evidencePathwaysRowTransformer);
+    const pathwayCount = _.uniqBy(rowsPathways, 'pathway.id').length;
+    return { rowsPathways, pathwayCount };
+  });
