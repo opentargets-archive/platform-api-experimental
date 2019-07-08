@@ -302,3 +302,41 @@ export const evidencePathways = (ensgId, efoId) =>
     const pathwayCount = _.uniqBy(rowsPathways, 'pathway.id').length;
     return { rowsPathways, pathwayCount };
   });
+
+const evidenceDifferentialExpressionRowTransformer = r => {
+  return {
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    tissue: {
+      id: r.disease.biosample.id.split('/').pop(),
+      name: r.disease.biosample.name,
+    },
+    activity: {
+      url: r.evidence.urls[0].url,
+      name: r.target.activity.split('_').shift(),
+    },
+    comparison: r.evidence.comparison_name,
+    evidenceSource: r.evidence.evidence_codes_info[0][0].label,
+    log2FoldChange: r.evidence.log2_fold_change.value,
+    percentileRank: r.evidence.log2_fold_change.percentile_rank,
+    pval: r.evidence.resource_score.value,
+    experiment: {
+      name:
+        r.evidence.experiment_overview || 'Experiment overview and raw data',
+      url: (r.evidence.urls[2] || r.evidence.urls[0]).url,
+    },
+  };
+};
+export const evidenceDifferentialExpression = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=expression_atlas&fields=disease&fields=evidence&fields=target&fields=literature&fields=access_level&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceDifferentialExpressionRowTransformer);
+      const experimentCount = _.uniqBy(rows, 'experiment.name').length;
+      return { rows, experimentCount };
+    });
