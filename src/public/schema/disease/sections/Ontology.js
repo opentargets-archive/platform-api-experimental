@@ -34,11 +34,13 @@ export const sectionTypeDefs = gql`
   }
   type DiseaseDetailOntology {
     nodes: [DiseaseOntologyNode!]!
+    therapeuticAreas: [String!]!
   }
 `;
 
 export const sectionResolvers = {
   DiseaseDetailOntology: {
     nodes: () => efo,
+    therapeuticAreas: () => therapeuticAreaIds,
   },
 };
