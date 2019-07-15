@@ -340,3 +340,36 @@ export const evidenceDifferentialExpression = (ensgId, efoId) =>
       const experimentCount = _.uniqBy(rows, 'experiment.name').length;
       return { rows, experimentCount };
     });
+
+const evidenceAnimalModelsRowTransformer = r => {
+  return {
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    humanPhenotypes: r.evidence.disease_model_association.human_phenotypes.map(
+      p => ({ id: p.id, name: p.label, url: p.term_id })
+    ),
+    modelPhenotypes: r.evidence.disease_model_association.model_phenotypes.map(
+      p => ({ id: p.id, name: p.label, url: p.term_id })
+    ),
+    modelId: r.evidence.biological_model.model_id,
+    allelicComposition: r.evidence.biological_model.allelic_composition,
+    geneticBackground: r.evidence.biological_model.genetic_background,
+    source: {
+      name: 'PhenoDigm',
+      url: 'https://www.sanger.ac.uk/science/tools/phenodigm',
+    },
+  };
+};
+export const evidenceAnimalModels = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=phenodigm&fields=disease&fields=evidence&fields=scores&fields=access_level&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceAnimalModelsRowTransformer);
+      const mouseModelCount = _.uniqBy(rows, 'modelId').length;
+      return { rows, mouseModelCount };
+    });
