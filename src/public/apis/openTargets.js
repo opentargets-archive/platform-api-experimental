@@ -348,10 +348,10 @@ const evidenceAnimalModelsRowTransformer = r => {
       name: r.disease.efo_info.label,
     },
     humanPhenotypes: r.evidence.disease_model_association.human_phenotypes.map(
-      p => ({ id: p.id, name: p.label })
+      p => ({ id: p.id, name: p.label, url: p.term_id })
     ),
     modelPhenotypes: r.evidence.disease_model_association.model_phenotypes.map(
-      p => ({ id: p.id, name: p.label })
+      p => ({ id: p.id, name: p.label, url: p.term_id })
     ),
     modelId: r.evidence.biological_model.model_id,
     allelicComposition: r.evidence.biological_model.allelic_composition,

@@ -31,6 +31,7 @@ export const sectionTypeDefs = gql`
   type Phenotype {
     id: String!
     name: String!
+    url: String!
   }
   type EvidenceRowAnimalModels {
     disease: Disease!
