@@ -373,3 +373,50 @@ export const evidenceAnimalModels = (ensgId, efoId) =>
       const mouseModelCount = _.uniqBy(rows, 'modelId').length;
       return { rows, mouseModelCount };
     });
+
+// text mining
+const evidenceTextMiningRowTransformer = r => {
+  return {
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+  };
+};
+
+export const evidenceTextMining = (ensgId, efoId) => {
+  console.log('evidenceTextMining ', ensgId, efoId);
+  return (
+    axios
+      // get basic literature from our API
+      .get(
+        `${ROOT}public/evidence/filter?size=10&from=0&datasource=europepmc&sort=evidence.date_asserted&search=&fields=access_level&fields=disease.efo_info.label&fields=disease.efo_info.efo_id&fields=evidence.literature_ref&fields=evidence.date_asserted&target=${ensgId}&disease=${efoId}&expandefo=true`
+      )
+      .then(response => {
+        // get abstract data
+        // const pmids = response.data.data.map(function (d) {
+        //     return 'ext_id:' + d.evidence.literature_ref.lit_id.split('/').pop();
+        // }).join(' OR ');
+
+        const rowsRaw = response.data.data;
+        const rows = rowsRaw.map(evidenceTextMiningRowTransformer);
+        const textMiningCount = response.data.total;
+        return { rows, textMiningCount };
+      })
+  );
+};
+
+export const evidenceTextMiningSummary = (ensgId, efoId) => {
+  console.log('evidenceTextMining ', ensgId, efoId);
+  return (
+    axios
+      // get quick literature count from our API
+      .get(
+        `${ROOT}public/evidence/filter?size=0&datasource=europepmc&target=${ensgId}&disease=${efoId}&expandefo=true`
+      )
+      .then(response => {
+        const textMiningCount = response.data.total;
+        return { textMiningCount };
+      })
+  );
+};
