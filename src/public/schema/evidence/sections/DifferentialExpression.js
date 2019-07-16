@@ -50,6 +50,7 @@ export const sectionTypeDefs = gql`
     percentileRank: Int!
     pval: Float!
     experiment: DifferentialExpressionExperiment!
+    pmIds: [String!]!
   }
   type EvidenceDetailDifferentialExpression {
     rows: [EvidenceRowDifferentialExpression!]!

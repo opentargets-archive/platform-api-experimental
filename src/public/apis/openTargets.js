@@ -327,6 +327,9 @@ const evidenceDifferentialExpressionRowTransformer = r => {
         r.evidence.experiment_overview || 'Experiment overview and raw data',
       url: (r.evidence.urls[2] || r.evidence.urls[0]).url,
     },
+    pmIds: r.literature
+      ? r.literature.references.map(d => d.lit_id.split('/').pop())
+      : [],
   };
 };
 export const evidenceDifferentialExpression = (ensgId, efoId) =>
