@@ -1,5 +1,6 @@
 import axios from 'axios';
 import _ from 'lodash';
+import { getAbstractData } from './epmc';
 
 const PROTOCOL = 'https';
 const HOST = 'api.opentargets.io';
@@ -376,16 +377,44 @@ export const evidenceAnimalModels = (ensgId, efoId) =>
 
 // text mining
 const evidenceTextMiningRowTransformer = r => {
+  const ref = r.evidence.literature_ref;
   return {
+    access: r.access_level,
     disease: {
       id: r.disease.efo_info.efo_id.split('/').pop(),
       name: r.disease.efo_info.label,
+    },
+    publication: {
+      id: ref.data.pmid || ref.data.pmcid || ref.data.id,
+      title: ref.data.title,
+      date: ref.data.pubYear,
+      authors: ref.data.authorList.author.map(auth => ({
+        firstName: auth.firstName,
+        lastName: auth.lastName,
+      })),
+      url: ref.url,
+      abstract: ref.data.abstractText,
+      matches: ref.mined_sentences.map(m => ({
+        text: m.text,
+        section: m.section,
+        target: { start: m.t_start, end: m.t_end },
+        disease: { start: m.d_start, end: m.d_end },
+      })),
+    },
+    journal: {
+      title:
+        ref.data.journalInfo.journal.medlineAbbreviation ||
+        ref.data.journalInfo.journal.title ||
+        '',
+      volume: ref.data.journalInfo.volume || null,
+      issue: ref.data.journalInfo.issue || null,
+      page: ref.data.pageInfo || null,
+      year: ref.data.journalInfo.yearOfPublication,
     },
   };
 };
 
 export const evidenceTextMining = (ensgId, efoId) => {
-  console.log('evidenceTextMining ', ensgId, efoId);
   return (
     axios
       // get basic literature from our API
@@ -394,14 +423,24 @@ export const evidenceTextMining = (ensgId, efoId) => {
       )
       .then(response => {
         // get abstract data
-        // const pmids = response.data.data.map(function (d) {
-        //     return 'ext_id:' + d.evidence.literature_ref.lit_id.split('/').pop();
-        // }).join(' OR ');
-
+        const pmids = response.data.data.map(function(d) {
+          return d.evidence.literature_ref.lit_id.split('/').pop();
+        });
         const rowsRaw = response.data.data;
-        const rows = rowsRaw.map(evidenceTextMiningRowTransformer);
-        const textMiningCount = response.data.total;
-        return { rows, textMiningCount };
+
+        return getAbstractData(pmids).then(abstracts => {
+          // Enrich reponse with abstract data
+          rowsRaw.forEach(d => {
+            d.evidence.literature_ref.data =
+              abstracts.find(i => {
+                var id = i.pmid || i.id; // some data MIGHT not have a pmid, but id SHOULD be the same
+                return id === d.evidence.literature_ref.lit_id.split('/').pop();
+              }) || {};
+          });
+          const rows = rowsRaw.map(evidenceTextMiningRowTransformer);
+          const textMiningCount = response.data.total;
+          return { rows, textMiningCount };
+        });
       })
   );
 };

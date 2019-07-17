@@ -31,19 +31,50 @@ export const summaryResolvers = {
 };
 
 export const sectionTypeDefs = gql`
-  # type Phenotype {
-  #   id: String!
-  #   name: String!
-  #   url: String!
-  # }
+  type Abstract {
+    title: String!
+  }
+
+  type Author {
+    firstName: String
+    lastName: String
+  }
+
+  type Match {
+    start: Int!
+    end: Int!
+  }
+
+  type SectionMatch {
+    text: String!
+    section: String!
+    target: Match
+    disease: Match
+  }
+
+  type Publication {
+    id: String!
+    title: String!
+    date: String!
+    authors: [Author!]!
+    url: String
+    abstract: String
+    matches: [SectionMatch]
+  }
+
+  type Journal {
+    title: String!
+    volume: String
+    issue: String
+    page: String
+    year: Int
+  }
+
   type EvidenceRowTextMining {
+    access: String!
     disease: Disease!
-    # humanPhenotypes: [Phenotype!]!
-    # modelPhenotypes: [Phenotype!]!
-    # modelId: String!
-    # allelicComposition: String!
-    # geneticBackground: String!
-    # source: Source!
+    journal: Journal!
+    publication: Publication!
   }
   type EvidenceDetailTextMining {
     rows: [EvidenceRowTextMining!]!
