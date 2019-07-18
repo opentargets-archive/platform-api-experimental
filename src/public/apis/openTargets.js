@@ -409,12 +409,22 @@ const evidenceTextMiningRowTransformer = r => {
           target: { start: m.t_start, end: m.t_end },
           disease: { start: m.d_start, end: m.d_end },
         }))
+        // sort the matches by section based on preferred order
         .sort((a, b) => {
           return (
             cat_list.findIndex(l => a.section.startsWith(l)) -
             cat_list.findIndex(l => b.section.startsWith(l))
           );
-        }),
+        })
+        // cluster matches by section for easier display
+        .reduce(function(matches, m) {
+          const i =
+            matches.findIndex(function(a) {
+              return (a[0] || {}).section === m.section;
+            }) + 1 || matches.push([]);
+          matches[i - 1].push(m);
+          return matches;
+        }, []),
     },
     journal: {
       title:

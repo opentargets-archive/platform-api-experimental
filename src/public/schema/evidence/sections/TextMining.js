@@ -59,7 +59,7 @@ export const sectionTypeDefs = gql`
     authors: [Author!]!
     url: String
     abstract: String
-    matches: [SectionMatch]
+    matches: [[SectionMatch]]
   }
 
   type Journal {
