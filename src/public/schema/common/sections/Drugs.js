@@ -39,7 +39,7 @@ export const typeDefs = gql`
     sourceUrl: String!
     sourceName: String!
   }
-  type MechanismOfAction {
+  type EvidenceMechanismOfAction {
     name: String!
     sourceUrl: String
     sourceName: String
@@ -49,6 +49,6 @@ export const typeDefs = gql`
     disease: Disease!
     drug: EvDrug!
     clinicalTrial: ClinicalTrial!
-    mechanismOfAction: MechanismOfAction!
+    mechanismOfAction: EvidenceMechanismOfAction!
   }
 `;
