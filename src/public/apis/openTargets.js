@@ -378,6 +378,14 @@ export const evidenceAnimalModels = (ensgId, efoId) =>
 // text mining
 const evidenceTextMiningRowTransformer = r => {
   const ref = r.evidence.literature_ref;
+  const cat_list = [
+    'title',
+    'intro',
+    'result',
+    'discussion',
+    'conclusion',
+    'other',
+  ]; // preferred sorting order
   return {
     access: r.access_level,
     disease: {
@@ -394,12 +402,19 @@ const evidenceTextMiningRowTransformer = r => {
       })),
       url: ref.url,
       abstract: ref.data.abstractText,
-      matches: ref.mined_sentences.map(m => ({
-        text: m.text,
-        section: m.section,
-        target: { start: m.t_start, end: m.t_end },
-        disease: { start: m.d_start, end: m.d_end },
-      })),
+      matches: ref.mined_sentences
+        .map(m => ({
+          text: m.text,
+          section: m.section.toLowerCase(),
+          target: { start: m.t_start, end: m.t_end },
+          disease: { start: m.d_start, end: m.d_end },
+        }))
+        .sort((a, b) => {
+          return (
+            cat_list.findIndex(l => a.section.startsWith(l)) -
+            cat_list.findIndex(l => b.section.startsWith(l))
+          );
+        }),
     },
     journal: {
       title:
