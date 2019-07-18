@@ -1,7 +1,5 @@
 import { gql } from 'apollo-server-express';
 
-import { diseaseSimilar } from '../../../apis/openTargets';
-
 export const id = 'phenotypes';
 
 export const summaryTypeDefs = gql`
