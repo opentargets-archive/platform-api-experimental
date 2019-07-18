@@ -439,12 +439,12 @@ const evidenceTextMiningRowTransformer = r => {
   };
 };
 
-export const evidenceTextMining = (ensgId, efoId) => {
+export const evidenceTextMining = (ensgId, efoId, from, size) => {
   return (
     axios
       // get basic literature from our API
       .get(
-        `${ROOT}public/evidence/filter?size=10&from=0&datasource=europepmc&sort=evidence.date_asserted&search=&fields=access_level&fields=disease.efo_info.label&fields=disease.efo_info.efo_id&fields=evidence.literature_ref&fields=evidence.date_asserted&target=${ensgId}&disease=${efoId}&expandefo=true`
+        `${ROOT}public/evidence/filter?size=${size}&from=${from}&datasource=europepmc&sort=evidence.date_asserted&search=&fields=access_level&fields=disease.efo_info.label&fields=disease.efo_info.efo_id&fields=evidence.literature_ref&fields=evidence.date_asserted&target=${ensgId}&disease=${efoId}&expandefo=true`
       )
       .then(response => {
         // get abstract data
@@ -471,7 +471,6 @@ export const evidenceTextMining = (ensgId, efoId) => {
 };
 
 export const evidenceTextMiningSummary = (ensgId, efoId) => {
-  console.log('evidenceTextMining ', ensgId, efoId);
   return (
     axios
       // get quick literature count from our API
