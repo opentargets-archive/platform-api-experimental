@@ -631,6 +631,18 @@ export const createDrugLoader = () =>
           }),
         }));
 
+        // linked targets is just the set from the mechanisms of action
+        // previously was besthitsearch, but this required evidence strings,
+        // so only picked up targets such that t-dr-d relationship known
+        const linkedTargets = Object.values(
+          mechanismsOfAction.reduce((acc, m) => {
+            m.targets.forEach(t => {
+              acc[t.id] = t;
+            });
+            return acc;
+          }, {})
+        );
+
         const uniqueActionTypes = _.uniq(
           mechanismsOfActionRaw.map(m => m.action_type)
         );
@@ -649,6 +661,7 @@ export const createDrugLoader = () =>
           mechanismsOfAction,
           uniqueActionTypes,
           uniqueTargetTypes,
+          linkedTargets,
         };
       });
     })
