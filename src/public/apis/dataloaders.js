@@ -591,16 +591,64 @@ export const createDrugLoader = () =>
           id,
           pref_name: name,
           synonyms,
-          yearOfFirstApproval,
+          trade_names,
+          year_first_approved: yearOfFirstApproval,
           type,
+          max_clinical_trial_phase: maximumClinicalTrialPhase,
+          mechanisms_of_action: mechanismsOfActionRaw,
         } = d.data;
+
+        const mechanismsOfAction = mechanismsOfActionRaw.map(m => ({
+          mechanismOfAction: m.description,
+          targetName: m.target_name,
+          targets: m.target_components.map(t => ({
+            id: t.ensembl,
+            uniprotId: t.uniprot,
+            name: t.approved_name,
+            symbol: t.approved_symbol,
+          })),
+          references: m.references.map(({ source, ids, urls }) => {
+            let url;
+            switch (source) {
+              case 'ISBN':
+                url = `https://isbnsearch.org/isbn/${ids[0].replace(/-/g, '')}`;
+                break;
+              case 'Wikipedia':
+                url = `https://en.wikipedia.org/wiki/${
+                  ids[0]
+                }#Mechanism_of_action`;
+                break;
+              case 'InterPro':
+                url = `https://www.ebi.ac.uk/interpro/entry/${ids[0]}`;
+                break;
+              default:
+                url = urls[0];
+            }
+            return {
+              name: source,
+              url,
+            };
+          }),
+        }));
+
+        const uniqueActionTypes = _.uniq(
+          mechanismsOfActionRaw.map(m => m.action_type)
+        );
+        const uniqueTargetTypes = _.uniq(
+          mechanismsOfActionRaw.map(m => m.target_type)
+        );
 
         return {
           id,
           name,
           synonyms,
+          tradeNames: trade_names || [],
           yearOfFirstApproval,
           type,
+          maximumClinicalTrialPhase,
+          mechanismsOfAction,
+          uniqueActionTypes,
+          uniqueTargetTypes,
         };
       });
     })
