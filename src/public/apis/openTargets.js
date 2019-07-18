@@ -439,7 +439,7 @@ const evidenceTextMiningRowTransformer = r => {
   };
 };
 
-export const evidenceTextMining = (ensgId, efoId, from, size) => {
+export const evidenceTextMining = (ensgId, efoId, from = 0, size = 10) => {
   return (
     axios
       // get basic literature from our API
