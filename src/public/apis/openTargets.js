@@ -15,6 +15,19 @@ export const drugs = chemblIds =>
     Promise.resolve(chemblIds),
     Promise.all(chemblIds.map(chemblId => drug(chemblId))),
   ]);
+export const drugDiseases = drugName =>
+  axios
+    .get(
+      `${ROOT}public/search?q=${drugName}&size=1000&filter=disease&search_profile=drug`
+    )
+    .then(response =>
+      response.data.data.map(d => ({
+        id: d.data.id,
+        name: d.data.name,
+        description: d.data.description,
+      }))
+    );
+
 export const disease = efoId => axios.get(`${ROOT}private/disease/${efoId}`);
 export const diseases = efoIds =>
   Promise.all([
@@ -328,6 +341,9 @@ const evidenceDifferentialExpressionRowTransformer = r => {
         r.evidence.experiment_overview || 'Experiment overview and raw data',
       url: (r.evidence.urls[2] || r.evidence.urls[0]).url,
     },
+    pmIds: r.literature
+      ? r.literature.references.map(d => d.lit_id.split('/').pop())
+      : [],
   };
 };
 export const evidenceDifferentialExpression = (ensgId, efoId) =>
