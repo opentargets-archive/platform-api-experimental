@@ -19,12 +19,10 @@ const therapeuticAreasPerDisease = therapeuticAreaIds.reduce((acc, taId) => {
     .find(d => d.id === taId)
     .descendants()
     .forEach(d => {
-      if (d.id !== taId) {
-        if (!acc[d.id]) {
-          acc[d.id] = [];
-        }
-        acc[d.id].push({ id: taId, name: namesPerDiseaseId[taId] });
+      if (!acc[d.id]) {
+        acc[d.id] = [];
       }
+      acc[d.id].push({ id: taId, name: namesPerDiseaseId[taId] });
     });
   return acc;
 }, {});
