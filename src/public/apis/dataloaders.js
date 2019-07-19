@@ -695,12 +695,6 @@ export const createDiseaseLoader = () =>
             path_labels: pathLabels,
             phenotypes: phenotypesRaw,
           } = d;
-          const therapeuticAreas = _.uniqBy(
-            _.zip(pathCodes.map(d => d[0]), pathLabels.map(d => d[0])).map(
-              l => ({ _efoId: l[0], id: l[0], name: l[1] })
-            ),
-            'id'
-          );
           const phenotypes = phenotypesRaw.map(d => ({
             id: d.uri.split('/').pop(),
             name: d.label,
@@ -711,8 +705,6 @@ export const createDiseaseLoader = () =>
             name,
             description,
             synonyms: synonyms.length > 0 ? synonyms : [],
-            therapeuticAreas:
-              therapeuticAreas.length > 0 ? therapeuticAreas : [],
             phenotypes,
           };
         });
