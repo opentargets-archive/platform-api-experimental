@@ -621,6 +621,9 @@ export const createDrugLoader = () =>
               case 'InterPro':
                 url = `https://www.ebi.ac.uk/interpro/entry/${ids[0]}`;
                 break;
+              case 'Other':
+                url = ids[0];
+                break;
               default:
                 url = urls[0];
             }
