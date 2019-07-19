@@ -2,6 +2,8 @@ import { gql } from 'apollo-server-express';
 // import { print } from 'graphql/language/printer';
 import _ from 'lodash';
 
+import therapeuticAreasPerDisease from './therapeuticAreasPerDisease';
+
 // load sections
 import * as sectionsObject from './sectionIndex';
 const sections = Object.values(sectionsObject);
@@ -71,12 +73,14 @@ const diseaseResolver = {
       synonyms
         ? synonyms
         : diseaseLoader.load(_efoId).then(({ synonyms }) => synonyms),
-    therapeuticAreas: ({ _efoId, therapeuticAreas }, args, { diseaseLoader }) =>
-      therapeuticAreas
-        ? therapeuticAreas
-        : diseaseLoader
-            .load(_efoId)
-            .then(({ therapeuticAreas }) => therapeuticAreas),
+    therapeuticAreas: ({ _efoId }, args, { diseaseLoader }) =>
+      therapeuticAreasPerDisease[_efoId]
+        ? therapeuticAreasPerDisease[_efoId].map(({ id, name }) => ({
+            _efoId: id,
+            id,
+            name,
+          }))
+        : [],
     summaries: _.identity,
     details: _.identity,
   },
