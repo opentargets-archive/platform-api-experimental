@@ -596,7 +596,21 @@ export const createDrugLoader = () =>
           type,
           max_clinical_trial_phase: maximumClinicalTrialPhase,
           mechanisms_of_action: mechanismsOfActionRaw,
+          withdrawn_flag: hasBeenWithdrawn,
+          withdrawn_class,
+          withdrawn_country,
+          withdrawn_reason,
+          withdrawn_year,
         } = d.data;
+
+        const withdrawnNotice = hasBeenWithdrawn
+          ? {
+              classes: withdrawn_class,
+              countries: withdrawn_country,
+              reasons: withdrawn_reason,
+              year: withdrawn_year,
+            }
+          : null;
 
         const mechanismsOfAction = mechanismsOfActionRaw.map(m => ({
           mechanismOfAction: m.description,
@@ -607,31 +621,36 @@ export const createDrugLoader = () =>
             name: t.approved_name,
             symbol: t.approved_symbol,
           })),
-          references: m.references.map(({ source, ids, urls }) => {
-            let url;
-            switch (source) {
-              case 'ISBN':
-                url = `https://isbnsearch.org/isbn/${ids[0].replace(/-/g, '')}`;
-                break;
-              case 'Wikipedia':
-                url = `https://en.wikipedia.org/wiki/${
-                  ids[0]
-                }#Mechanism_of_action`;
-                break;
-              case 'InterPro':
-                url = `https://www.ebi.ac.uk/interpro/entry/${ids[0]}`;
-                break;
-              case 'Other':
-                url = ids[0];
-                break;
-              default:
-                url = urls[0];
-            }
-            return {
-              name: source,
-              url,
-            };
-          }),
+          references: m.references
+            ? m.references.map(({ source, ids, urls }) => {
+                let url;
+                switch (source) {
+                  case 'ISBN':
+                    url = `https://isbnsearch.org/isbn/${ids[0].replace(
+                      /-/g,
+                      ''
+                    )}`;
+                    break;
+                  case 'Wikipedia':
+                    url = `https://en.wikipedia.org/wiki/${
+                      ids[0]
+                    }#Mechanism_of_action`;
+                    break;
+                  case 'InterPro':
+                    url = `https://www.ebi.ac.uk/interpro/entry/${ids[0]}`;
+                    break;
+                  case 'Other':
+                    url = ids[0];
+                    break;
+                  default:
+                    url = urls[0];
+                }
+                return {
+                  name: source,
+                  url,
+                };
+              })
+            : [],
         }));
 
         // linked targets is just the set from the mechanisms of action
@@ -665,6 +684,8 @@ export const createDrugLoader = () =>
           uniqueActionTypes,
           uniqueTargetTypes,
           linkedTargets,
+          hasBeenWithdrawn,
+          withdrawnNotice,
         };
       });
     })
