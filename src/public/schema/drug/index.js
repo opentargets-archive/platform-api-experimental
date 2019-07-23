@@ -11,19 +11,21 @@ const summaryTypeDefs = sections.map(d => d.summaryTypeDefs);
 const sectionTypeDefs = sections.map(d => d.sectionTypeDefs);
 const summariesTypeDef = gql`
   type DrugSummaries {
-    ${sections
-      .map(d => `${d.id}: DrugSummary${_.upperFirst(d.id)}`)
-      .join('\n')}
+    ${sections.map(d => `${d.id}: DrugSummary${_.upperFirst(d.id)}`).join('\n')}
   }
 `;
 const sectionsTypeDef = gql`
   type DrugDetails {
-    ${sections
-      .map(d => `${d.id}: DrugDetail${_.upperFirst(d.id)}`)
-      .join('\n')}
+    ${sections.map(d => `${d.id}: DrugDetail${_.upperFirst(d.id)}`).join('\n')}
   }
 `;
 const drugTypeDef = gql`
+  type WithdrawnNotice {
+    classes: [String!]!
+    countries: [String!]!
+    reasons: [String!]!
+    year: String!
+  }
   type Drug {
     id: String!
     name: String!
@@ -32,6 +34,8 @@ const drugTypeDef = gql`
     yearOfFirstApproval: String
     type: String!
     maximumClinicalTrialPhase: Int
+    hasBeenWithdrawn: Boolean!
+    withdrawnNotice: WithdrawnNotice
     summaries: DrugSummaries!
     details: DrugDetails!
   }
@@ -70,13 +74,23 @@ const drugResolver = {
         ? synonyms
         : drugLoader.load(_chemblId).then(({ synonyms }) => synonyms),
     maximumClinicalTrialPhase: ({ _chemblId }, args, { drugLoader }) =>
-      drugLoader.load(_chemblId).then(({ maximumClinicalTrialPhase }) => maximumClinicalTrialPhase),
+      drugLoader
+        .load(_chemblId)
+        .then(({ maximumClinicalTrialPhase }) => maximumClinicalTrialPhase),
     type: ({ _chemblId }, args, { drugLoader }) =>
       drugLoader.load(_chemblId).then(({ type }) => type),
     yearOfFirstApproval: ({ _chemblId }, args, { drugLoader }) =>
-      drugLoader.load(_chemblId).then(({ yearOfFirstApproval }) => yearOfFirstApproval),
+      drugLoader
+        .load(_chemblId)
+        .then(({ yearOfFirstApproval }) => yearOfFirstApproval),
     tradeNames: ({ _chemblId }, args, { drugLoader }) =>
       drugLoader.load(_chemblId).then(({ tradeNames }) => tradeNames),
+    hasBeenWithdrawn: ({ _chemblId }, args, { drugLoader }) =>
+      drugLoader
+        .load(_chemblId)
+        .then(({ hasBeenWithdrawn }) => hasBeenWithdrawn),
+    withdrawnNotice: ({ _chemblId }, args, { drugLoader }) =>
+      drugLoader.load(_chemblId).then(({ withdrawnNotice }) => withdrawnNotice),
     summaries: _.identity,
     details: _.identity,
   },
