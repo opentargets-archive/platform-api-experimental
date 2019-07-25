@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server-express';
 
-import { diseaseSimilar } from '../../../apis/openTargets';
+import { diseaseSimilar, associations } from '../../../apis/openTargets';
 
 export const id = 'relatedDiseases';
 
@@ -25,6 +25,11 @@ export const summaryResolvers = {
 };
 
 export const sectionTypeDefs = gql`
+  type ExpandedRowRelatedDisease {
+    target: Target!
+    associationScoreA: Float!
+    associationScoreB: Float!
+  }
   type RowRelatedDisease {
     A: Disease!
     B: Disease!
@@ -36,6 +41,7 @@ export const sectionTypeDefs = gql`
   }
   type DiseaseDetailRelatedDiseases {
     rows: [RowRelatedDisease!]!
+    expanded(otherEfoId: String!): [ExpandedRowRelatedDisease!]!
   }
 `;
 
@@ -53,5 +59,38 @@ export const sectionResolvers = {
           score: d.value,
         }))
       ),
+    expanded: ({ _efoId }, { otherEfoId }) =>
+      diseaseSimilar(_efoId)
+        .then(response => {
+          const entry = response.data.data.find(
+            d => d.object.id === otherEfoId
+          );
+          const { shared_targets: ensgIds } = entry;
+          const pageEfoIdQuery = { ensgIds, efoIds: [_efoId] };
+          const otherEfoIdQuery = { ensgIds, efoIds: [otherEfoId] };
+          return Promise.all([
+            Promise.resolve(ensgIds),
+            associations(pageEfoIdQuery),
+            associations(otherEfoIdQuery),
+          ]);
+        })
+        .then(([ensgIds, pageResponse, otherResponse]) =>
+          ensgIds.map(ensgId => {
+            const pageRow = pageResponse.data.data.find(
+              d => d.target.id === ensgId
+            );
+            const otherRow = otherResponse.data.data.find(
+              d => d.target.id === ensgId
+            );
+            return {
+              target: {
+                id: ensgId,
+                symbol: pageRow.target.gene_info.symbol,
+              },
+              associationScoreA: pageRow.association_score.overall,
+              associationScoreB: otherRow.association_score.overall,
+            };
+          })
+        ),
   },
 };
