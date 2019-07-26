@@ -123,7 +123,15 @@ export const targetAssociationsFacets = ensgId =>
 
 export const diseaseSimilar = efoId =>
   axios.get(`${ROOT}private/relation/disease/${efoId}?id=${efoId}&size=10000`);
-
+export const associations = ({ ensgIds, efoIds }) =>
+  axios.post(
+    `https://platform-api.opentargets.io/v3/platform/public/association/filter`,
+    {
+      disease: efoIds,
+      target: ensgIds,
+      size: 10000,
+    }
+  );
 const diseasesDrugsIteration = async (efoIds, next = null) => {
   const props = {
     size: 10000,
