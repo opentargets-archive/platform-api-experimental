@@ -23,7 +23,7 @@ const drugTypeDef = gql`
   type WithdrawnNotice {
     classes: [String!]
     countries: [String!]!
-    reasons: [String!]!
+    reasons: [String!]
     year: String!
   }
   type Drug {
