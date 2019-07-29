@@ -78,6 +78,7 @@ export const sectionTypeDefs = gql`
   }
   type EvidenceDetailTextMining {
     rows: [EvidenceRowTextMining!]!
+    textMiningCount: Int!
   }
 `;
 
@@ -86,6 +87,10 @@ export const sectionResolvers = {
     rows: ({ _ensgId, _efoId, _from, _size }) =>
       evidenceTextMining(_ensgId, _efoId, _from, _size).then(
         ({ rows }) => rows
+      ),
+    textMiningCount: ({ _ensgId, _efoId, _from, _size }) =>
+      evidenceTextMining(_ensgId, _efoId, _from, _size).then(
+        ({ textMiningCount }) => textMiningCount
       ),
   },
 };
