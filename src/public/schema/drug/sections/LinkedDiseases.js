@@ -2,6 +2,8 @@ import { gql } from 'apollo-server-express';
 
 import { drugDiseases } from '../../../apis/openTargets';
 
+import therapeuticAreasPerDisease from '../../disease/therapeuticAreasPerDisease';
+
 export const id = 'linkedDiseases';
 
 // TODO: We should NOT use `drugDiseases`, which essentially looks for
@@ -41,6 +43,15 @@ export const sectionTypeDefs = gql`
 export const sectionResolvers = {
   DrugDetailLinkedDiseases: {
     rows: ({ _chemblId }, args, { drugLoader }) =>
-      drugLoader.load(_chemblId).then(({ name }) => drugDiseases(name)),
+      drugLoader
+        .load(_chemblId)
+        .then(({ name }) => drugDiseases(name))
+        .then(rows =>
+          rows.map(({ id, name }) => ({
+            _efoId: id, // needed for other disease resolvers
+            id,
+            name,
+          }))
+        ),
   },
 };
