@@ -38,6 +38,7 @@ const drugTypeDef = gql`
     withdrawnNotice: WithdrawnNotice
     summaries: DrugSummaries!
     details: DrugDetails!
+    internalCompound: Boolean!
   }
 `;
 export const typeDefs = [
@@ -91,6 +92,10 @@ const drugResolver = {
         .then(({ hasBeenWithdrawn }) => hasBeenWithdrawn),
     withdrawnNotice: ({ _chemblId }, args, { drugLoader }) =>
       drugLoader.load(_chemblId).then(({ withdrawnNotice }) => withdrawnNotice),
+    internalCompound: ({ _chemblId }, args, { drugLoader }) =>
+      drugLoader
+        .load(_chemblId)
+        .then(({ internalCompound }) => internalCompound),
     summaries: _.identity,
     details: _.identity,
   },
