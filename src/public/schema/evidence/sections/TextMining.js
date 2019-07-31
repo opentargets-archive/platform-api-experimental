@@ -75,6 +75,7 @@ export const sectionTypeDefs = gql`
     disease: Disease!
     journal: Journal!
     publication: Publication!
+    score: Float!
   }
   type EvidenceDetailTextMining {
     rows: [EvidenceRowTextMining!]!
@@ -84,12 +85,12 @@ export const sectionTypeDefs = gql`
 
 export const sectionResolvers = {
   EvidenceDetailTextMining: {
-    rows: ({ _ensgId, _efoId, _from, _size }) =>
-      evidenceTextMining(_ensgId, _efoId, _from, _size).then(
+    rows: ({ _ensgId, _efoId, _from, _size, _sortBy, _order }) =>
+      evidenceTextMining(_ensgId, _efoId, _from, _size, _sortBy, _order).then(
         ({ rows }) => rows
       ),
-    textMiningCount: ({ _ensgId, _efoId, _from, _size }) =>
-      evidenceTextMining(_ensgId, _efoId, _from, _size).then(
+    textMiningCount: ({ _ensgId, _efoId, _from, _size, _sortBy, _order }) =>
+      evidenceTextMining(_ensgId, _efoId, _from, _size, _sortBy, _order).then(
         ({ textMiningCount }) => textMiningCount
       ),
   },

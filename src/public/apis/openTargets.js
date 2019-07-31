@@ -412,6 +412,7 @@ const evidenceTextMiningRowTransformer = r => {
   ]; // preferred sorting order
   return {
     access: r.access_level,
+    score: r.scores.association_score,
     disease: {
       id: r.disease.efo_info.efo_id.split('/').pop(),
       name: r.disease.efo_info.label,
@@ -463,12 +464,36 @@ const evidenceTextMiningRowTransformer = r => {
   };
 };
 
-export const evidenceTextMining = (ensgId, efoId, from = 0, size = 10) => {
+export const evidenceTextMining = (
+  ensgId,
+  efoId,
+  from = 0,
+  size = 10,
+  sortBy,
+  order = ''
+) => {
+  // map sort field
+  // Note that our API only support sorting for selected fields, hence sorting
+  // by disease or publication title (the latter not available in our data) is not possible
+  let sort;
+  const orderPrefix = order.toLowerCase() === 'asc' ? '~' : '';
+  // in this case for both supported fields the default order is 'desc'
+  // so they both get the same orderPrefix. For certain fields you might have to
+  // treat this independently for each sortBy field.
+  switch (sortBy) {
+    case 'publication.date':
+      sort = orderPrefix + 'evidence.date_asserted';
+      break;
+    default:
+      // default sort is by score desc
+      sort = orderPrefix + 'scores.association_score';
+  }
+
   return (
     axios
       // get basic literature from our API
       .get(
-        `${ROOT}public/evidence/filter?size=${size}&from=${from}&datasource=europepmc&sort=evidence.date_asserted&search=&fields=access_level&fields=disease.efo_info.label&fields=disease.efo_info.efo_id&fields=evidence.literature_ref&fields=evidence.date_asserted&target=${ensgId}&disease=${efoId}&expandefo=true`
+        `${ROOT}public/evidence/filter?size=${size}&from=${from}&sort=${sort}&datasource=europepmc&search=&fields=access_level&fields=disease.efo_info.label&fields=disease.efo_info.efo_id&fields=evidence.literature_ref&fields=evidence.date_asserted&fields=scores.association_score&target=${ensgId}&disease=${efoId}&expandefo=true`
       )
       .then(response => {
         // get abstract data
