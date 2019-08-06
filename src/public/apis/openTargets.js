@@ -412,7 +412,7 @@ const evidenceTextMiningRowTransformer = r => {
   ]; // preferred sorting order
   return {
     access: r.access_level,
-    score: r.scores.association_score,
+    relevance: (r.scores.association_score * 5) / 1.66666666,
     disease: {
       id: r.disease.efo_info.efo_id.split('/').pop(),
       name: r.disease.efo_info.label,

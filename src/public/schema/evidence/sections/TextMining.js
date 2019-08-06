@@ -75,7 +75,7 @@ export const sectionTypeDefs = gql`
     disease: Disease!
     journal: Journal!
     publication: Publication!
-    score: Float!
+    relevance: Float!
   }
   type EvidenceDetailTextMining {
     rows: [EvidenceRowTextMining!]!
