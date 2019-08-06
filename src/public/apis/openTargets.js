@@ -481,6 +481,10 @@ const evidenceTextMiningRowTransformer = r => {
   return {
     access: r.access_level,
     relevance: (r.scores.association_score * 5) / 1.66666666,
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
     publication: {
       id: ref.data.pmid || ref.data.pmcid || ref.data.id,
       title: ref.data.title,
