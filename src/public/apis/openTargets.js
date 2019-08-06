@@ -437,7 +437,7 @@ const evidencePheWASCatalogRowTransformer = r => {
     confidenceInterval: r.unique_association_fields.confidence_interval,
     vepConsequence: getVepConsequenceLabel(r),
     source: {
-      name: 'GWAS Catalog',
+      name: 'PheWAS Catalog',
       url:
         'https://docs.targetvalidation.org/data-sources/genetic-associations#gwas-catalog',
     },
