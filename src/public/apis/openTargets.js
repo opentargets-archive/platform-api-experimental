@@ -399,6 +399,74 @@ export const evidenceAnimalModels = (ensgId, efoId) =>
       return { rows, mouseModelCount };
     });
 
+const getVepConsequenceLabel = evidenceString => {
+  const ecoId = evidenceString.evidence.gene2variant.functional_consequence
+    .split('/')
+    .pop();
+  const eco = evidenceString.evidence.evidence_codes_info.find(
+    d => d[0].eco_id === ecoId
+  );
+  return eco[0].label;
+};
+const evidenceGWASCatalogRowTransformer = r => {
+  return {
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    rsId: r.variant.id.split('/').pop(),
+    pval: r.evidence.variant2disease.resource_score.value,
+    oddsRatio: parseFloat(r.unique_association_fields.odd_ratio),
+    confidenceInterval: r.unique_association_fields.confidence_interval,
+    vepConsequence: getVepConsequenceLabel(r),
+    source: {
+      name: 'GWAS Catalog',
+      url:
+        'https://docs.targetvalidation.org/data-sources/genetic-associations#gwas-catalog',
+    },
+  };
+};
+const evidencePheWASCatalogRowTransformer = r => {
+  return {
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    rsId: r.variant.id.split('/').pop(),
+    pval: r.evidence.variant2disease.resource_score.value,
+    oddsRatio: parseFloat(r.unique_association_fields.odds_ratio),
+    confidenceInterval: r.unique_association_fields.confidence_interval,
+    vepConsequence: getVepConsequenceLabel(r),
+    source: {
+      name: 'PheWAS Catalog',
+      url:
+        'https://docs.targetvalidation.org/data-sources/genetic-associations#gwas-catalog',
+    },
+  };
+};
+export const evidenceGWASCatalog = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=gwas_catalog&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceGWASCatalogRowTransformer);
+      const variantCount = _.uniqBy(rows, 'rsId').length;
+      return { rows, variantCount };
+    });
+export const evidencePheWASCatalog = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=phewas_catalog&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidencePheWASCatalogRowTransformer);
+      const variantCount = _.uniqBy(rows, 'rsId').length;
+      return { rows, variantCount };
+    });
+
 // text mining
 const evidenceTextMiningRowTransformer = r => {
   const ref = r.evidence.literature_ref;
@@ -413,10 +481,6 @@ const evidenceTextMiningRowTransformer = r => {
   return {
     access: r.access_level,
     relevance: (r.scores.association_score * 5) / 1.66666666,
-    disease: {
-      id: r.disease.efo_info.efo_id.split('/').pop(),
-      name: r.disease.efo_info.label,
-    },
     publication: {
       id: ref.data.pmid || ref.data.pmcid || ref.data.id,
       title: ref.data.title,
