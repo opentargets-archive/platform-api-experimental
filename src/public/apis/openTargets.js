@@ -414,8 +414,26 @@ const evidenceGWASCatalogRowTransformer = r => {
       name: r.disease.efo_info.label,
     },
     rsId: r.variant.id.split('/').pop(),
-    pval: parseFloat(r.unique_association_fields.pvalue),
+    pval: r.evidence.variant2disease.resource_score.value,
     oddsRatio: parseFloat(r.unique_association_fields.odd_ratio),
+    confidenceInterval: r.unique_association_fields.confidence_interval,
+    vepConsequence: getVepConsequenceLabel(r),
+    source: {
+      name: 'GWAS Catalog',
+      url:
+        'https://docs.targetvalidation.org/data-sources/genetic-associations#gwas-catalog',
+    },
+  };
+};
+const evidencePheWASCatalogRowTransformer = r => {
+  return {
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    rsId: r.variant.id.split('/').pop(),
+    pval: r.evidence.variant2disease.resource_score.value,
+    oddsRatio: parseFloat(r.unique_association_fields.odds_ratio),
     confidenceInterval: r.unique_association_fields.confidence_interval,
     vepConsequence: getVepConsequenceLabel(r),
     source: {
@@ -433,6 +451,17 @@ export const evidenceGWASCatalog = (ensgId, efoId) =>
     .then(response => {
       const rowsRaw = response.data.data;
       const rows = rowsRaw.map(evidenceGWASCatalogRowTransformer);
+      const variantCount = _.uniqBy(rows, 'rsId').length;
+      return { rows, variantCount };
+    });
+export const evidencePheWASCatalog = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=phewas_catalog&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidencePheWASCatalogRowTransformer);
       const variantCount = _.uniqBy(rows, 'rsId').length;
       return { rows, variantCount };
     });
