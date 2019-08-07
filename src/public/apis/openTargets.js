@@ -288,7 +288,11 @@ const MAP_PATHWAYS_SOURCE = {
   progeny: 'PROGENy',
 };
 const MAP_PATHWAYS_REACTOME_ACTIVITY = {
+  decreased_transcript_level: 'DECREASED_TRANSCRIPT_LEVEL',
   gain_of_function: 'GAIN_OF_FUNCTION',
+  loss_of_function: 'LOSS_OF_FUNCTION',
+  partial_loss_of_function: 'PARTIAL_LOSS_OF_FUNCTION',
+  up_or_down: 'UP_OR_DOWN',
 };
 const evidencePathwaysRowTransformer = r => {
   return {
@@ -307,6 +311,10 @@ const evidencePathwaysRowTransformer = r => {
       name: MAP_PATHWAYS_SOURCE[r.sourceID],
       url: r.evidence.provenance_type.literature.references[0].lit_id,
     },
+    mutations:
+      r.evidence.known_mutations && r.evidence.known_mutations.length > 0
+        ? r.evidence.known_mutations.map(m => m.preferred_name)
+        : [],
   };
 };
 export const evidencePathways = (ensgId, efoId) =>
@@ -320,8 +328,29 @@ export const evidencePathways = (ensgId, efoId) =>
   ]).then(([responsePathways, responseCrispr]) => {
     const pathwaysRaw = responsePathways.data.data;
     const rowsPathways = pathwaysRaw.map(evidencePathwaysRowTransformer);
+    const rowsReactome = rowsPathways.filter(
+      d => d.source.name === MAP_PATHWAYS_SOURCE.reactome
+    );
+    const rowsSlapenrich = rowsPathways.filter(
+      d => d.source.name === MAP_PATHWAYS_SOURCE.slapenrich
+    );
+    const rowsProgeny = rowsPathways.filter(
+      d => d.source.name === MAP_PATHWAYS_SOURCE.progeny
+    );
     const pathwayCount = _.uniqBy(rowsPathways, 'pathway.id').length;
-    return { rowsPathways, pathwayCount };
+    const reactomeCount = _.uniqBy(rowsReactome, 'pathway.id').length;
+    const slapenrichCount = _.uniqBy(rowsSlapenrich, 'pathway.id').length;
+    const progenyCount = _.uniqBy(rowsProgeny, 'pathway.id').length;
+    return {
+      rowsPathways,
+      rowsReactome,
+      rowsSlapenrich,
+      rowsProgeny,
+      pathwayCount,
+      reactomeCount,
+      slapenrichCount,
+      progenyCount,
+    };
   });
 
 const evidenceDifferentialExpressionRowTransformer = r => {

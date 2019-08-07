@@ -2,36 +2,26 @@ import { gql } from 'apollo-server-express';
 
 import { evidencePathways } from '../../../apis/openTargets';
 
-export const id = 'pathways';
+export const id = 'reactome';
 
 export const summaryTypeDefs = gql`
-  type EvidenceSummaryPathways {
+  type EvidenceSummaryReactome {
     pathwayCount: Int!
     sources: [Source!]!
   }
 `;
 
 export const summaryResolvers = {
-  EvidenceSummaryPathways: {
+  EvidenceSummaryReactome: {
     pathwayCount: ({ _ensgId, _efoId }) =>
       evidencePathways(_ensgId, _efoId).then(
-        ({ pathwayCount }) => pathwayCount
+        ({ reactomeCount }) => reactomeCount
       ),
     sources: () => [
       {
         name: 'Reactome',
         url:
           'https://docs.targetvalidation.org/data-sources/affected-pathways#reactome',
-      },
-      {
-        name: 'SLAPenrich',
-        url:
-          'https://docs.targetvalidation.org/data-sources/affected-pathways#slapenrich',
-      },
-      {
-        name: 'PROGENy',
-        url:
-          'https://docs.targetvalidation.org/data-sources/affected-pathways#progeny',
       },
     ],
   },
@@ -45,23 +35,23 @@ export const sectionTypeDefs = gql`
     PARTIAL_LOSS_OF_FUNCTION
     UP_OR_DOWN
   }
-  type EvidenceRowPathways {
+  type EvidenceRowReactome {
     activity: ReactomeActivity
     disease: Disease!
     pathway: ReactomePathway!
     mutations: [String!]!
     source: Source!
   }
-  type EvidenceDetailPathways {
-    rowsPathways: [EvidenceRowPathways!]!
+  type EvidenceDetailReactome {
+    rows: [EvidenceRowReactome!]!
   }
 `;
 
 export const sectionResolvers = {
-  EvidenceDetailPathways: {
-    rowsPathways: ({ _ensgId, _efoId }) =>
+  EvidenceDetailReactome: {
+    rows: ({ _ensgId, _efoId }) =>
       evidencePathways(_ensgId, _efoId).then(
-        ({ rowsPathways }) => rowsPathways
+        ({ rowsReactome }) => rowsReactome
       ),
   },
 };
