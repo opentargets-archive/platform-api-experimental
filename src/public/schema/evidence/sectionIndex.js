@@ -11,6 +11,7 @@ import * as reactomeRaw from './sections/Reactome';
 import * as slapenrichRaw from './sections/SLAPenrich';
 import * as progenyRaw from './sections/PROGENy';
 import * as crisprRaw from './sections/CRISPR';
+import * as sysBioRaw from './sections/SysBio';
 
 export const animalModels = animalModelsRaw;
 export const differentialExpression = differentialExpressionRaw;
@@ -22,3 +23,4 @@ export const reactome = reactomeRaw;
 export const slapenrich = slapenrichRaw;
 export const progeny = progenyRaw;
 export const crispr = crisprRaw;
+export const sysBio = sysBioRaw;

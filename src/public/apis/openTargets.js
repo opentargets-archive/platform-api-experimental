@@ -326,6 +326,15 @@ const evidenceCrisprRowTransformer = r => ({
   method: r.evidence.resource_score.method.description,
   pmId: '30971826', // TODO: this should be returned in the API
 });
+const evidenceSysBioRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  geneSet: r.unique_association_fields.gene_set,
+  method: r.evidence.resource_score.method.description,
+  pmId: r.evidence.resource_score.method.reference.split('/').pop(),
+});
 export const evidencePathways = (ensgId, efoId) =>
   Promise.all([
     axios.get(
@@ -334,11 +343,16 @@ export const evidencePathways = (ensgId, efoId) =>
     axios.get(
       `${ROOT}public/evidence/filter?size=1000&datasource=crispr&fields=access_level&fields=disease.efo_info&fields=scores&fields=evidence.resource_score.method&target=${ensgId}&disease=${efoId}&expandefo=true`
     ),
-  ]).then(([responsePathways, responseCrispr]) => {
+    axios.get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=sysbio&fields=access_level&fields=target.gene_info&fields=disease.efo_info&fields=disease.id&fields=unique_association_fields&fields=evidence.resource_score.method&target=${ensgId}&disease=${efoId}&expandefo=true`
+    ),
+  ]).then(([responsePathways, responseCrispr, responseSysBio]) => {
     const pathwaysRaw = responsePathways.data.data;
     const crisprRaw = responseCrispr.data.data;
+    const sysBioRaw = responseSysBio.data.data;
     const rowsPathways = pathwaysRaw.map(evidencePathwaysRowTransformer);
     const rowsCrispr = crisprRaw.map(evidenceCrisprRowTransformer);
+    const rowsSysBio = sysBioRaw.map(evidenceSysBioRowTransformer);
     const rowsReactome = rowsPathways.filter(
       d => d.source.name === MAP_PATHWAYS_SOURCE.reactome
     );
@@ -353,17 +367,20 @@ export const evidencePathways = (ensgId, efoId) =>
     const slapenrichCount = _.uniqBy(rowsSlapenrich, 'pathway.id').length;
     const progenyCount = _.uniqBy(rowsProgeny, 'pathway.id').length;
     const hasCrispr = rowsCrispr.length > 0;
+    const hasSysBio = rowsSysBio.length > 0;
     return {
       rowsPathways,
       rowsReactome,
       rowsSlapenrich,
       rowsProgeny,
       rowsCrispr,
+      rowsSysBio,
       pathwayCount,
       reactomeCount,
       slapenrichCount,
       progenyCount,
       hasCrispr,
+      hasSysBio,
     };
   });
 

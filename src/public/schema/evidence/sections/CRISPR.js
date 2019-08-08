@@ -30,7 +30,7 @@ export const sectionTypeDefs = gql`
     disease: Disease!
     score: Float!
     method: String!
-    source: Source!
+    pmId: String!
   }
   type EvidenceDetailCrispr {
     rows: [EvidenceRowCrispr!]!
