@@ -38,6 +38,7 @@ export const sectionTypeDefs = gql`
   type Author {
     firstName: String
     lastName: String
+    initials: String
   }
 
   type Match {

@@ -490,8 +490,9 @@ const evidenceTextMiningRowTransformer = r => {
       title: ref.data.title,
       date: ref.data.pubYear,
       authors: ref.data.authorList.author.map(auth => ({
-        firstName: auth.firstName,
+        firstName: auth.firstName || auth.initials || '',
         lastName: auth.lastName,
+        initials: auth.initials,
       })),
       url: ref.url,
       abstract: ref.data.abstractText,
