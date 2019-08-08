@@ -6,14 +6,14 @@ export const id = 'gene2Phenotype';
 
 export const summaryTypeDefs = gql`
   type EvidenceSummaryGene2Phenotype {
-    hasGene2Phenotype: Boolean!
+    hasPanel: Boolean!
     sources: [Source!]!
   }
 `;
 
 export const summaryResolvers = {
   EvidenceSummaryGene2Phenotype: {
-    hasGene2Phenotype: ({ _ensgId, _efoId }) =>
+    hasPanel: ({ _ensgId, _efoId }) =>
       evidenceGene2Phenotype(_ensgId, _efoId).then(
         ({ hasGene2Phenotype }) => hasGene2Phenotype
       ),

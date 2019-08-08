@@ -6,14 +6,14 @@ export const id = 'genomicsEngland';
 
 export const summaryTypeDefs = gql`
   type EvidenceSummaryGenomicsEngland {
-    hasGenomicsEngland: Boolean!
+    hasPanel: Boolean!
     sources: [Source!]!
   }
 `;
 
 export const summaryResolvers = {
   EvidenceSummaryGenomicsEngland: {
-    hasGenomicsEngland: ({ _ensgId, _efoId }) =>
+    hasPanel: ({ _ensgId, _efoId }) =>
       evidenceGenomicsEngland(_ensgId, _efoId).then(
         ({ hasGenomicsEngland }) => hasGenomicsEngland
       ),
