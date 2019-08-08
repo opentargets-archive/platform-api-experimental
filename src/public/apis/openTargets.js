@@ -518,6 +518,18 @@ const evidenceEVARowTransformer = r => ({
         .pop()
     : null,
 });
+const evidenceGene2PhenotypeRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  panelsUrl: r.evidence.urls[0].url,
+  pmId: r.evidence.provenance_type.literature
+    ? r.evidence.provenance_type.literature.references[0].lit_id
+        .split('/')
+        .pop()
+    : null,
+});
 export const evidenceGWASCatalog = (ensgId, efoId) =>
   axios
     .get(
@@ -550,4 +562,16 @@ export const evidenceEVA = (ensgId, efoId) =>
       const rows = rowsRaw.map(evidenceEVARowTransformer);
       const variantCount = _.uniqBy(rows, 'rsId').length;
       return { rows, variantCount };
+    });
+
+export const evidenceGene2Phenotype = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=gene2phenotype&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceGene2PhenotypeRowTransformer);
+      const hasGene2Phenotype = rows.length > 0;
+      return { rows, hasGene2Phenotype };
     });

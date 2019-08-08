@@ -13,6 +13,7 @@ import * as progenyRaw from './sections/PROGENy';
 import * as crisprRaw from './sections/CRISPR';
 import * as sysBioRaw from './sections/SysBio';
 import * as evaRaw from './sections/EVA';
+import * as gene2PhenotypeRaw from './sections/Gene2Phenotype';
 
 export const animalModels = animalModelsRaw;
 export const differentialExpression = differentialExpressionRaw;
@@ -26,3 +27,4 @@ export const progeny = progenyRaw;
 export const crispr = crisprRaw;
 export const sysBio = sysBioRaw;
 export const eva = evaRaw;
+export const gene2Phenotype = gene2PhenotypeRaw;
