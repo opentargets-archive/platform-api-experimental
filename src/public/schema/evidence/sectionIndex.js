@@ -12,6 +12,7 @@ import * as slapenrichRaw from './sections/SLAPenrich';
 import * as progenyRaw from './sections/PROGENy';
 import * as crisprRaw from './sections/CRISPR';
 import * as sysBioRaw from './sections/SysBio';
+import * as evaRaw from './sections/EVA';
 
 export const animalModels = animalModelsRaw;
 export const differentialExpression = differentialExpressionRaw;
@@ -24,3 +25,4 @@ export const slapenrich = slapenrichRaw;
 export const progeny = progenyRaw;
 export const crispr = crisprRaw;
 export const sysBio = sysBioRaw;
+export const eva = evaRaw;

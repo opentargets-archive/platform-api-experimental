@@ -503,6 +503,21 @@ const evidencePheWASCatalogRowTransformer = r => {
     },
   };
 };
+const evidenceEVARowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  rsId: r.variant.id.split('/').pop(),
+  clinVarId: r.evidence.gene2variant.urls[0].url.split('/').pop(),
+  vepConsequence: getVepConsequenceLabel(r),
+  clinicalSignificance: r.evidence.variant2disease.clinical_significance,
+  pmId: r.evidence.variant2disease.provenance_type.literature
+    ? r.evidence.variant2disease.provenance_type.literature.references[0].lit_id
+        .split('/')
+        .pop()
+    : null,
+});
 export const evidenceGWASCatalog = (ensgId, efoId) =>
   axios
     .get(
@@ -522,6 +537,17 @@ export const evidencePheWASCatalog = (ensgId, efoId) =>
     .then(response => {
       const rowsRaw = response.data.data;
       const rows = rowsRaw.map(evidencePheWASCatalogRowTransformer);
+      const variantCount = _.uniqBy(rows, 'rsId').length;
+      return { rows, variantCount };
+    });
+export const evidenceEVA = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=eva&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceEVARowTransformer);
       const variantCount = _.uniqBy(rows, 'rsId').length;
       return { rows, variantCount };
     });
