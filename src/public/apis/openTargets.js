@@ -592,8 +592,8 @@ export const evidenceGene2Phenotype = (ensgId, efoId) =>
     .then(response => {
       const rowsRaw = response.data.data;
       const rows = rowsRaw.map(evidenceGene2PhenotypeRowTransformer);
-      const hasGene2Phenotype = rows.length > 0;
-      return { rows, hasGene2Phenotype };
+      const hasPanel = rows.length > 0;
+      return { rows, hasPanel };
     });
 export const evidenceGenomicsEngland = (ensgId, efoId) =>
   axios
@@ -603,6 +603,6 @@ export const evidenceGenomicsEngland = (ensgId, efoId) =>
     .then(response => {
       const rowsRaw = response.data.data;
       const rows = rowsRaw.map(evidenceGenomicsEnglandRowTransformer);
-      const hasGene2Phenotype = rows.length > 0;
-      return { rows, hasGene2Phenotype };
+      const hasPanel = rows.length > 0;
+      return { rows, hasPanel };
     });

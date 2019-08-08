@@ -14,9 +14,7 @@ export const summaryTypeDefs = gql`
 export const summaryResolvers = {
   EvidenceSummaryGene2Phenotype: {
     hasPanel: ({ _ensgId, _efoId }) =>
-      evidenceGene2Phenotype(_ensgId, _efoId).then(
-        ({ hasGene2Phenotype }) => hasGene2Phenotype
-      ),
+      evidenceGene2Phenotype(_ensgId, _efoId).then(({ hasPanel }) => hasPanel),
     sources: () => [
       {
         name: 'Gene2Phenotype',

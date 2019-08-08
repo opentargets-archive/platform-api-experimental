@@ -14,9 +14,7 @@ export const summaryTypeDefs = gql`
 export const summaryResolvers = {
   EvidenceSummaryGenomicsEngland: {
     hasPanel: ({ _ensgId, _efoId }) =>
-      evidenceGenomicsEngland(_ensgId, _efoId).then(
-        ({ hasGenomicsEngland }) => hasGenomicsEngland
-      ),
+      evidenceGenomicsEngland(_ensgId, _efoId).then(({ hasPanel }) => hasPanel),
     sources: () => [
       {
         name: 'GenomicsEngland',
