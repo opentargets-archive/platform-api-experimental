@@ -317,17 +317,28 @@ const evidencePathwaysRowTransformer = r => {
         : [],
   };
 };
+const evidenceCrisprRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  score: r.scores.association_score,
+  method: r.evidence.resource_score.method.description,
+  pmId: '30971826', // TODO: this should be returned in the API
+});
 export const evidencePathways = (ensgId, efoId) =>
   Promise.all([
     axios.get(
       `${ROOT}public/evidence/filter?size=1000&datasource=reactome&datasource=slapenrich&datasource=progeny&fields=target.activity&fields=disease.efo_info&fields=evidence&fields=access_level&fields=sourceID&target=${ensgId}&disease=${efoId}&expandefo=true`
     ),
     axios.get(
-      `${ROOT}public/evidence/filter?size=1000&datasource=crispr&fields=access_level&fields=disease.name&fields=disease.id&fields=scores&fields=evidence.resource_score.method&target=${ensgId}&disease=${efoId}&expandefo=true`
+      `${ROOT}public/evidence/filter?size=1000&datasource=crispr&fields=access_level&fields=disease.efo_info&fields=scores&fields=evidence.resource_score.method&target=${ensgId}&disease=${efoId}&expandefo=true`
     ),
   ]).then(([responsePathways, responseCrispr]) => {
     const pathwaysRaw = responsePathways.data.data;
+    const crisprRaw = responseCrispr.data.data;
     const rowsPathways = pathwaysRaw.map(evidencePathwaysRowTransformer);
+    const rowsCrispr = crisprRaw.map(evidenceCrisprRowTransformer);
     const rowsReactome = rowsPathways.filter(
       d => d.source.name === MAP_PATHWAYS_SOURCE.reactome
     );
@@ -341,15 +352,18 @@ export const evidencePathways = (ensgId, efoId) =>
     const reactomeCount = _.uniqBy(rowsReactome, 'pathway.id').length;
     const slapenrichCount = _.uniqBy(rowsSlapenrich, 'pathway.id').length;
     const progenyCount = _.uniqBy(rowsProgeny, 'pathway.id').length;
+    const hasCrispr = rowsCrispr.length > 0;
     return {
       rowsPathways,
       rowsReactome,
       rowsSlapenrich,
       rowsProgeny,
+      rowsCrispr,
       pathwayCount,
       reactomeCount,
       slapenrichCount,
       progenyCount,
+      hasCrispr,
     };
   });
 

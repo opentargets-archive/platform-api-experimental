@@ -10,6 +10,7 @@ import * as phewasCatalogRaw from './sections/PheWASCatalog';
 import * as reactomeRaw from './sections/Reactome';
 import * as slapenrichRaw from './sections/SLAPenrich';
 import * as progenyRaw from './sections/PROGENy';
+import * as crisprRaw from './sections/CRISPR';
 
 export const animalModels = animalModelsRaw;
 export const differentialExpression = differentialExpressionRaw;
@@ -20,3 +21,4 @@ export const phewasCatalog = phewasCatalogRaw;
 export const reactome = reactomeRaw;
 export const slapenrich = slapenrichRaw;
 export const progeny = progenyRaw;
+export const crispr = crisprRaw;
