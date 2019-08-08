@@ -17,9 +17,9 @@ export const summaryResolvers = {
       evidenceEVA(_ensgId, _efoId).then(({ variantCount }) => variantCount),
     sources: () => [
       {
-        name: 'CRISPR',
+        name: 'EVA',
         url:
-          'https://docs.targetvalidation.org/data-sources/affected-pathways#crispr',
+          'https://docs.targetvalidation.org/data-sources/genetic-associations#european-variation-archive-eva',
       },
     ],
   },
