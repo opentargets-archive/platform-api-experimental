@@ -460,6 +460,11 @@ export const evidenceAnimalModels = (ensgId, efoId) =>
       return { rows, mouseModelCount };
     });
 
+const cleanVepConsequenceLabel = string =>
+  string
+    .toUpperCase()
+    .replace('5', 'FIVE')
+    .replace('3', 'THREE');
 const getVepConsequenceLabel = evidenceString => {
   const ecoId = evidenceString.evidence.gene2variant.functional_consequence
     .split('/')
@@ -467,10 +472,7 @@ const getVepConsequenceLabel = evidenceString => {
   const eco = evidenceString.evidence.evidence_codes_info.find(
     d => d[0].eco_id === ecoId
   );
-  return eco[0].label
-    .toUpperCase()
-    .replace('5', 'FIVE')
-    .replace('3', 'THREE');
+  return cleanVepConsequenceLabel(eco[0].label);
 };
 const evidenceGWASCatalogRowTransformer = r => {
   return {
@@ -519,6 +521,23 @@ const evidenceEVARowTransformer = r => ({
   clinicalSignificance: r.evidence.variant2disease.clinical_significance,
   pmId: r.evidence.variant2disease.provenance_type.literature
     ? r.evidence.variant2disease.provenance_type.literature.references[0].lit_id
+        .split('/')
+        .pop()
+    : null,
+});
+const evidenceEVASomaticRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  rsId: r.unique_association_fields.variant_id,
+  clinVarId: r.evidence.urls[0].url.split('/').pop(),
+  vepConsequence: cleanVepConsequenceLabel(
+    r.evidence.known_mutations[0].preferred_name
+  ),
+  clinicalSignificance: r.evidence.clinical_significance,
+  pmId: r.evidence.provenance_type.literature
+    ? r.evidence.provenance_type.literature.references[0].lit_id
         .split('/')
         .pop()
     : null,
@@ -584,6 +603,17 @@ export const evidenceEVA = (ensgId, efoId) =>
     .then(response => {
       const rowsRaw = response.data.data;
       const rows = rowsRaw.map(evidenceEVARowTransformer);
+      const variantCount = _.uniqBy(rows, 'rsId').length;
+      return { rows, variantCount };
+    });
+export const evidenceEVASomatic = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=eva_somatic&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceEVASomaticRowTransformer);
       const variantCount = _.uniqBy(rows, 'rsId').length;
       return { rows, variantCount };
     });
