@@ -34,7 +34,7 @@ export const sectionTypeDefs = gql`
     pval: Float!
     oddsRatio: Float
     confidenceInterval: String
-    vepConsequence: String
+    vepConsequence: VEPConsequence
     source: Source!
   }
   type EvidenceDetailPhewasCatalog {

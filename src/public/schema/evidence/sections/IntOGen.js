@@ -31,7 +31,7 @@ export const sectionTypeDefs = gql`
     LOSS_OF_FUNCTION
     UNKNOWN
   }
-  enum IntogenInheritancePattern {
+  enum InheritancePattern {
     DOMINANT
     RECESSIVE
     UNKNOWN
@@ -39,7 +39,7 @@ export const sectionTypeDefs = gql`
   type EvidenceRowIntogen {
     disease: Disease!
     activity: IntogenActivity!
-    inheritancePattern: IntogenInheritancePattern!
+    inheritancePattern: InheritancePattern!
     source: Source!
     pmId: String!
   }

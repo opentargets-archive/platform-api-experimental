@@ -30,7 +30,7 @@ export const sectionTypeDefs = gql`
     disease: Disease!
     rsId: String!
     clinVarId: String!
-    vepConsequence: String!
+    vepConsequence: VEPConsequence!
     clinicalSignificance: String!
     pmId: String
   }

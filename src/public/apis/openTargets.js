@@ -467,7 +467,10 @@ const getVepConsequenceLabel = evidenceString => {
   const eco = evidenceString.evidence.evidence_codes_info.find(
     d => d[0].eco_id === ecoId
   );
-  return eco[0].label;
+  return eco[0].label
+    .toUpperCase()
+    .replace('5', 'FIVE')
+    .replace('3', 'THREE');
 };
 const evidenceGWASCatalogRowTransformer = r => {
   return {
@@ -633,6 +636,38 @@ export const evidenceIntogen = (ensgId, efoId) =>
     .then(response => {
       const rowsRaw = response.data.data;
       const rows = rowsRaw.map(evidenceIntogenRowTransformer);
+      const hasMutations = rows.length > 0;
+      return { rows, hasMutations };
+    });
+
+const evidenceCancerGeneCensusRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  mutationType: r.evidence.known_mutations[0].preferred_name
+    .trim()
+    .toUpperCase(),
+  inheritancePattern: r.evidence.known_mutations[0].inheritance_pattern.toUpperCase(),
+  source: {
+    name: r.evidence.urls[0].nice_name,
+    url: r.evidence.urls[0].url,
+  },
+  samplesWithMutationTypeCount:
+    r.evidence.known_mutations[0].number_samples_with_mutation_type,
+  mutatedSamplesCount: r.evidence.known_mutations[0].number_mutated_samples,
+  pmIds: r.evidence.provenance_type.literature.references.map(d =>
+    d.lit_id.split('/').pop()
+  ),
+});
+export const evidenceCancerGeneCensus = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=cancer_gene_census&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceCancerGeneCensusRowTransformer);
       const hasMutations = rows.length > 0;
       return { rows, hasMutations };
     });
