@@ -640,6 +640,14 @@ export const evidenceIntogen = (ensgId, efoId) =>
       return { rows, hasMutations };
     });
 
+const inheritancePatternMap = {
+  'X-linked recessive': 'X_LINKED_RECESSIVE',
+  dominant: 'DOMINANT',
+  'dominant/recessive': 'DOMINANT_OR_RECESSIVE',
+  recessive: 'RECESSIVE',
+  unknown: 'UNKNOWN',
+};
+
 const evidenceCancerGeneCensusRowTransformer = r => ({
   disease: {
     id: r.disease.efo_info.efo_id.split('/').pop(),
@@ -648,7 +656,8 @@ const evidenceCancerGeneCensusRowTransformer = r => ({
   mutationType: r.evidence.known_mutations[0].preferred_name
     .trim()
     .toUpperCase(),
-  inheritancePattern: r.evidence.known_mutations[0].inheritance_pattern.toUpperCase(),
+  inheritancePattern:
+    inheritancePatternMap[r.evidence.known_mutations[0].inheritance_pattern],
   source: {
     name: r.evidence.urls[0].nice_name,
     url: r.evidence.urls[0].url,
@@ -656,9 +665,9 @@ const evidenceCancerGeneCensusRowTransformer = r => ({
   samplesWithMutationTypeCount:
     r.evidence.known_mutations[0].number_samples_with_mutation_type,
   mutatedSamplesCount: r.evidence.known_mutations[0].number_mutated_samples,
-  pmIds: r.evidence.provenance_type.literature.references.map(d =>
-    d.lit_id.split('/').pop()
-  ),
+  pmIds: r.literature
+    ? r.literature.references.map(d => d.lit_id.split('/').pop())
+    : [],
 });
 export const evidenceCancerGeneCensus = (ensgId, efoId) =>
   axios

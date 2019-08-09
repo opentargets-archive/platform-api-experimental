@@ -32,6 +32,8 @@ export const sectionTypeDefs = gql`
     UNKNOWN
   }
   enum InheritancePattern {
+    X_LINKED_RECESSIVE
+    DOMINANT_OR_RECESSIVE
     DOMINANT
     RECESSIVE
     UNKNOWN
