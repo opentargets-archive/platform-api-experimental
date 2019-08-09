@@ -710,3 +710,27 @@ export const evidenceCancerGeneCensus = (ensgId, efoId) =>
       const hasMutations = rows.length > 0;
       return { rows, hasMutations };
     });
+const evidenceUniProtLiteratureRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  source: {
+    name: r.evidence.urls[0].nice_name,
+    url: r.evidence.urls[0].url,
+  },
+  pmIds: r.literature
+    ? r.literature.references.map(d => d.lit_id.split('/').pop())
+    : [],
+});
+export const evidenceUniProtLiterature = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=uniprot_literature&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceUniProtLiteratureRowTransformer);
+      const hasVariants = rows.length > 0;
+      return { rows, hasVariants };
+    });
