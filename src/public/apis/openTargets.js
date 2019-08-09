@@ -606,3 +606,31 @@ export const evidenceGenomicsEngland = (ensgId, efoId) =>
       const hasPanel = rows.length > 0;
       return { rows, hasPanel };
     });
+
+const evidenceIntogenRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  activity: r.target.activity
+    .split('/')
+    .pop()
+    .toUpperCase(),
+  inheritancePattern: r.evidence.known_mutations[0].inheritance_pattern.toUpperCase(),
+  source: {
+    name: r.evidence.urls[0].nice_name,
+    url: r.evidence.urls[0].url,
+  },
+  pmId: r.evidence.provenance_type.literature.references[0].lit_id,
+});
+export const evidenceIntogen = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=intogen&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceIntogenRowTransformer);
+      const hasMutations = rows.length > 0;
+      return { rows, hasMutations };
+    });
