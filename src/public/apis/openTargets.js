@@ -621,7 +621,9 @@ const evidenceIntogenRowTransformer = r => ({
     name: r.evidence.urls[0].nice_name,
     url: r.evidence.urls[0].url,
   },
-  pmId: r.evidence.provenance_type.literature.references[0].lit_id,
+  pmId: r.evidence.provenance_type.literature.references[0].lit_id
+    .split('/')
+    .pop(),
 });
 export const evidenceIntogen = (ensgId, efoId) =>
   axios
