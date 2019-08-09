@@ -734,3 +734,31 @@ export const evidenceUniProtLiterature = (ensgId, efoId) =>
       const hasVariants = rows.length > 0;
       return { rows, hasVariants };
     });
+const evidenceUniProtRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  rsId: r.variant.id.split('/').pop(),
+  vepConsequence: getVepConsequenceLabel(r),
+  source: {
+    name: r.evidence.gene2variant.urls[0].nice_name,
+    url: r.evidence.gene2variant.urls[0].url,
+  },
+  pmIds: r.evidence.gene2variant.provenance_type.literature
+    ? r.evidence.gene2variant.provenance_type.literature.references.map(d =>
+        d.lit_id.split('/').pop()
+      )
+    : [],
+});
+export const evidenceUniProt = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=uniprot&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceUniProtRowTransformer);
+      const hasVariants = rows.length > 0;
+      return { rows, hasVariants };
+    });

@@ -18,6 +18,7 @@ import * as evaRaw from './sections/EVA';
 import * as evaSomaticRaw from './sections/EVASomatic';
 import * as gene2PhenotypeRaw from './sections/Gene2Phenotype';
 import * as genomicsEnglandRaw from './sections/GenomicsEngland';
+import * as uniProtRaw from './sections/UniProt';
 import * as uniProtLiteratureRaw from './sections/UniProtLiterature';
 
 export const animalModels = animalModelsRaw;
@@ -37,4 +38,5 @@ export const eva = evaRaw;
 export const evaSomatic = evaSomaticRaw;
 export const gene2Phenotype = gene2PhenotypeRaw;
 export const genomicsEngland = genomicsEnglandRaw;
+export const uniProt = uniProtRaw;
 export const uniProtLiterature = uniProtLiteratureRaw;
