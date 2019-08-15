@@ -2,6 +2,8 @@ import axios from 'axios';
 import _ from 'lodash';
 import { getAbstractData } from './epmc';
 
+import getMultiplePublicationsSource from '../utils/getMultiplePublicationsSource';
+
 const PROTOCOL = 'https';
 const HOST = 'api.opentargets.io';
 const STEM = 'v3/platform';
@@ -289,7 +291,11 @@ const MAP_PATHWAYS_SOURCE = {
   progeny: 'PROGENy',
 };
 const MAP_PATHWAYS_REACTOME_ACTIVITY = {
+  decreased_transcript_level: 'DECREASED_TRANSCRIPT_LEVEL',
   gain_of_function: 'GAIN_OF_FUNCTION',
+  loss_of_function: 'LOSS_OF_FUNCTION',
+  partial_loss_of_function: 'PARTIAL_LOSS_OF_FUNCTION',
+  up_or_down: 'UP_OR_DOWN',
 };
 const evidencePathwaysRowTransformer = r => {
   return {
@@ -308,21 +314,77 @@ const evidencePathwaysRowTransformer = r => {
       name: MAP_PATHWAYS_SOURCE[r.sourceID],
       url: r.evidence.provenance_type.literature.references[0].lit_id,
     },
+    mutations:
+      r.evidence.known_mutations && r.evidence.known_mutations.length > 0
+        ? r.evidence.known_mutations.map(m => m.preferred_name)
+        : [],
   };
 };
+const evidenceCrisprRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  score: r.scores.association_score,
+  method: r.evidence.resource_score.method.description,
+  pmId: '30971826', // TODO: this should be returned in the API
+});
+const evidenceSysBioRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  geneSet: r.unique_association_fields.gene_set,
+  method: r.evidence.resource_score.method.description,
+  pmId: r.evidence.resource_score.method.reference.split('/').pop(),
+});
 export const evidencePathways = (ensgId, efoId) =>
   Promise.all([
     axios.get(
       `${ROOT}public/evidence/filter?size=1000&datasource=reactome&datasource=slapenrich&datasource=progeny&fields=target.activity&fields=disease.efo_info&fields=evidence&fields=access_level&fields=sourceID&target=${ensgId}&disease=${efoId}&expandefo=true`
     ),
     axios.get(
-      `${ROOT}public/evidence/filter?size=1000&datasource=crispr&fields=access_level&fields=disease.name&fields=disease.id&fields=scores&fields=evidence.resource_score.method&target=${ensgId}&disease=${efoId}&expandefo=true`
+      `${ROOT}public/evidence/filter?size=1000&datasource=crispr&fields=access_level&fields=disease.efo_info&fields=scores&fields=evidence.resource_score.method&target=${ensgId}&disease=${efoId}&expandefo=true`
     ),
-  ]).then(([responsePathways, responseCrispr]) => {
+    axios.get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=sysbio&fields=access_level&fields=target.gene_info&fields=disease.efo_info&fields=disease.id&fields=unique_association_fields&fields=evidence.resource_score.method&target=${ensgId}&disease=${efoId}&expandefo=true`
+    ),
+  ]).then(([responsePathways, responseCrispr, responseSysBio]) => {
     const pathwaysRaw = responsePathways.data.data;
+    const crisprRaw = responseCrispr.data.data;
+    const sysBioRaw = responseSysBio.data.data;
     const rowsPathways = pathwaysRaw.map(evidencePathwaysRowTransformer);
+    const rowsCrispr = crisprRaw.map(evidenceCrisprRowTransformer);
+    const rowsSysBio = sysBioRaw.map(evidenceSysBioRowTransformer);
+    const rowsReactome = rowsPathways.filter(
+      d => d.source.name === MAP_PATHWAYS_SOURCE.reactome
+    );
+    const rowsSlapenrich = rowsPathways.filter(
+      d => d.source.name === MAP_PATHWAYS_SOURCE.slapenrich
+    );
+    const rowsProgeny = rowsPathways.filter(
+      d => d.source.name === MAP_PATHWAYS_SOURCE.progeny
+    );
     const pathwayCount = _.uniqBy(rowsPathways, 'pathway.id').length;
-    return { rowsPathways, pathwayCount };
+    const reactomeCount = _.uniqBy(rowsReactome, 'pathway.id').length;
+    const slapenrichCount = _.uniqBy(rowsSlapenrich, 'pathway.id').length;
+    const progenyCount = _.uniqBy(rowsProgeny, 'pathway.id').length;
+    const hasCrispr = rowsCrispr.length > 0;
+    const hasSysBio = rowsSysBio.length > 0;
+    return {
+      rowsPathways,
+      rowsReactome,
+      rowsSlapenrich,
+      rowsProgeny,
+      rowsCrispr,
+      rowsSysBio,
+      pathwayCount,
+      reactomeCount,
+      slapenrichCount,
+      progenyCount,
+      hasCrispr,
+      hasSysBio,
+    };
   });
 
 const evidenceDifferentialExpressionRowTransformer = r => {
@@ -399,6 +461,11 @@ export const evidenceAnimalModels = (ensgId, efoId) =>
       return { rows, mouseModelCount };
     });
 
+const cleanVepConsequenceLabel = string =>
+  string
+    .toUpperCase()
+    .replace('5', 'FIVE')
+    .replace('3', 'THREE');
 const getVepConsequenceLabel = evidenceString => {
   const ecoId = evidenceString.evidence.gene2variant.functional_consequence
     .split('/')
@@ -406,7 +473,7 @@ const getVepConsequenceLabel = evidenceString => {
   const eco = evidenceString.evidence.evidence_codes_info.find(
     d => d[0].eco_id === ecoId
   );
-  return eco[0].label;
+  return cleanVepConsequenceLabel(eco[0].label);
 };
 const evidenceGWASCatalogRowTransformer = r => {
   return {
@@ -444,6 +511,69 @@ const evidencePheWASCatalogRowTransformer = r => {
     },
   };
 };
+const evidenceEVARowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  rsId: r.variant.id.split('/').pop(),
+  clinVarId: r.evidence.gene2variant.urls[0].url.split('/').pop(),
+  vepConsequence: getVepConsequenceLabel(r),
+  clinicalSignificance: r.evidence.variant2disease.clinical_significance,
+  pmId: r.evidence.variant2disease.provenance_type.literature
+    ? r.evidence.variant2disease.provenance_type.literature.references[0].lit_id
+        .split('/')
+        .pop()
+    : null,
+});
+const evidenceEVASomaticRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  rsId: r.unique_association_fields.variant_id,
+  clinVarId: r.evidence.urls[0].url.split('/').pop(),
+  vepConsequence: cleanVepConsequenceLabel(
+    r.evidence.known_mutations[0].preferred_name
+  ),
+  clinicalSignificance: r.evidence.clinical_significance,
+  pmId: r.evidence.provenance_type.literature
+    ? r.evidence.provenance_type.literature.references[0].lit_id
+        .split('/')
+        .pop()
+    : null,
+});
+const evidenceGene2PhenotypeRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  panelsUrl: r.evidence.urls[0].url,
+  pmId: r.evidence.provenance_type.literature
+    ? r.evidence.provenance_type.literature.references[0].lit_id
+        .split('/')
+        .pop()
+    : null,
+});
+const evidenceGenomicsEnglandRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  panel: {
+    id: r.evidence.urls[0].url.split('/').reverse()[1],
+    url: r.evidence.urls[0].url,
+  },
+  source:
+    r.evidence.provenance_type.literature.references.length > 0 &&
+    r.evidence.provenance_type.literature.references[0].lit_id !== 'NA'
+      ? getMultiplePublicationsSource(
+          r.evidence.provenance_type.literature.references.map(d =>
+            d.lit_id.split('/').pop()
+          )
+        )
+      : null,
+});
 export const evidenceGWASCatalog = (ensgId, efoId) =>
   axios
     .get(
@@ -465,6 +595,200 @@ export const evidencePheWASCatalog = (ensgId, efoId) =>
       const rows = rowsRaw.map(evidencePheWASCatalogRowTransformer);
       const variantCount = _.uniqBy(rows, 'rsId').length;
       return { rows, variantCount };
+    });
+export const evidenceEVA = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=eva&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceEVARowTransformer);
+      const variantCount = _.uniqBy(rows, 'rsId').length;
+      return { rows, variantCount };
+    });
+export const evidenceEVASomatic = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=eva_somatic&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceEVASomaticRowTransformer);
+      const variantCount = _.uniqBy(rows, 'rsId').length;
+      return { rows, variantCount };
+    });
+export const evidenceGene2Phenotype = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=gene2phenotype&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceGene2PhenotypeRowTransformer);
+      const hasPanel = rows.length > 0;
+      return { rows, hasPanel };
+    });
+export const evidenceGenomicsEngland = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=genomics_england&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceGenomicsEnglandRowTransformer);
+      const hasPanel = rows.length > 0;
+      return { rows, hasPanel };
+    });
+
+const evidenceIntogenRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  activity: r.target.activity
+    .split('/')
+    .pop()
+    .toUpperCase(),
+  inheritancePattern: r.evidence.known_mutations[0].inheritance_pattern.toUpperCase(),
+  source: {
+    name: r.evidence.urls[0].nice_name,
+    url: r.evidence.urls[0].url,
+  },
+  pmId: r.evidence.provenance_type.literature.references[0].lit_id
+    .split('/')
+    .pop(),
+});
+export const evidenceIntogen = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=intogen&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceIntogenRowTransformer);
+      const hasMutations = rows.length > 0;
+      return { rows, hasMutations };
+    });
+
+const inheritancePatternMap = {
+  'X-linked recessive': 'X_LINKED_RECESSIVE',
+  dominant: 'DOMINANT',
+  'dominant/recessive': 'DOMINANT_OR_RECESSIVE',
+  recessive: 'RECESSIVE',
+  unknown: 'UNKNOWN',
+};
+
+const evidenceCancerGeneCensusRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  mutationType: r.evidence.known_mutations[0].preferred_name
+    .trim()
+    .toUpperCase(),
+  inheritancePattern:
+    inheritancePatternMap[r.evidence.known_mutations[0].inheritance_pattern],
+  source: {
+    name: r.evidence.urls[0].nice_name,
+    url: r.evidence.urls[0].url,
+  },
+  samplesWithMutationTypeCount:
+    r.evidence.known_mutations[0].number_samples_with_mutation_type,
+  mutatedSamplesCount: r.evidence.known_mutations[0].number_mutated_samples,
+  pmIds: r.literature
+    ? r.literature.references.map(d => d.lit_id.split('/').pop())
+    : [],
+});
+export const evidenceCancerGeneCensus = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=cancer_gene_census&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceCancerGeneCensusRowTransformer);
+      const hasMutations = rows.length > 0;
+      return { rows, hasMutations };
+    });
+const evidenceUniProtLiteratureRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  source: {
+    name: r.evidence.urls[0].nice_name,
+    url: r.evidence.urls[0].url,
+  },
+  pmIds: r.literature
+    ? r.literature.references.map(d => d.lit_id.split('/').pop())
+    : [],
+});
+export const evidenceUniProtLiterature = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=uniprot_literature&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceUniProtLiteratureRowTransformer);
+      const hasVariants = rows.length > 0;
+      return { rows, hasVariants };
+    });
+const evidenceUniProtRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  rsId: r.variant.id.split('/').pop(),
+  vepConsequence: getVepConsequenceLabel(r),
+  source: {
+    name: r.evidence.gene2variant.urls[0].nice_name,
+    url: r.evidence.gene2variant.urls[0].url,
+  },
+  pmIds: r.evidence.gene2variant.provenance_type.literature
+    ? r.evidence.gene2variant.provenance_type.literature.references.map(d =>
+        d.lit_id.split('/').pop()
+      )
+    : [],
+});
+export const evidenceUniProt = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=uniprot&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceUniProtRowTransformer);
+      const variantCount = _.uniqBy(rows, 'rsId').length;
+      return { rows, variantCount };
+    });
+const evidenceUniProtSomaticRowTransformer = r => ({
+  disease: {
+    id: r.disease.efo_info.efo_id.split('/').pop(),
+    name: r.disease.efo_info.label,
+  },
+  vepConsequence: r.evidence.known_mutations[0].preferred_name.toUpperCase(),
+  source: {
+    name: r.evidence.urls[0].nice_name,
+    url: r.evidence.urls[0].url,
+  },
+  pmIds: r.evidence.provenance_type.literature
+    ? r.evidence.provenance_type.literature.references.map(d =>
+        d.lit_id.split('/').pop()
+      )
+    : [],
+});
+export const evidenceUniProtSomatic = (ensgId, efoId) =>
+  axios
+    .get(
+      `${ROOT}public/evidence/filter?size=1000&datasource=uniprot_somatic&target=${ensgId}&disease=${efoId}&expandefo=true`
+    )
+    .then(response => {
+      const rowsRaw = response.data.data;
+      const rows = rowsRaw.map(evidenceUniProtSomaticRowTransformer);
+      const hasVariants = rows.length > 0;
+      return { rows, hasVariants };
     });
 
 // text mining
