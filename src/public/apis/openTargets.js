@@ -1,5 +1,6 @@
 import axios from 'axios';
 import _ from 'lodash';
+import { getAbstractData } from './epmc';
 
 import getMultiplePublicationsSource from '../utils/getMultiplePublicationsSource';
 
@@ -789,3 +790,138 @@ export const evidenceUniProtSomatic = (ensgId, efoId) =>
       const hasVariants = rows.length > 0;
       return { rows, hasVariants };
     });
+
+// text mining
+const evidenceTextMiningRowTransformer = r => {
+  const ref = r.evidence.literature_ref;
+  const cat_list = [
+    'title',
+    'intro',
+    'result',
+    'discussion',
+    'conclusion',
+    'other',
+  ]; // preferred sorting order
+  return {
+    access: r.access_level,
+    relevance: (r.scores.association_score * 5) / 1.66666666,
+    disease: {
+      id: r.disease.efo_info.efo_id.split('/').pop(),
+      name: r.disease.efo_info.label,
+    },
+    publication: {
+      id: ref.data.pmid || ref.data.pmcid || ref.data.id,
+      title: ref.data.title,
+      date: ref.data.pubYear,
+      authors: ref.data.authorList.author.map(auth => ({
+        firstName: auth.firstName || auth.initials || '',
+        lastName: auth.lastName,
+        initials: auth.initials,
+      })),
+      url: ref.url,
+      abstract: ref.data.abstractText,
+      matches: ref.mined_sentences
+        .map(m => ({
+          text: m.text,
+          section: m.section.toLowerCase(),
+          target: { start: m.t_start, end: m.t_end },
+          disease: { start: m.d_start, end: m.d_end },
+        }))
+        // sort the matches by section based on preferred order
+        .sort((a, b) => {
+          return (
+            cat_list.findIndex(l => a.section.startsWith(l)) -
+            cat_list.findIndex(l => b.section.startsWith(l))
+          );
+        })
+        // cluster matches by section for easier display
+        .reduce(function(matches, m) {
+          const i =
+            matches.findIndex(function(a) {
+              return (a[0] || {}).section === m.section;
+            }) + 1 || matches.push([]);
+          matches[i - 1].push(m);
+          return matches;
+        }, []),
+    },
+    journal: {
+      title:
+        ref.data.journalInfo.journal.medlineAbbreviation ||
+        ref.data.journalInfo.journal.title ||
+        '',
+      volume: ref.data.journalInfo.volume || null,
+      issue: ref.data.journalInfo.issue || null,
+      page: ref.data.pageInfo || null,
+      year: ref.data.journalInfo.yearOfPublication,
+    },
+  };
+};
+
+export const evidenceTextMining = (
+  ensgId,
+  efoId,
+  from = 0,
+  size = 10,
+  sortBy,
+  order = ''
+) => {
+  // map sort field
+  // Note that our API only support sorting for selected fields, hence sorting
+  // by disease or publication title (the latter not available in our data) is not possible
+  let sort;
+  const orderPrefix = order.toLowerCase() === 'asc' ? '~' : '';
+  // in this case for both supported fields the default order is 'desc'
+  // so they both get the same orderPrefix. For certain fields you might have to
+  // treat this independently for each sortBy field.
+  switch (sortBy) {
+    case 'publication.date':
+      sort = orderPrefix + 'evidence.date_asserted';
+      break;
+    default:
+      // default sort is by score desc
+      sort = orderPrefix + 'scores.association_score';
+  }
+
+  return (
+    axios
+      // get basic literature from our API
+      .get(
+        `${ROOT}public/evidence/filter?size=${size}&from=${from}&sort=${sort}&datasource=europepmc&search=&fields=access_level&fields=disease.efo_info.label&fields=disease.efo_info.efo_id&fields=evidence.literature_ref&fields=evidence.date_asserted&fields=scores.association_score&target=${ensgId}&disease=${efoId}&expandefo=true`
+      )
+      .then(response => {
+        // get abstract data
+        const pmids = response.data.data.map(function(d) {
+          return d.evidence.literature_ref.lit_id.split('/').pop();
+        });
+        const rowsRaw = response.data.data;
+
+        return getAbstractData(pmids).then(abstracts => {
+          // Enrich reponse with abstract data
+          rowsRaw.forEach(d => {
+            d.evidence.literature_ref.data =
+              abstracts.find(i => {
+                var id = i.pmid || i.id; // some data MIGHT not have a pmid, but id SHOULD be the same
+                return id === d.evidence.literature_ref.lit_id.split('/').pop();
+              }) || {};
+          });
+          const rows = rowsRaw.map(evidenceTextMiningRowTransformer);
+          const textMiningCount = response.data.total;
+          return { rows, textMiningCount };
+        });
+      })
+  );
+};
+
+export const evidenceTextMiningSummary = (ensgId, efoId) => {
+  return (
+    axios
+      // get quick literature count from our API
+      .get(
+        `${ROOT}public/evidence/filter?size=0&datasource=europepmc&target=${ensgId}&disease=${efoId}&expandefo=true`
+      )
+      .then(response => {
+        const textMiningCount = response.data.total;
+        return { textMiningCount };
+      })
+  );
+};

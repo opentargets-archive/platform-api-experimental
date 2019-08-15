@@ -21,6 +21,7 @@ import * as genomicsEnglandRaw from './sections/GenomicsEngland';
 import * as uniProtRaw from './sections/UniProt';
 import * as uniProtLiteratureRaw from './sections/UniProtLiterature';
 import * as uniProtSomaticRaw from './sections/UniProtSomatic';
+import * as textMiningRaw from './sections/TextMining';
 
 export const animalModels = animalModelsRaw;
 export const differentialExpression = differentialExpressionRaw;
@@ -42,3 +43,4 @@ export const genomicsEngland = genomicsEnglandRaw;
 export const uniProt = uniProtRaw;
 export const uniProtLiterature = uniProtLiteratureRaw;
 export const uniProtSomatic = uniProtSomaticRaw;
+export const textMining = textMiningRaw;
