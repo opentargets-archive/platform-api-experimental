@@ -465,7 +465,10 @@ const cleanVepConsequenceLabel = string =>
   string
     .toUpperCase()
     .replace('5', 'FIVE')
-    .replace('3', 'THREE');
+    .replace('3', 'THREE')
+    .replace('&APOS;', ' PRIME')
+    .replace(/ /g, '_');
+
 const getVepConsequenceLabel = evidenceString => {
   const ecoId = evidenceString.evidence.gene2variant.functional_consequence
     .split('/')

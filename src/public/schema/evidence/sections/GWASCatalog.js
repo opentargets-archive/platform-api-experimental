@@ -65,7 +65,7 @@ export const sectionTypeDefs = gql`
     REGULATORY_REGION_VARIANT
     FEATURE_TRUNCATION
     INTERGENIC_VARIANT
-    NEAREST_GENE_FIVE_PRIME_END # this is a fake consequence that we invented
+    NEAREST_GENE_COUNTING_FROM_FIVE_PRIME_END # this is a fake consequence that we invented
   }
   type EvidenceRowGwasCatalog {
     disease: Disease!
