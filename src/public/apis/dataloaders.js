@@ -748,7 +748,20 @@ export const createTargetAssociationsFacetLoader = () =>
             count: b.unique_disease_count.value,
           })),
         };
-        return { therapeuticArea };
+        const dataTypeAndSource = {
+          items: facetsRaw.datatype.buckets.map(dt => ({
+            id: dt.key,
+            name: dt.key,
+            count: dt.unique_disease_count.value,
+            children: dt.datasource.buckets.map(ds => ({
+              id: ds.key,
+              name: ds.key,
+              count: ds.unique_disease_count.value,
+              children: null,
+            })),
+          })),
+        };
+        return { therapeuticArea, dataTypeAndSource };
       });
     })
   );
