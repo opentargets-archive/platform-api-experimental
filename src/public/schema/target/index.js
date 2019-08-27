@@ -1,6 +1,11 @@
 import { gql } from 'apollo-server-express';
-// import { print } from 'graphql/language/printer';
 import _ from 'lodash';
+
+// load associations
+import {
+  typeDefs as associationsTypeDefs,
+  resolvers as associationsResolvers,
+} from './associations';
 
 // load sections
 import * as sectionsObject from './sectionIndex';
@@ -39,6 +44,7 @@ const targetTypeDef = gql`
     synonyms: [String!]!
     summaries: TargetSummaries!
     details: TargetDetails!
+    associations: TargetAssociations!
   }
 `;
 export const typeDefs = [
@@ -46,6 +52,7 @@ export const typeDefs = [
   ...sectionTypeDefs,
   summariesTypeDef,
   sectionsTypeDef,
+  ...associationsTypeDefs,
   targetTypeDef,
 ];
 
@@ -94,6 +101,7 @@ const targetResolver = {
         : targetLoader.load(_ensgId).then(({ synonyms }) => synonyms),
     summaries: _.identity,
     details: _.identity,
+    associations: _.identity,
   },
 };
 export const resolvers = _.merge(
@@ -101,5 +109,6 @@ export const resolvers = _.merge(
   ...sectionsResolvers,
   summariesResolver,
   sectionsResolver,
+  associationsResolvers,
   targetResolver
 );

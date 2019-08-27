@@ -11,6 +11,7 @@ import {
   createDiseaseDrugsLoader,
   createDiseaseLoader,
   createDrugLoader,
+  createTargetAssociationsFacetLoader,
 } from './apis/dataloaders';
 
 const apolloServerConfig = {
@@ -25,6 +26,7 @@ const apolloServerConfig = {
     drugLoader: createDrugLoader(),
     targetDrugsLoader: createTargetDrugsLoader(),
     diseaseDrugsLoader: createDiseaseDrugsLoader(),
+    targetAssociationsFacetLoader: createTargetAssociationsFacetLoader(),
   }),
 };
 
