@@ -129,6 +129,10 @@ const dataTypeMap = {
   animal_model: 'ANIMAL_MODELS',
   literature: 'TEXT_MINING',
 };
+const dataTypeMapInverse = Object.entries(dataTypeMap).reduce((acc, [k, v]) => {
+  acc[v] = k;
+  return acc;
+}, {});
 export const targetAssociationsFacets = (ensgId, facets) => {
   // handle each facet
   const facetFields = {};
@@ -137,8 +141,12 @@ export const targetAssociationsFacets = (ensgId, facets) => {
       facetFields.therapeutic_area = facets.therapeuticArea.efoIds;
     }
     if (facets.dataTypeAndSource) {
-      facetFields.datatype = facets.dataTypeAndSource.dataTypeIds;
-      facetFields.datasource = facets.dataTypeAndSource.dataSourceIds;
+      facetFields.datatype =
+        facets.dataTypeAndSource.dataTypeIds &&
+        facets.dataTypeAndSource.dataTypeIds.map(dt => dataTypeMapInverse[dt]);
+      facetFields.datasource =
+        facets.dataTypeAndSource.dataSourceIds &&
+        facets.dataTypeAndSource.dataSourceIds.map(ds => ds.toLowerCase());
     }
   }
 
