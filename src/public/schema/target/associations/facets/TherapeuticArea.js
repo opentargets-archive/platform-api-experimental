@@ -13,11 +13,14 @@ export const facetTypeDefs = gql`
   }
 `;
 
+export const facetInputTypeDefs = gql`
+  input TargetAssociationsFacetInputTherapeuticArea {
+    efoIds: [String!]!
+  }
+`;
+
 export const facetResolvers = {
   TargetAssociationsFacetTherapeuticArea: {
-    items: ({ _ensgId }, args, { targetAssociationsFacetLoader }) =>
-      targetAssociationsFacetLoader
-        .load(_ensgId)
-        .then(({ therapeuticArea }) => therapeuticArea.items),
+    items: ({ _facets }) => _facets.therapeuticArea.items,
   },
 };

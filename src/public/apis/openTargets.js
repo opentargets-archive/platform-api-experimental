@@ -1,7 +1,8 @@
 import axios from 'axios';
 import _ from 'lodash';
-import { getAbstractData } from './epmc';
+import queryString from 'query-string';
 
+import { getAbstractData } from './epmc';
 import getMultiplePublicationsSource from '../utils/getMultiplePublicationsSource';
 
 const PROTOCOL = 'https';
@@ -119,10 +120,54 @@ export const targetAssociations = ensgId =>
     search: '',
     draw: 2,
   });
-export const targetAssociationsFacets = ensgId =>
-  axios.get(
-    `${ROOT}public/association/filter?target=${ensgId}&outputstructure=flat&facets=true&direct=true&size=1`
-  );
+export const targetAssociationsFacets = (ensgId, facets) => {
+  // handle each facet
+  const facetFields = {};
+  if (facets) {
+    if (facets.therapeuticArea) {
+      facetFields.therapeutic_area = facets.therapeuticArea.efoIds;
+    }
+    if (facets.dataTypeAndSource) {
+      facetFields.datatype = facets.dataTypeAndSource.dataTypeIds;
+      facetFields.datasource = facets.dataTypeAndSource.dataSourceIds;
+    }
+  }
+
+  // serialise
+  const qs = queryString.stringify({
+    target: ensgId,
+    ...facetFields,
+    outputstructure: 'flat',
+    facets: true,
+    direct: true,
+    size: 0,
+  });
+  return axios.get(`${ROOT}public/association/filter?${qs}`).then(response => {
+    const facetsRaw = response.data.facets;
+    const therapeuticArea = {
+      items: facetsRaw.therapeutic_area.buckets.map(b => ({
+        id: b.key,
+        name: b.label,
+        count: b.unique_disease_count.value,
+      })),
+    };
+    const dataTypeAndSource = {
+      items: facetsRaw.datatype.buckets.map(dt => ({
+        id: dt.key,
+        name: dt.key,
+        count: dt.unique_disease_count.value,
+        children: dt.datasource.buckets.map(ds => ({
+          id: ds.key,
+          name: ds.key,
+          count: ds.unique_disease_count.value,
+          children: null,
+        })),
+      })),
+    };
+    // console.log(therapeuticArea, dataTypeAndSource);
+    return { therapeuticArea, dataTypeAndSource };
+  });
+};
 export const targetsAssociationsFacets = ensgIds =>
   Promise.all([
     Promise.resolve(ensgIds),

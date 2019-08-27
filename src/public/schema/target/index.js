@@ -44,7 +44,7 @@ const targetTypeDef = gql`
     synonyms: [String!]!
     summaries: TargetSummaries!
     details: TargetDetails!
-    associations: TargetAssociations!
+    associations(facets: TargetAssociationsFacetsInput): TargetAssociations!
   }
 `;
 export const typeDefs = [
@@ -101,7 +101,7 @@ const targetResolver = {
         : targetLoader.load(_ensgId).then(({ synonyms }) => synonyms),
     summaries: _.identity,
     details: _.identity,
-    associations: _.identity,
+    associations: (obj, args) => ({ ...obj, _assocsArgs: args }),
   },
 };
 export const resolvers = _.merge(

@@ -14,11 +14,15 @@ export const facetTypeDefs = gql`
   }
 `;
 
+export const facetInputTypeDefs = gql`
+  input TargetAssociationsFacetInputDataTypeAndSource {
+    dataTypeIds: [String!]
+    dataSourceIds: [String!]
+  }
+`;
+
 export const facetResolvers = {
   TargetAssociationsFacetDataTypeAndSource: {
-    items: ({ _ensgId }, args, { targetAssociationsFacetLoader }) =>
-      targetAssociationsFacetLoader
-        .load(_ensgId)
-        .then(({ dataTypeAndSource }) => dataTypeAndSource.items),
+    items: ({ _facets }) => _facets.dataTypeAndSource.items,
   },
 };
