@@ -1,7 +1,10 @@
 import { gql } from 'apollo-server-express';
 import _ from 'lodash';
 
-import { targetAssociationsFacets } from '../../../apis/openTargets';
+import {
+  targetAssociationsFacets,
+  targetAssociations,
+} from '../../../apis/openTargets';
 
 // load facets
 import * as facetsObject from './facetIndex';
@@ -27,10 +30,25 @@ const facetsTypeDef = gql`
       .map(d => `${d.id}: TargetAssociationsFacet${_.upperFirst(d.id)}`)
       .join('\n')}
   }
+  type ScoreForDataType {
+    id: DataType!
+    score: Float!
+  }
+  type ScoreForDataSource {
+    id: DataSource!
+    score: Float!
+  }
+  type TargetAssociation {
+    disease: Disease!
+    score: Float!
+    scoresByDataType: [ScoreForDataType!]!
+    scoresByDataSource: [ScoreForDataSource!]!
+  }
 `;
 const associationsTypeDef = gql`
   type TargetAssociations {
     facets: TargetAssociationsFacets!
+    rows: [TargetAssociation!]!
   }
 `;
 export const typeDefs = [
@@ -60,6 +78,8 @@ const associationsResolver = {
         _assocsArgs,
         _facets: facets,
       })),
+    rows: ({ _ensgId, _assocsArgs }) =>
+      targetAssociations(_ensgId, _assocsArgs.facets),
   },
 };
 export const resolvers = _.merge(

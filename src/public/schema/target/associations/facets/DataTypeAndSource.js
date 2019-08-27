@@ -25,7 +25,7 @@ export const facetInputTypeDefs = gql`
     PHEWAS_CATALOG
     EVA
     EVA_SOMATIC
-    GENE_2_PHENOTYPE
+    GENE2PHENOTYPE
     GENOMICS_ENGLAND
     INTOGEN
     CANCER_GENE_CENSUS
