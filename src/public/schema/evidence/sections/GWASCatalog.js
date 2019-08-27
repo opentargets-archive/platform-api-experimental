@@ -66,6 +66,7 @@ export const sectionTypeDefs = gql`
     FEATURE_TRUNCATION
     INTERGENIC_VARIANT
     NEAREST_GENE_COUNTING_FROM_FIVE_PRIME_END # this is a fake consequence that we invented
+    SEQUENCE_VARIANT
   }
   type EvidenceRowGwasCatalog {
     disease: Disease!
