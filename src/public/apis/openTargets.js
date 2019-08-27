@@ -120,6 +120,15 @@ export const targetAssociations = ensgId =>
     search: '',
     draw: 2,
   });
+const dataTypeMap = {
+  genetic_association: 'GENETIC_ASSOCIATION',
+  somatic_mutation: 'SOMATIC_MUTATION',
+  known_drug: 'KNOWN_DRUGS',
+  affected_pathway: 'PATHWAYS',
+  rna_expression: 'DIFFERENTIAL_EXPRESSION',
+  animal_model: 'ANIMAL_MODELS',
+  literature: 'TEXT_MINING',
+};
 export const targetAssociationsFacets = (ensgId, facets) => {
   // handle each facet
   const facetFields = {};
@@ -153,18 +162,16 @@ export const targetAssociationsFacets = (ensgId, facets) => {
     };
     const dataTypeAndSource = {
       items: facetsRaw.datatype.buckets.map(dt => ({
-        id: dt.key,
+        id: dataTypeMap[dt.key],
         name: dt.key,
         count: dt.unique_disease_count.value,
         children: dt.datasource.buckets.map(ds => ({
-          id: ds.key,
+          id: ds.key.toUpperCase(),
           name: ds.key,
           count: ds.unique_disease_count.value,
-          children: null,
         })),
       })),
     };
-    // console.log(therapeuticArea, dataTypeAndSource);
     return { therapeuticArea, dataTypeAndSource };
   });
 };
