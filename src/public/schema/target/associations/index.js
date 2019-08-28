@@ -46,9 +46,30 @@ const facetsTypeDef = gql`
   }
 `;
 const associationsTypeDef = gql`
+  # graphql does not support unions of enums or input types,
+  # but we could consider how to refactor the following
+  enum TargetAssociationsRowsSortByField {
+    SCORE_DATATYPE_GENETIC_ASSOCIATION
+    SCORE_DATATYPE_SOMATIC_MUTATION
+    SCORE_DATATYPE_KNOWN_DRUGS
+    SCORE_DATATYPE_PATHWAYS
+    SCORE_DATATYPE_DIFFERENTIAL_EXPRESSION
+    SCORE_DATATYPE_ANIMAL_MODELS
+    SCORE_DATATYPE_TEXT_MINING
+    SCORE_OVERALL
+    DISEASE_NAME
+  }
+  input TargetAssociationsRowsSortByInput {
+    field: TargetAssociationsRowsSortByField!
+    ascending: Boolean!
+  }
   type TargetAssociations {
     facets: TargetAssociationsFacets!
-    rows: [TargetAssociation!]!
+    rows(
+      search: String
+      size: Int
+      sortBy: TargetAssociationsRowsSortByInput
+    ): [TargetAssociation!]!
   }
 `;
 export const typeDefs = [
@@ -78,8 +99,18 @@ const associationsResolver = {
         _assocsArgs,
         _facets: facets,
       })),
-    rows: ({ _ensgId, _assocsArgs }) =>
-      targetAssociations(_ensgId, _assocsArgs.facets),
+    rows: ({ _ensgId, _assocsArgs }, { sortBy, search = '', size = 50 }) => {
+      const { field: sortField, ascending: sortAscending = true } =
+        sortBy || {};
+      return targetAssociations(
+        _ensgId,
+        _assocsArgs.facets,
+        search,
+        sortField,
+        sortAscending,
+        size
+      );
+    },
   },
 };
 export const resolvers = _.merge(

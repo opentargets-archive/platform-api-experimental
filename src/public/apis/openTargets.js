@@ -131,20 +131,29 @@ const transformFacetsInput = facets => {
 export const targetAssociations = (
   ensgId,
   facets,
-  search = '',
+  search,
   sortField,
-  sortAscending = true,
-  size = 10000
+  sortAscending,
+  size
 ) => {
   // handle each facet
   const facetFields = transformFacetsInput(facets);
 
   // sort
-  const sort = [
-    `${sortAscending ? '' : '~'}association_score.${
-      sortField ? `datatypes.${dataTypeMapInverse[sortField]}` : 'overall'
-    }`,
-  ];
+  let sortFieldMapped;
+  if (sortField && sortField.startsWith('SCORE_DATATYPE_')) {
+    const dataType = sortField.replace('SCORE_DATATYPE_', '');
+    sortFieldMapped = `association_score.datatypes.${
+      dataTypeMapInverse[dataType]
+    }`;
+  } else if (sortField === 'DISEASE_NAME') {
+    sortFieldMapped = 'disease.efo_info.label';
+  } else if (sortField === 'SCORE_OVERALL') {
+    sortFieldMapped = 'association_score.overall';
+  } else {
+    sortFieldMapped = 'association_score.overall'; // default
+  }
+  const sort = [`${sortAscending ? '~' : ''}${sortFieldMapped}`];
 
   // call
   return axios
@@ -155,7 +164,7 @@ export const targetAssociations = (
       direct: true,
       size,
       sort,
-      search: '',
+      search,
       draw: 2,
     })
     .then(response => {
