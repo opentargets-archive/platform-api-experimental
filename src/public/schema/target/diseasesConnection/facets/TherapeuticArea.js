@@ -8,19 +8,19 @@ export const facetTypeDefs = gql`
     name: String!
     count: Int!
   }
-  type TargetAssociationsFacetTherapeuticArea {
+  type TargetDiseasesConnectionFacetTherapeuticArea {
     items: [CategoryFacetItem!]!
   }
 `;
 
 export const facetInputTypeDefs = gql`
-  input TargetAssociationsFacetInputTherapeuticArea {
+  input TargetDiseasesConnectionFacetInputTherapeuticArea {
     efoIds: [String!]!
   }
 `;
 
 export const facetResolvers = {
-  TargetAssociationsFacetTherapeuticArea: {
+  TargetDiseasesConnectionFacetTherapeuticArea: {
     items: ({ _facets }) => _facets.therapeuticArea.items,
   },
 };

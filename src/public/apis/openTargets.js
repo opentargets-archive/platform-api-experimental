@@ -10,6 +10,13 @@ const HOST = 'api.opentargets.io';
 const STEM = 'v3/platform';
 const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
 
+// encode/decode elasticsearch search_after to string
+// search_after gives `next` as multi-typed array
+const nextToCursor = next =>
+  next ? Buffer.from(JSON.stringify(next)).toString('base64') : null; // not present if on last page
+const cursorToNext = cursor =>
+  JSON.parse(Buffer.from(cursor, 'base64').toString());
+
 export const drug = chemblId => axios.get(`${ROOT}private/drug/${chemblId}`);
 // TODO: REST API currently does not support POST for private/drug endpoint (needed for dataloader)
 //       (this is currently making one call per drug, not scalable)
@@ -134,7 +141,8 @@ export const targetAssociations = (
   search,
   sortField,
   sortAscending,
-  size
+  first,
+  after
 ) => {
   // handle each facet
   const facetFields = transformFacetsInput(facets);
@@ -155,22 +163,28 @@ export const targetAssociations = (
   }
   const sort = [`${sortAscending ? '~' : ''}${sortFieldMapped}`];
 
+  // next field
+  const nextField = {};
+  if (after) {
+    nextField.next = cursorToNext(after);
+  }
+
   // call
   return axios
     .post(`${ROOT}public/association/filter`, {
       target: [ensgId],
+      ...nextField,
       ...facetFields,
       facets: false,
       direct: true,
-      size,
+      size: first,
       sort,
       search,
-      draw: 2,
     })
     .then(response => {
       const totalCount = response.data.total;
-      const rows = response.data.data.map(d => ({
-        disease: {
+      const edges = response.data.data.map(d => ({
+        node: {
           id: d.disease.id,
           name: d.disease.efo_info.label,
         },
@@ -192,7 +206,8 @@ export const targetAssociations = (
           return acc;
         }, []),
       }));
-      return rows;
+      const cursor = nextToCursor(response.data.next);
+      return { totalCount, edges, cursor };
     });
 };
 
@@ -248,6 +263,40 @@ export const targetAssociationsFacets = (ensgId, facets) => {
     return { therapeuticArea, dataTypeAndSource };
   });
 };
+export const targetDiseasesConnection = (
+  ensgId,
+  facets,
+  search,
+  sortField,
+  sortAscending,
+  first,
+  after
+) =>
+  Promise.all([
+    targetAssociations(
+      ensgId,
+      facets,
+      search,
+      sortField,
+      sortAscending,
+      first,
+      after
+    ),
+    targetAssociationsFacets(ensgId, facets),
+  ]).then(
+    ([
+      { totalCount, edges, cursor },
+      { therapeuticArea, dataTypeAndSource },
+    ]) => {
+      return {
+        totalCount,
+        edges,
+        pageInfo: { nextCursor: cursor, hasNextPage: cursor !== null },
+        facets: { therapeuticArea, dataTypeAndSource },
+      };
+    }
+  );
+
 export const targetsAssociationsFacets = ensgIds =>
   Promise.all([
     Promise.resolve(ensgIds),

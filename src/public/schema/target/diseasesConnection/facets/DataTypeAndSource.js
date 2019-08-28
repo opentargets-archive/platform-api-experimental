@@ -14,7 +14,7 @@ export const facetTypeDefs = gql`
     name: String!
     count: Int!
   }
-  type TargetAssociationsFacetDataTypeAndSource {
+  type TargetDiseasesConnectionFacetDataTypeAndSource {
     items: [DataTypeFacetItem!]!
   }
 `;
@@ -51,14 +51,14 @@ export const facetInputTypeDefs = gql`
     ANIMAL_MODELS
     TEXT_MINING
   }
-  input TargetAssociationsFacetInputDataTypeAndSource {
+  input TargetDiseasesConnectionFacetInputDataTypeAndSource {
     dataTypeIds: [DataType!]
     dataSourceIds: [DataSource!]
   }
 `;
 
 export const facetResolvers = {
-  TargetAssociationsFacetDataTypeAndSource: {
+  TargetDiseasesConnectionFacetDataTypeAndSource: {
     items: ({ _facets }) => _facets.dataTypeAndSource.items,
   },
 };
