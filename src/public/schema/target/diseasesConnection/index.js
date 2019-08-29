@@ -32,13 +32,13 @@ const diseasesConnectionTypeDef = gql`
   # # graphql does not support unions of enums or input types,
   # # but we could consider how to refactor the following
   enum TargetDiseasesConnectionSortByField {
-    SCORE_DATATYPE_GENETIC_ASSOCIATION
-    SCORE_DATATYPE_SOMATIC_MUTATION
-    SCORE_DATATYPE_KNOWN_DRUGS
-    SCORE_DATATYPE_PATHWAYS
-    SCORE_DATATYPE_DIFFERENTIAL_EXPRESSION
-    SCORE_DATATYPE_ANIMAL_MODELS
-    SCORE_DATATYPE_TEXT_MINING
+    GENETIC_ASSOCIATION
+    SOMATIC_MUTATION
+    KNOWN_DRUGS
+    PATHWAYS
+    DIFFERENTIAL_EXPRESSION
+    ANIMAL_MODELS
+    TEXT_MINING
     SCORE_OVERALL
     DISEASE_NAME
   }

@@ -149,17 +149,16 @@ export const targetAssociations = (
 
   // sort
   let sortFieldMapped;
-  if (sortField && sortField.startsWith('SCORE_DATATYPE_')) {
-    const dataType = sortField.replace('SCORE_DATATYPE_', '');
+  if (sortField === 'DISEASE_NAME') {
+    sortFieldMapped = 'disease.efo_info.label';
+  } else if (sortField === 'SCORE_OVERALL' || !sortField) {
+    sortFieldMapped = 'association_score.overall';
+  } else {
+    // nothing else currently supported
+    const dataType = sortField;
     sortFieldMapped = `association_score.datatypes.${
       dataTypeMapInverse[dataType]
     }`;
-  } else if (sortField === 'DISEASE_NAME') {
-    sortFieldMapped = 'disease.efo_info.label';
-  } else if (sortField === 'SCORE_OVERALL') {
-    sortFieldMapped = 'association_score.overall';
-  } else {
-    sortFieldMapped = 'association_score.overall'; // default
   }
   const sort = [`${sortAscending ? '~' : ''}${sortFieldMapped}`];
 
