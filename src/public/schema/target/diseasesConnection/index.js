@@ -47,11 +47,11 @@ const diseasesConnectionTypeDef = gql`
     ascending: Boolean!
   }
   type ScoreForDataType {
-    id: DataType!
+    dataTypeId: DataType!
     score: Float!
   }
   type ScoreForDataSource {
-    id: DataSource!
+    dataSourceId: DataSource!
     score: Float!
   }
   # interface TargetDiseaseAssociation { # maybe add this when doing DiseaseTargetsConnectionEdge
@@ -60,6 +60,7 @@ const diseasesConnectionTypeDef = gql`
   #   scoresByDataSource: [ScoreForDataSource!]!
   # }
   type TargetDiseasesConnectionEdge { #implements TargetDiseaseAssociation {
+    id: String!
     node: Disease!
     score: Float!
     scoresByDataType: [ScoreForDataType!]!

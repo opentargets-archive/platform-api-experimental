@@ -184,6 +184,7 @@ export const targetAssociations = (
     .then(response => {
       const totalCount = response.data.total;
       const edges = response.data.data.map(d => ({
+        id: `${ensgId}-${d.disease.id}`,
         node: {
           id: d.disease.id,
           name: d.disease.efo_info.label,
@@ -191,7 +192,7 @@ export const targetAssociations = (
         score: d.association_score.overall,
         scoresByDataType: Object.entries(d.association_score.datatypes).reduce(
           (acc, [k, v]) => {
-            acc.push({ id: dataTypeMap[k], score: v });
+            acc.push({ dataTypeId: dataTypeMap[k], score: v });
             return acc;
           },
           []
@@ -201,7 +202,7 @@ export const targetAssociations = (
         ).reduce((acc, [k, v]) => {
           // TODO: fix in rest api
           if (k !== 'postgap') {
-            acc.push({ id: k.toUpperCase(), score: v });
+            acc.push({ dataSourceId: k.toUpperCase(), score: v });
           }
           return acc;
         }, []),
