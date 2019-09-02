@@ -244,18 +244,18 @@ export const targetAssociationsFacets = (ensgId, facets) => {
     const therapeuticArea = {
       items: facetsRaw.therapeutic_area.buckets.map(b => ({
         id: b.key,
-        name: b.label,
+        name: _.startCase(b.label),
         count: b.unique_disease_count.value,
       })),
     };
     const dataTypeAndSource = {
       items: facetsRaw.datatype.buckets.map(dt => ({
         id: dataTypeMap[dt.key],
-        name: dt.key,
+        name: _.startCase(dt.key),
         count: dt.unique_disease_count.value,
         children: dt.datasource.buckets.map(ds => ({
           id: ds.key.toUpperCase(),
-          name: ds.key,
+          name: _.startCase(ds.key),
           count: ds.unique_disease_count.value,
         })),
       })),
