@@ -1,13 +1,21 @@
 import axios from 'axios';
 import _ from 'lodash';
-import { getAbstractData } from './epmc';
+import queryString from 'query-string';
 
+import { getAbstractData } from './epmc';
 import getMultiplePublicationsSource from '../utils/getMultiplePublicationsSource';
 
 const PROTOCOL = 'https';
 const HOST = 'api.opentargets.io';
 const STEM = 'v3/platform';
 const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
+
+// encode/decode elasticsearch search_after to string
+// search_after gives `next` as multi-typed array
+const nextToCursor = next =>
+  next ? Buffer.from(JSON.stringify(next)).toString('base64') : null; // not present if on last page
+const cursorToNext = cursor =>
+  JSON.parse(Buffer.from(cursor, 'base64').toString());
 
 export const drug = chemblId => axios.get(`${ROOT}private/drug/${chemblId}`);
 // TODO: REST API currently does not support POST for private/drug endpoint (needed for dataloader)
@@ -109,20 +117,191 @@ export const targetVariantsCommon = ensgId =>
 
 export const targetSimilar = ensgId =>
   axios.get(`${ROOT}private/relation/target/${ensgId}?id=${ensgId}&size=10000`);
-export const targetAssociations = ensgId =>
-  axios.post(`${ROOT}public/association/filter`, {
+
+const transformFacetsInput = facets => {
+  const facetFields = {};
+  if (facets) {
+    if (facets.therapeuticArea) {
+      facetFields.therapeutic_area = facets.therapeuticArea.efoIds;
+    }
+    if (facets.dataTypeAndSource) {
+      facetFields.datatype =
+        facets.dataTypeAndSource.dataTypeIds &&
+        facets.dataTypeAndSource.dataTypeIds.map(dt => dataTypeMapInverse[dt]);
+      facetFields.datasource =
+        facets.dataTypeAndSource.dataSourceIds &&
+        facets.dataTypeAndSource.dataSourceIds.map(ds => ds.toLowerCase());
+    }
+  }
+  return facetFields;
+};
+export const targetAssociations = (
+  ensgId,
+  facets,
+  search,
+  sortField,
+  sortAscending,
+  first,
+  after
+) => {
+  // handle each facet
+  const facetFields = transformFacetsInput(facets);
+
+  // sort
+  let sortFieldMapped;
+  if (sortField === 'DISEASE_NAME') {
+    sortFieldMapped = 'disease.efo_info.label';
+  } else if (sortField === 'SCORE_OVERALL' || !sortField) {
+    sortFieldMapped = 'association_score.overall';
+  } else {
+    // nothing else currently supported
+    const dataType = sortField;
+    sortFieldMapped = `association_score.datatypes.${
+      dataTypeMapInverse[dataType]
+    }`;
+  }
+  const sort = [`${sortAscending ? '~' : ''}${sortFieldMapped}`];
+
+  // next field
+  const nextField = {};
+  if (after) {
+    nextField.next = cursorToNext(after);
+  }
+
+  // call
+  return axios
+    .post(`${ROOT}public/association/filter`, {
+      target: [ensgId],
+      ...nextField,
+      ...facetFields,
+      facets: false,
+      direct: true,
+      size: first,
+      sort,
+      search,
+    })
+    .then(response => {
+      const totalCount = response.data.total;
+      const edges = response.data.data.map(d => ({
+        id: `${ensgId}-${d.disease.id}`,
+        node: {
+          id: d.disease.id,
+          name: d.disease.efo_info.label,
+        },
+        score: d.association_score.overall,
+        scoresByDataType: Object.entries(d.association_score.datatypes).reduce(
+          (acc, [k, v]) => {
+            acc.push({ dataTypeId: dataTypeMap[k], score: v });
+            return acc;
+          },
+          []
+        ),
+        scoresByDataSource: Object.entries(
+          d.association_score.datasources
+        ).reduce((acc, [k, v]) => {
+          // TODO: fix in rest api
+          if (k !== 'postgap') {
+            acc.push({ dataSourceId: k.toUpperCase(), score: v });
+          }
+          return acc;
+        }, []),
+      }));
+      const cursor = nextToCursor(response.data.next);
+      return { totalCount, edges, cursor };
+    });
+};
+
+const dataTypeMap = {
+  genetic_association: 'GENETIC_ASSOCIATION',
+  somatic_mutation: 'SOMATIC_MUTATION',
+  known_drug: 'KNOWN_DRUGS',
+  affected_pathway: 'PATHWAYS',
+  rna_expression: 'DIFFERENTIAL_EXPRESSION',
+  animal_model: 'ANIMAL_MODELS',
+  literature: 'TEXT_MINING',
+};
+const dataTypeMapInverse = Object.entries(dataTypeMap).reduce((acc, [k, v]) => {
+  acc[v] = k;
+  return acc;
+}, {});
+export const targetAssociationsFacets = (ensgId, facets) => {
+  // handle each facet
+  const facetFields = transformFacetsInput(facets);
+
+  // serialise
+  const qs = queryString.stringify({
     target: [ensgId],
-    facets: false,
+    ...facetFields,
+    outputstructure: 'flat',
+    facets: true,
     direct: true,
-    size: 10000,
-    sort: ['association_score.overall'],
-    search: '',
-    draw: 2,
+    size: 0,
   });
-export const targetAssociationsFacets = ensgId =>
-  axios.get(
-    `${ROOT}public/association/filter?target=${ensgId}&outputstructure=flat&facets=true&direct=true&size=1`
+
+  // call
+  return axios.get(`${ROOT}public/association/filter?${qs}`).then(response => {
+    const facetsRaw = response.data.facets;
+    const therapeuticArea = {
+      items: facetsRaw.therapeutic_area.buckets.map(b => ({
+        id: b.key,
+        name: _.startCase(b.label),
+        count: b.unique_disease_count.value,
+      })),
+    };
+    const dataTypeAndSource = {
+      items: facetsRaw.datatype.buckets.map(dt => ({
+        id: dataTypeMap[dt.key],
+        name: _.startCase(dt.key),
+        count: dt.unique_disease_count.value,
+        children: dt.datasource.buckets.map(ds => ({
+          id: ds.key.toUpperCase(),
+          name: _.startCase(ds.key),
+          count: ds.unique_disease_count.value,
+        })),
+      })),
+    };
+    return { therapeuticArea, dataTypeAndSource };
+  });
+};
+export const targetDiseasesConnection = (
+  ensgId,
+  facets,
+  search,
+  sortField,
+  sortAscending,
+  first,
+  after
+) =>
+  Promise.all([
+    targetAssociations(
+      ensgId,
+      facets,
+      search,
+      sortField,
+      sortAscending,
+      first,
+      after
+    ),
+    targetAssociationsFacets(ensgId, facets),
+  ]).then(
+    ([
+      { totalCount, edges, cursor },
+      { therapeuticArea, dataTypeAndSource },
+    ]) => {
+      return {
+        totalCount,
+        edges,
+        pageInfo: { nextCursor: cursor, hasNextPage: cursor !== null },
+        facets: { therapeuticArea, dataTypeAndSource },
+      };
+    }
   );
+
+export const targetsAssociationsFacets = ensgIds =>
+  Promise.all([
+    Promise.resolve(ensgIds),
+    Promise.all(ensgIds.map(ensgId => targetAssociationsFacets(ensgId))),
+  ]);
 
 export const diseaseSimilar = efoId =>
   axios.get(`${ROOT}private/relation/disease/${efoId}?id=${efoId}&size=10000`);

@@ -9,6 +9,7 @@ import {
   diseasesDrugs,
   drugs,
   evidenceDrugsRowTransformer,
+  targetsAssociationsFacets,
 } from './openTargets';
 import { expressionsAtlas } from './expressionAtlas';
 import { gtexs } from './gtex';
@@ -731,6 +732,37 @@ export const createDiseaseLoader = () =>
             phenotypes,
           };
         });
+    })
+  );
+
+export const createTargetAssociationsFacetLoader = () =>
+  new DataLoader(keys =>
+    targetsAssociationsFacets(keys).then(([ensgIds, responses]) => {
+      return ensgIds.map(ensgId => {
+        const response = responses.find(d => d.data.query.target[0] === ensgId);
+        const facetsRaw = response.data.facets;
+        const therapeuticArea = {
+          items: facetsRaw.therapeutic_area.buckets.map(b => ({
+            id: b.key,
+            name: b.label,
+            count: b.unique_disease_count.value,
+          })),
+        };
+        const dataTypeAndSource = {
+          items: facetsRaw.datatype.buckets.map(dt => ({
+            id: dt.key,
+            name: dt.key,
+            count: dt.unique_disease_count.value,
+            children: dt.datasource.buckets.map(ds => ({
+              id: ds.key,
+              name: ds.key,
+              count: ds.unique_disease_count.value,
+              children: null,
+            })),
+          })),
+        };
+        return { therapeuticArea, dataTypeAndSource };
+      });
     })
   );
 
