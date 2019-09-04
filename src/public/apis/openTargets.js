@@ -336,18 +336,18 @@ export const targetAssociationsFacets = (ensgId, facets) => {
     const facetsRaw = response.data.facets;
     const therapeuticArea = {
       items: facetsRaw.therapeutic_area.buckets.map(b => ({
-        id: b.key,
+        itemId: b.key,
         name: _.startCase(b.label),
         count: b.unique_disease_count.value,
       })),
     };
     const dataTypeAndSource = {
       items: facetsRaw.datatype.buckets.map(dt => ({
-        id: dataTypeMap[dt.key],
+        itemId: dataTypeMap[dt.key],
         name: _.startCase(dt.key),
         count: dt.unique_disease_count.value,
         children: dt.datasource.buckets.map(ds => ({
-          id: ds.key.toUpperCase(),
+          itemId: ds.key.toUpperCase(),
           name: _.startCase(ds.key),
           count: ds.unique_disease_count.value,
         })),
@@ -375,11 +375,11 @@ export const diseaseAssociationsFacets = (efoId, facets) => {
     const facetsRaw = response.data.facets;
     const dataTypeAndSource = {
       items: facetsRaw.datatype.buckets.map(dt => ({
-        id: dataTypeMap[dt.key],
+        itemId: dataTypeMap[dt.key],
         name: _.startCase(dt.key),
         count: dt.unique_target_count.value,
         children: dt.datasource.buckets.map(ds => ({
-          id: ds.key.toUpperCase(),
+          itemId: ds.key.toUpperCase(),
           name: _.startCase(ds.key),
           count: ds.unique_target_count.value,
         })),
@@ -387,11 +387,11 @@ export const diseaseAssociationsFacets = (efoId, facets) => {
     };
     const pathways = {
       items: facetsRaw.pathway.buckets.map(d => ({
-        id: d.key,
+        itemId: d.key,
         name: d.label,
         count: d.unique_target_count.value,
         children: d.pathway.buckets.map(d2 => ({
-          id: d2.key,
+          itemId: d2.key,
           name: d2.label,
           count: d2.unique_target_count.value,
         })),

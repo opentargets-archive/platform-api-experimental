@@ -4,7 +4,7 @@ export const id = 'pathways';
 
 export const facetTypeDefs = gql`
   type SinglyNestedCategoryFacetItem {
-    id: String!
+    itemId: String!
     name: String!
     count: Int!
     children: [CategoryFacetItem!]!

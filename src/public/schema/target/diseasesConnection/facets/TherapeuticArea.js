@@ -4,7 +4,7 @@ export const id = 'therapeuticArea';
 
 export const facetTypeDefs = gql`
   type CategoryFacetItem {
-    id: String!
+    itemId: String!
     name: String!
     count: Int!
   }
