@@ -374,11 +374,11 @@ export const diseaseAssociationsFacets = (efoId, facets) => {
       items: facetsRaw.datatype.buckets.map(dt => ({
         id: dataTypeMap[dt.key],
         name: _.startCase(dt.key),
-        count: dt.unique_disease_count.value,
+        count: dt.unique_target_count.value,
         children: dt.datasource.buckets.map(ds => ({
           id: ds.key.toUpperCase(),
           name: _.startCase(ds.key),
-          count: ds.unique_disease_count.value,
+          count: ds.unique_target_count.value,
         })),
       })),
     };
