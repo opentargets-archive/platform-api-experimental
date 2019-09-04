@@ -138,6 +138,9 @@ const transformTargetAssociationsFacetsInput = facets => {
 const transformDiseaseAssociationsFacetsInput = facets => {
   const facetFields = {};
   if (facets) {
+    if (facets.pathways) {
+      facetFields.pathway = facets.pathways.pathwayIds;
+    }
     if (facets.dataTypeAndSource) {
       facetFields.datatype =
         facets.dataTypeAndSource.dataTypeIds &&
@@ -382,7 +385,19 @@ export const diseaseAssociationsFacets = (efoId, facets) => {
         })),
       })),
     };
-    return { dataTypeAndSource };
+    const pathways = {
+      items: facetsRaw.pathway.buckets.map(d => ({
+        id: d.key,
+        name: d.label,
+        count: d.unique_target_count.value,
+        children: d.pathway.buckets.map(d2 => ({
+          id: d2.key,
+          name: d2.label,
+          count: d2.unique_target_count.value,
+        })),
+      })),
+    };
+    return { dataTypeAndSource, pathways };
   });
 };
 
@@ -439,14 +454,16 @@ export const diseaseTargetsConnection = (
       after
     ),
     diseaseAssociationsFacets(efoId, facets),
-  ]).then(([{ totalCount, edges, cursor }, { dataTypeAndSource }]) => {
-    return {
-      totalCount,
-      edges,
-      pageInfo: { nextCursor: cursor, hasNextPage: cursor !== null },
-      facets: { dataTypeAndSource },
-    };
-  });
+  ]).then(
+    ([{ totalCount, edges, cursor }, { dataTypeAndSource, pathways }]) => {
+      return {
+        totalCount,
+        edges,
+        pageInfo: { nextCursor: cursor, hasNextPage: cursor !== null },
+        facets: { dataTypeAndSource, pathways },
+      };
+    }
+  );
 
 export const targetsAssociationsFacets = ensgIds =>
   Promise.all([
