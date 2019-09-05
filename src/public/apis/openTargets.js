@@ -144,6 +144,11 @@ const transformDiseaseAssociationsFacetsInput = facets => {
     if (facets.targetClass) {
       facetFields.target_class = facets.targetClass.targetClassIds;
     }
+    if (facets.tractability && facets.tractability.tractabilityIds) {
+      facetFields.tractability = facets.tractability.tractabilityIds.map(d =>
+        d.toLowerCase()
+      );
+    }
     if (facets.dataTypeAndSource) {
       facetFields.datatype =
         facets.dataTypeAndSource.dataTypeIds &&
@@ -412,7 +417,17 @@ export const diseaseAssociationsFacets = (efoId, facets) => {
         })),
       })),
     };
-    return { dataTypeAndSource, pathways, targetClass };
+
+    const tractability = {
+      items: facetsRaw.tractability.buckets.map(d => ({
+        itemId: d.key.toUpperCase(),
+        name: _.startCase(
+          d.key.replace('smallmolecule_', '').replace('antibody_', '')
+        ),
+        count: d.unique_target_count.value,
+      })),
+    };
+    return { dataTypeAndSource, pathways, targetClass, tractability };
   });
 };
 
@@ -472,13 +487,13 @@ export const diseaseTargetsConnection = (
   ]).then(
     ([
       { totalCount, edges, cursor },
-      { dataTypeAndSource, pathways, targetClass },
+      { dataTypeAndSource, pathways, targetClass, tractability },
     ]) => {
       return {
         totalCount,
         edges,
         pageInfo: { nextCursor: cursor, hasNextPage: cursor !== null },
-        facets: { dataTypeAndSource, pathways, targetClass },
+        facets: { dataTypeAndSource, pathways, targetClass, tractability },
       };
     }
   );
