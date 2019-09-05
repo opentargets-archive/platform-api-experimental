@@ -40,7 +40,7 @@ const targetsConnectionTypeDef = gql`
     ANIMAL_MODELS
     TEXT_MINING
     SCORE_OVERALL
-    DISEASE_NAME
+    TARGET_SYMBOL
   }
   input DiseaseTargetsConnectionSortByInput {
     field: DiseaseTargetsConnectionSortByField!
