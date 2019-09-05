@@ -149,6 +149,10 @@ const transformDiseaseAssociationsFacetsInput = facets => {
         d.toLowerCase()
       );
     }
+    if (facets.tissueSpecificity && facets.tissueSpecificity.tissueIds) {
+      facetFields.zscore_expression_level = 1;
+      facetFields.zscore_expression_tissue = facets.tissueSpecificity.tissueIds;
+    }
     if (facets.dataTypeAndSource) {
       facetFields.datatype =
         facets.dataTypeAndSource.dataTypeIds &&
@@ -417,7 +421,6 @@ export const diseaseAssociationsFacets = (efoId, facets) => {
         })),
       })),
     };
-
     const tractability = {
       items: facetsRaw.tractability.buckets.map(d => ({
         itemId: d.key.toUpperCase(),
@@ -427,7 +430,21 @@ export const diseaseAssociationsFacets = (efoId, facets) => {
         count: d.unique_target_count.value,
       })),
     };
-    return { dataTypeAndSource, pathways, targetClass, tractability };
+    const tissueSpecificity = {
+      items: facetsRaw.zscore_expression_tissue.buckets.map(d => ({
+        itemId: d.data.efo_code,
+        name: d.data.label,
+        organs: d.data.organs,
+        anatomicalSystems: d.data.anatomical_systems,
+      })),
+    };
+    return {
+      dataTypeAndSource,
+      pathways,
+      targetClass,
+      tractability,
+      tissueSpecificity,
+    };
   });
 };
 
@@ -487,13 +504,25 @@ export const diseaseTargetsConnection = (
   ]).then(
     ([
       { totalCount, edges, cursor },
-      { dataTypeAndSource, pathways, targetClass, tractability },
+      {
+        dataTypeAndSource,
+        pathways,
+        targetClass,
+        tractability,
+        tissueSpecificity,
+      },
     ]) => {
       return {
         totalCount,
         edges,
         pageInfo: { nextCursor: cursor, hasNextPage: cursor !== null },
-        facets: { dataTypeAndSource, pathways, targetClass, tractability },
+        facets: {
+          dataTypeAndSource,
+          pathways,
+          targetClass,
+          tractability,
+          tissueSpecificity,
+        },
       };
     }
   );
