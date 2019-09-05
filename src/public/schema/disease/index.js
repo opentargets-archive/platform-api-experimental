@@ -2,7 +2,14 @@ import { gql } from 'apollo-server-express';
 // import { print } from 'graphql/language/printer';
 import _ from 'lodash';
 
+import { diseaseTargetsConnection } from '../../apis/openTargets';
 import therapeuticAreasPerDisease from './therapeuticAreasPerDisease';
+
+// load targets connection
+import {
+  typeDefs as targetsConnectionTypeDefs,
+  resolvers as targetsConnectionResolvers,
+} from './targetsConnection';
 
 // load sections
 import * as sectionsObject from './sectionIndex';
@@ -34,6 +41,13 @@ const diseaseTypeDef = gql`
     therapeuticAreas: [Disease!]!
     summaries: DiseaseSummaries!
     details: DiseaseDetails!
+    targetsConnection(
+      facets: DiseaseTargetsConnectionFacetsInput
+      sortBy: DiseaseTargetsConnectionSortByInput
+      first: Int
+      after: String
+      search: String
+    ): DiseaseTargetsConnection!
   }
 `;
 export const typeDefs = [
@@ -41,6 +55,7 @@ export const typeDefs = [
   ...sectionTypeDefs,
   summariesTypeDef,
   sectionsTypeDef,
+  ...targetsConnectionTypeDefs,
   diseaseTypeDef,
 ];
 
@@ -83,6 +98,25 @@ const diseaseResolver = {
         : [],
     summaries: _.identity,
     details: _.identity,
+    targetsConnection: (
+      { _efoId },
+      { facets, sortBy, search = '', first = 50, after = null }
+    ) => {
+      const { field: sortField, ascending: sortAscending = false } =
+        sortBy || {};
+      return diseaseTargetsConnection(
+        _efoId,
+        facets,
+        search,
+        sortField,
+        sortAscending,
+        first,
+        after
+      ).then(data => ({
+        _efoId,
+        _data: data,
+      }));
+    },
   },
 };
 export const resolvers = _.merge(
@@ -90,5 +124,6 @@ export const resolvers = _.merge(
   ...sectionsResolvers,
   summariesResolver,
   sectionsResolver,
+  targetsConnectionResolvers,
   diseaseResolver
 );

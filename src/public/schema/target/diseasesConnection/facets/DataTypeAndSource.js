@@ -4,13 +4,13 @@ export const id = 'dataTypeAndSource';
 
 export const facetTypeDefs = gql`
   type DataTypeFacetItem {
-    id: DataType!
+    itemId: DataType!
     name: String!
     count: Int!
     children: [DataSourceFacetItem!]
   }
   type DataSourceFacetItem {
-    id: DataSource!
+    itemId: DataSource!
     name: String!
     count: Int!
   }

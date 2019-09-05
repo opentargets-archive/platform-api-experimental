@@ -118,11 +118,40 @@ export const targetVariantsCommon = ensgId =>
 export const targetSimilar = ensgId =>
   axios.get(`${ROOT}private/relation/target/${ensgId}?id=${ensgId}&size=10000`);
 
-const transformFacetsInput = facets => {
+const transformTargetAssociationsFacetsInput = facets => {
   const facetFields = {};
   if (facets) {
     if (facets.therapeuticArea) {
       facetFields.therapeutic_area = facets.therapeuticArea.efoIds;
+    }
+    if (facets.dataTypeAndSource) {
+      facetFields.datatype =
+        facets.dataTypeAndSource.dataTypeIds &&
+        facets.dataTypeAndSource.dataTypeIds.map(dt => dataTypeMapInverse[dt]);
+      facetFields.datasource =
+        facets.dataTypeAndSource.dataSourceIds &&
+        facets.dataTypeAndSource.dataSourceIds.map(ds => ds.toLowerCase());
+    }
+  }
+  return facetFields;
+};
+const transformDiseaseAssociationsFacetsInput = facets => {
+  const facetFields = {};
+  if (facets) {
+    if (facets.pathways) {
+      facetFields.pathway = facets.pathways.pathwayIds;
+    }
+    if (facets.targetClass) {
+      facetFields.target_class = facets.targetClass.targetClassIds;
+    }
+    if (facets.tractability && facets.tractability.tractabilityIds) {
+      facetFields.tractability = facets.tractability.tractabilityIds.map(d =>
+        d.toLowerCase()
+      );
+    }
+    if (facets.tissueSpecificity && facets.tissueSpecificity.tissueIds) {
+      facetFields.zscore_expression_level = 1;
+      facetFields.zscore_expression_tissue = facets.tissueSpecificity.tissueIds;
     }
     if (facets.dataTypeAndSource) {
       facetFields.datatype =
@@ -145,7 +174,7 @@ export const targetAssociations = (
   after
 ) => {
   // handle each facet
-  const facetFields = transformFacetsInput(facets);
+  const facetFields = transformTargetAssociationsFacetsInput(facets);
 
   // sort
   let sortFieldMapped;
@@ -210,6 +239,82 @@ export const targetAssociations = (
       return { totalCount, edges, cursor };
     });
 };
+export const diseaseAssociations = (
+  efoId,
+  facets,
+  search,
+  sortField,
+  sortAscending,
+  first,
+  after
+) => {
+  // handle each facet
+  const facetFields = transformDiseaseAssociationsFacetsInput(facets);
+
+  // sort
+  let sortFieldMapped;
+  if (sortField === 'TARGET_SYMBOL') {
+    sortFieldMapped = 'target.gene_info.symbol';
+  } else if (sortField === 'SCORE_OVERALL' || !sortField) {
+    sortFieldMapped = 'association_score.overall';
+  } else {
+    // nothing else currently supported
+    const dataType = sortField;
+    sortFieldMapped = `association_score.datatypes.${
+      dataTypeMapInverse[dataType]
+    }`;
+  }
+  const sort = [`${sortAscending ? '~' : ''}${sortFieldMapped}`];
+
+  // next field
+  const nextField = {};
+  if (after) {
+    nextField.next = cursorToNext(after);
+  }
+
+  // call
+  return axios
+    .post(`${ROOT}public/association/filter`, {
+      disease: [efoId],
+      ...nextField,
+      ...facetFields,
+      facets: false,
+      direct: true,
+      size: first,
+      sort,
+      search,
+    })
+    .then(response => {
+      const totalCount = response.data.total;
+      const edges = response.data.data.map(d => ({
+        id: `${d.target.id}-${efoId}`,
+        node: {
+          id: d.target.id,
+          symbol: d.target.gene_info.symbol,
+          name: d.target.gene_info.name,
+        },
+        score: d.association_score.overall,
+        scoresByDataType: Object.entries(d.association_score.datatypes).reduce(
+          (acc, [k, v]) => {
+            acc.push({ dataTypeId: dataTypeMap[k], score: v });
+            return acc;
+          },
+          []
+        ),
+        scoresByDataSource: Object.entries(
+          d.association_score.datasources
+        ).reduce((acc, [k, v]) => {
+          // TODO: fix in rest api
+          if (k !== 'postgap') {
+            acc.push({ dataSourceId: k.toUpperCase(), score: v });
+          }
+          return acc;
+        }, []),
+      }));
+      const cursor = nextToCursor(response.data.next);
+      return { totalCount, edges, cursor };
+    });
+};
 
 const dataTypeMap = {
   genetic_association: 'GENETIC_ASSOCIATION',
@@ -226,7 +331,7 @@ const dataTypeMapInverse = Object.entries(dataTypeMap).reduce((acc, [k, v]) => {
 }, {});
 export const targetAssociationsFacets = (ensgId, facets) => {
   // handle each facet
-  const facetFields = transformFacetsInput(facets);
+  const facetFields = transformTargetAssociationsFacetsInput(facets);
 
   // serialise
   const qs = queryString.stringify({
@@ -243,18 +348,18 @@ export const targetAssociationsFacets = (ensgId, facets) => {
     const facetsRaw = response.data.facets;
     const therapeuticArea = {
       items: facetsRaw.therapeutic_area.buckets.map(b => ({
-        id: b.key,
+        itemId: b.key,
         name: _.startCase(b.label),
         count: b.unique_disease_count.value,
       })),
     };
     const dataTypeAndSource = {
       items: facetsRaw.datatype.buckets.map(dt => ({
-        id: dataTypeMap[dt.key],
+        itemId: dataTypeMap[dt.key],
         name: _.startCase(dt.key),
         count: dt.unique_disease_count.value,
         children: dt.datasource.buckets.map(ds => ({
-          id: ds.key.toUpperCase(),
+          itemId: ds.key.toUpperCase(),
           name: _.startCase(ds.key),
           count: ds.unique_disease_count.value,
         })),
@@ -263,6 +368,86 @@ export const targetAssociationsFacets = (ensgId, facets) => {
     return { therapeuticArea, dataTypeAndSource };
   });
 };
+export const diseaseAssociationsFacets = (efoId, facets) => {
+  // handle each facet
+  const facetFields = transformDiseaseAssociationsFacetsInput(facets);
+
+  // serialise
+  const qs = queryString.stringify({
+    disease: [efoId],
+    ...facetFields,
+    outputstructure: 'flat',
+    facets: true,
+    // direct: false, // absent in original call
+    size: 0,
+  });
+
+  // call
+  return axios.get(`${ROOT}public/association/filter?${qs}`).then(response => {
+    const facetsRaw = response.data.facets;
+    const dataTypeAndSource = {
+      items: facetsRaw.datatype.buckets.map(dt => ({
+        itemId: dataTypeMap[dt.key],
+        name: _.startCase(dt.key),
+        count: dt.unique_target_count.value,
+        children: dt.datasource.buckets.map(ds => ({
+          itemId: ds.key.toUpperCase(),
+          name: _.startCase(ds.key),
+          count: ds.unique_target_count.value,
+        })),
+      })),
+    };
+    const pathways = {
+      items: facetsRaw.pathway.buckets.map(d => ({
+        itemId: d.key,
+        name: d.label,
+        count: d.unique_target_count.value,
+        children: d.pathway.buckets.map(d2 => ({
+          itemId: d2.key,
+          name: d2.label,
+          count: d2.unique_target_count.value,
+        })),
+      })),
+    };
+    const targetClass = {
+      items: facetsRaw.target_class.buckets.map(d => ({
+        itemId: `${d.key}`, // returns an int
+        name: d.label,
+        count: d.unique_target_count.value,
+        children: d.target_class.buckets.map(d2 => ({
+          itemId: `${d2.key}`,
+          name: d2.label,
+          count: d2.unique_target_count.value,
+        })),
+      })),
+    };
+    const tractability = {
+      items: facetsRaw.tractability.buckets.map(d => ({
+        itemId: d.key.toUpperCase(),
+        name: _.startCase(
+          d.key.replace('smallmolecule_', '').replace('antibody_', '')
+        ),
+        count: d.unique_target_count.value,
+      })),
+    };
+    const tissueSpecificity = {
+      items: facetsRaw.zscore_expression_tissue.buckets.map(d => ({
+        itemId: d.data.efo_code,
+        name: d.data.label,
+        organs: d.data.organs,
+        anatomicalSystems: d.data.anatomical_systems,
+      })),
+    };
+    return {
+      dataTypeAndSource,
+      pathways,
+      targetClass,
+      tractability,
+      tissueSpecificity,
+    };
+  });
+};
+
 export const targetDiseasesConnection = (
   ensgId,
   facets,
@@ -293,6 +478,51 @@ export const targetDiseasesConnection = (
         edges,
         pageInfo: { nextCursor: cursor, hasNextPage: cursor !== null },
         facets: { therapeuticArea, dataTypeAndSource },
+      };
+    }
+  );
+export const diseaseTargetsConnection = (
+  efoId,
+  facets,
+  search,
+  sortField,
+  sortAscending,
+  first,
+  after
+) =>
+  Promise.all([
+    diseaseAssociations(
+      efoId,
+      facets,
+      search,
+      sortField,
+      sortAscending,
+      first,
+      after
+    ),
+    diseaseAssociationsFacets(efoId, facets),
+  ]).then(
+    ([
+      { totalCount, edges, cursor },
+      {
+        dataTypeAndSource,
+        pathways,
+        targetClass,
+        tractability,
+        tissueSpecificity,
+      },
+    ]) => {
+      return {
+        totalCount,
+        edges,
+        pageInfo: { nextCursor: cursor, hasNextPage: cursor !== null },
+        facets: {
+          dataTypeAndSource,
+          pathways,
+          targetClass,
+          tractability,
+          tissueSpecificity,
+        },
       };
     }
   );
