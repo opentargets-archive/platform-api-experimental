@@ -325,6 +325,15 @@ const dataTypeMap = {
   animal_model: 'ANIMAL_MODELS',
   literature: 'TEXT_MINING',
 };
+const dataTypeOrder = [
+  'GENETIC_ASSOCIATION',
+  'SOMATIC_MUTATION',
+  'KNOWN_DRUGS',
+  'PATHWAYS',
+  'DIFFERENTIAL_EXPRESSION',
+  'TEXT_MINING',
+  'ANIMAL_MODELS',
+];
 const dataTypeMapInverse = Object.entries(dataTypeMap).reduce((acc, [k, v]) => {
   acc[v] = k;
   return acc;
@@ -354,16 +363,28 @@ export const targetAssociationsFacets = (ensgId, facets) => {
       })),
     };
     const dataTypeAndSource = {
-      items: facetsRaw.datatype.buckets.map(dt => ({
-        itemId: dataTypeMap[dt.key],
-        name: _.startCase(dt.key),
-        count: dt.unique_disease_count.value,
-        children: dt.datasource.buckets.map(ds => ({
-          itemId: ds.key.toUpperCase(),
-          name: _.startCase(ds.key),
-          count: ds.unique_disease_count.value,
-        })),
-      })),
+      items: dataTypeOrder.map(d => {
+        const dt = facetsRaw.datatype.buckets.find(
+          dt => dataTypeMap[dt.key] === d
+        );
+        return dt
+          ? {
+              itemId: dataTypeMap[dt.key],
+              name: _.startCase(dt.key),
+              count: dt.unique_disease_count.value,
+              children: dt.datasource.buckets.map(ds => ({
+                itemId: ds.key.toUpperCase(),
+                name: _.startCase(ds.key),
+                count: ds.unique_disease_count.value,
+              })),
+            }
+          : {
+              itemId: d,
+              name: _.startCase(d.toLowerCase()),
+              count: 0,
+              children: [],
+            };
+      }),
     };
     return { therapeuticArea, dataTypeAndSource };
   });
@@ -386,16 +407,28 @@ export const diseaseAssociationsFacets = (efoId, facets) => {
   return axios.get(`${ROOT}public/association/filter?${qs}`).then(response => {
     const facetsRaw = response.data.facets;
     const dataTypeAndSource = {
-      items: facetsRaw.datatype.buckets.map(dt => ({
-        itemId: dataTypeMap[dt.key],
-        name: _.startCase(dt.key),
-        count: dt.unique_target_count.value,
-        children: dt.datasource.buckets.map(ds => ({
-          itemId: ds.key.toUpperCase(),
-          name: _.startCase(ds.key),
-          count: ds.unique_target_count.value,
-        })),
-      })),
+      items: dataTypeOrder.map(d => {
+        const dt = facetsRaw.datatype.buckets.find(
+          dt => dataTypeMap[dt.key] === d
+        );
+        return dt
+          ? {
+              itemId: dataTypeMap[dt.key],
+              name: _.startCase(dt.key),
+              count: dt.unique_target_count.value,
+              children: dt.datasource.buckets.map(ds => ({
+                itemId: ds.key.toUpperCase(),
+                name: _.startCase(ds.key),
+                count: ds.unique_target_count.value,
+              })),
+            }
+          : {
+              itemId: d,
+              name: _.startCase(d.toLowerCase()),
+              count: 0,
+              children: [],
+            };
+      }),
     };
     const pathways = {
       items: facetsRaw.pathway.buckets.map(d => ({
