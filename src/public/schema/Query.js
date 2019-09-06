@@ -1,11 +1,20 @@
 import { gql } from 'apollo-server-express';
+import _ from 'lodash';
+
+import efo from '../data/efo/efo2.1904.json';
+import therapeuticAreaIds from '../data/efo/efo2.therapeuticAreas.json';
 
 export const typeDefs = [
   gql`
+    type DiseaseOntology {
+      nodes: [DiseaseOntologyNode!]!
+      therapeuticAreas: [String!]!
+    }
     type Query {
       target(ensgId: String!): Target!
       disease(efoId: String!): Disease!
       drug(chemblId: String!): Drug!
+      efo: DiseaseOntology!
       evidence(
         ensgId: String!
         efoId: String!
@@ -19,10 +28,15 @@ export const typeDefs = [
 ];
 
 export const resolvers = {
+  DiseaseOntology: {
+    nodes: () => efo,
+    therapeuticAreas: () => therapeuticAreaIds,
+  },
   Query: {
     target: (obj, { ensgId }) => ({ _ensgId: ensgId }),
     disease: (obj, { efoId }) => ({ _efoId: efoId }),
     drug: (obj, { chemblId }) => ({ _chemblId: chemblId }),
+    efo: () => ({}),
     evidence: (obj, { ensgId, efoId, from, size, sortBy, order }) => ({
       _ensgId: ensgId,
       _efoId: efoId,
