@@ -642,12 +642,7 @@ export const diseasesDrugs = efoIds =>
 //       const
 //       return response.data.total;
 //     });
-const MAP_ACTIVITY = {
-  positive_modulator: 'agonist',
-  negative_modulator: 'antagonist',
-  up_or_down: 'up_or_down',
-  other: 'other',
-};
+
 export const evidenceDrugsRowTransformer = r => {
   return {
     target: {
@@ -663,7 +658,7 @@ export const evidenceDrugsRowTransformer = r => {
       id: r.drug.id.split('/').pop(),
       name: r.drug.molecule_name,
       type: r.drug.molecule_type.replace(' ', '_').toUpperCase(),
-      activity: MAP_ACTIVITY[r.target.activity].toUpperCase(),
+      activity: r.target.activity.toUpperCase(),
     },
     clinicalTrial: {
       phase: r.evidence.drug2clinic.clinical_trial_phase.numeric_index,
