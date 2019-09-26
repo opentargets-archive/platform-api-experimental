@@ -643,9 +643,10 @@ export const diseasesDrugs = efoIds =>
 //       return response.data.total;
 //     });
 const MAP_ACTIVITY = {
-  drug_positive_modulator: 'agonist',
-  drug_negative_modulator: 'antagonist',
+  positive_modulator: 'agonist',
+  negative_modulator: 'antagonist',
   up_or_down: 'up_or_down',
+  other: 'other',
 };
 export const evidenceDrugsRowTransformer = r => {
   return {

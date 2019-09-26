@@ -5,6 +5,7 @@ export const typeDefs = gql`
     AGONIST
     ANTAGONIST
     UP_OR_DOWN
+    OTHER
   }
   enum DrugType {
     SMALL_MOLECULE
