@@ -2,9 +2,8 @@ import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   enum DrugActivity {
-    AGONIST
-    ANTAGONIST
-    UP_OR_DOWN
+    POSITIVE_MODULATOR
+    NEGATIVE_MODULATOR
     OTHER
   }
   enum DrugType {
