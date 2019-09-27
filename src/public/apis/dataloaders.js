@@ -603,7 +603,7 @@ export const createDrugLoader = () =>
           withdrawn_reason,
           withdrawn_year,
           internal_compound: internalCompound,
-        } = d.data;
+        } = d.data.data[0];
 
         const withdrawnNotice = hasBeenWithdrawn
           ? {
