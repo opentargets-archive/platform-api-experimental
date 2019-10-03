@@ -765,7 +765,7 @@ const evidenceCrisprRowTransformer = r => ({
   },
   score: r.scores.association_score,
   method: r.evidence.resource_score.method.description,
-  pmId: '30971826', // TODO: this should be returned in the API
+  pmId: r.evidence.resource_score.method.reference.split('/').pop(),
 });
 const evidenceSysBioRowTransformer = r => ({
   disease: {
