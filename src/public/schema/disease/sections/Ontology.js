@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server-express';
 
-import efo from '../../../data/efo/efo2.1904.json';
-import therapeuticAreaIds from '../../../data/efo/efo2.therapeuticAreas.json';
+import efo from '../../../data/efo/efo3.1911.hacked.json';
+import therapeuticAreaIds from '../../../data/efo/efo3.therapeuticAreas.hacked.json';
 
 export const id = 'ontology';
 
