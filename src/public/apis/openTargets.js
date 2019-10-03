@@ -6,7 +6,7 @@ import { getAbstractData } from './epmc';
 import getMultiplePublicationsSource from '../utils/getMultiplePublicationsSource';
 
 const PROTOCOL = 'https';
-const HOST = 'api.opentargets.io';
+const HOST = 'platform-api-qc.opentargets.io';
 const STEM = 'v3/platform';
 const ROOT = `${PROTOCOL}://${HOST}/${STEM}/`;
 
