@@ -603,6 +603,7 @@ export const createDrugLoader = () =>
           withdrawn_reason,
           withdrawn_year,
           internal_compound: internalCompound,
+          adverse_events: adverseEventsRaw,
         } = d.data.data[0];
 
         const withdrawnNotice = hasBeenWithdrawn
@@ -674,6 +675,13 @@ export const createDrugLoader = () =>
           mechanismsOfActionRaw.map(m => m.target_type)
         );
 
+        const adverseEvents = {
+          critval: adverseEventsRaw.critval,
+          significant: adverseEventsRaw.significant.sort(
+            (a, b) => b.llr - a.llr
+          ),
+        };
+
         return {
           id,
           name,
@@ -689,6 +697,7 @@ export const createDrugLoader = () =>
           hasBeenWithdrawn,
           withdrawnNotice,
           internalCompound,
+          adverseEvents,
         };
       });
     })
