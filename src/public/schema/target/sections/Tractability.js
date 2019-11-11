@@ -53,13 +53,17 @@ export const sectionTypeDefs = gql`
 
 export const sectionResolvers = {
   TargetDetailTractability: {
-    smallMolecule: ({ _ensgId }, args, { targetLoader }) =>
-      targetLoader
-        .load(_ensgId)
-        .then(({ tractability }) => tractability.smallMolecule),
-    antibody: ({ _ensgId }, args, { targetLoader }) =>
-      targetLoader
-        .load(_ensgId)
-        .then(({ tractability }) => tractability.antibody),
+    smallMolecule: ({ _ensgId, details }, args, { targetLoader }) =>
+      details && details.tractability
+        ? details.tractability.smallMolecule
+        : targetLoader
+            .load(_ensgId)
+            .then(({ tractability }) => tractability.smallMolecule),
+    antibody: ({ _ensgId, details }, args, { targetLoader }) =>
+      details && details.tractability
+        ? details.tractability.antibody
+        : targetLoader
+            .load(_ensgId)
+            .then(({ tractability }) => tractability.antibody),
   },
 };

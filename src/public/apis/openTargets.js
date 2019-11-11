@@ -4,6 +4,7 @@ import queryString from 'query-string';
 
 import { getAbstractData } from './epmc';
 import getMultiplePublicationsSource from '../utils/getMultiplePublicationsSource';
+import { transformTractability } from './dataloaders';
 
 const PROTOCOL = 'https';
 const HOST = 'api.opentargets.io';
@@ -286,31 +287,38 @@ export const diseaseAssociations = (
     })
     .then(response => {
       const totalCount = response.data.total;
-      const edges = response.data.data.map(d => ({
-        id: `${d.target.id}-${efoId}`,
-        node: {
-          id: d.target.id,
-          symbol: d.target.gene_info.symbol,
-          name: d.target.gene_info.name,
-        },
-        score: d.association_score.overall,
-        scoresByDataType: Object.entries(d.association_score.datatypes).reduce(
-          (acc, [k, v]) => {
+      const edges = response.data.data.map(d => {
+        const { smallMolecule, antibody } = transformTractability(
+          d.target.tractability || {}
+        );
+        return {
+          id: `${d.target.id}-${efoId}`,
+          node: {
+            id: d.target.id,
+            symbol: d.target.gene_info.symbol,
+            name: d.target.gene_info.name,
+            details: {
+              tractability: { smallMolecule, antibody }, // for prioritisation view
+            },
+          },
+          score: d.association_score.overall,
+          scoresByDataType: Object.entries(
+            d.association_score.datatypes
+          ).reduce((acc, [k, v]) => {
             acc.push({ dataTypeId: dataTypeMap[k], score: v });
             return acc;
-          },
-          []
-        ),
-        scoresByDataSource: Object.entries(
-          d.association_score.datasources
-        ).reduce((acc, [k, v]) => {
-          // TODO: fix in rest api
-          if (k !== 'postgap') {
-            acc.push({ dataSourceId: k.toUpperCase(), score: v });
-          }
-          return acc;
-        }, []),
-      }));
+          }, []),
+          scoresByDataSource: Object.entries(
+            d.association_score.datasources
+          ).reduce((acc, [k, v]) => {
+            // TODO: fix in rest api
+            if (k !== 'postgap') {
+              acc.push({ dataSourceId: k.toUpperCase(), score: v });
+            }
+            return acc;
+          }, []),
+        };
+      });
       const cursor = nextToCursor(response.data.next);
       return { totalCount, edges, cursor };
     });
