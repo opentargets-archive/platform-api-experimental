@@ -1262,7 +1262,7 @@ const evidenceTextMiningRowTransformer = r => {
       id: ref.data.pmid || ref.data.pmcid || ref.data.id,
       title: ref.data.title,
       date: ref.data.pubYear,
-      authors: ref.data.authorList.author.map(auth => ({
+      authors: (ref.data.authorList || { author: [] }).author.map(auth => ({
         firstName: auth.firstName || auth.initials || '',
         lastName: auth.lastName,
         initials: auth.initials,
