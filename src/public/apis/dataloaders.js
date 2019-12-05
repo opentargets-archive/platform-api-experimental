@@ -138,32 +138,32 @@ const antibodyTractabilityLevels = [
   //     bucket: 10
   // }
 ];
-const transformTractability = rawTractability => {
+export const transformTractability = rawTractability => {
   let hasSmallMoleculeTractabilityAssessment = false;
   let hasAntibodyTractabilityAssessment = false;
   let smallMolecule = null;
   let antibody = null;
 
-  if (rawTractability.smallmolecule) {
-    hasSmallMoleculeTractabilityAssessment =
-      rawTractability.smallmolecule.buckets.length !== 0;
-    smallMolecule = smallMoleculeTractabilityLevels.map(d => ({
-      chemblBucket: d.bucket,
-      description: d.label,
-      value: rawTractability.smallmolecule.buckets.indexOf(d.bucket) >= 0,
-    }));
-  }
+  hasSmallMoleculeTractabilityAssessment =
+    rawTractability.smallmolecule &&
+    rawTractability.smallmolecule.buckets.length !== 0;
+  smallMolecule = smallMoleculeTractabilityLevels.map(d => ({
+    chemblBucket: d.bucket,
+    description: d.label,
+    value: rawTractability.smallmolecule
+      ? rawTractability.smallmolecule.buckets.indexOf(d.bucket) >= 0
+      : false,
+  }));
 
-  if (rawTractability.antibody) {
-    hasAntibodyTractabilityAssessment =
-      rawTractability.antibody.buckets.length !== 0;
-
-    antibody = antibodyTractabilityLevels.map(d => ({
-      chemblBucket: d.bucket,
-      description: d.label,
-      value: rawTractability.antibody.buckets.indexOf(d.bucket) >= 0,
-    }));
-  }
+  hasAntibodyTractabilityAssessment =
+    rawTractability.antibody && rawTractability.antibody.buckets.length !== 0;
+  antibody = antibodyTractabilityLevels.map(d => ({
+    chemblBucket: d.bucket,
+    description: d.label,
+    value: rawTractability.antibody
+      ? rawTractability.antibody.buckets.indexOf(d.bucket) >= 0
+      : false,
+  }));
 
   return {
     hasSmallMoleculeTractabilityAssessment,
