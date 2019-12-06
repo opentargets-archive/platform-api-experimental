@@ -1,8 +1,8 @@
 import { gql } from 'apollo-server-express';
 import _ from 'lodash';
 
-import efo from '../data/efo/efo2.1904.json';
-import therapeuticAreaIds from '../data/efo/efo2.therapeuticAreas.json';
+import efo from '../data/efo/efo3.1911.json';
+import therapeuticAreaIds from '../data/efo/efo3.therapeuticAreas.json';
 
 export const typeDefs = [
   gql`
