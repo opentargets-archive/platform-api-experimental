@@ -21,10 +21,7 @@ export const summaryTypeDefs = gql`
 export const summaryResolvers = {
   DrugSummaryLinkedDiseases: {
     linkedDiseaseCount: ({ _chemblId }, args, { drugLoader }) =>
-      drugLoader
-        .load(_chemblId)
-        .then(({ name }) => drugDiseases(name))
-        .then(diseases => diseases.length),
+      drugLoader.load(_chemblId).then(({ indications }) => indications.length),
     sources: () => [
       {
         name: 'ChEMBL',

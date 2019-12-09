@@ -604,6 +604,7 @@ export const createDrugLoader = () =>
           withdrawn_year,
           internal_compound: internalCompound,
           adverse_events: adverseEventsRaw,
+          indications,
         } = d.data.data[0];
 
         const withdrawnNotice = hasBeenWithdrawn
@@ -698,6 +699,7 @@ export const createDrugLoader = () =>
           withdrawnNotice,
           internalCompound,
           adverseEvents,
+          indications,
         };
       });
     })
