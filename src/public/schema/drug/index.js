@@ -1,6 +1,7 @@
 import { gql } from 'apollo-server-express';
 // import { print } from 'graphql/language/printer';
 import _ from 'lodash';
+import therapeuticAreasPerDisease from '../disease/therapeuticAreasPerDisease';
 
 // load sections
 import * as sectionsObject from './sectionIndex';
@@ -40,6 +41,12 @@ const drugTypeDef = gql`
     details: DrugDetails!
     internalCompound: Boolean!
   }
+  type Indication {
+    id: String!
+    name: String!
+    therapeuticAreas: [Disease!]!
+    maxPhase: Int
+  }
 `;
 export const typeDefs = [
   ...summaryTypeDefs,
@@ -64,6 +71,23 @@ const sectionsResolver = {
     return acc;
   }, {}),
 };
+
+const indicationResolver = {
+  Indication: {
+    id: ({ id }) => id,
+    name: ({ name }) => name,
+    maxPhase: ({ maxPhase }) => maxPhase,
+    therapeuticAreas: ({ _efoId }) =>
+      therapeuticAreasPerDisease[_efoId]
+        ? therapeuticAreasPerDisease[_efoId].map(({ id, name }) => ({
+            _efoId: id,
+            id,
+            name,
+          }))
+        : [],
+  },
+};
+
 const drugResolver = {
   Drug: {
     id: ({ _chemblId, id }, args, { drugLoader }) =>
@@ -105,5 +129,6 @@ export const resolvers = _.merge(
   ...sectionsResolvers,
   summariesResolver,
   sectionsResolver,
-  drugResolver
+  drugResolver,
+  indicationResolver
 );
