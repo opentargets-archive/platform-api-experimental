@@ -21,7 +21,8 @@ export const facetTypeDefs = gql`
 
 export const facetInputTypeDefs = gql`
   enum DataSource {
-    GWAS_CATALOG
+    OT_GENETICS_PORTAL
+    # GWAS_CATALOG
     PHEWAS_CATALOG
     EVA
     EVA_SOMATIC
