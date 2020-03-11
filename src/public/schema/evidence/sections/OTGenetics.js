@@ -31,14 +31,29 @@ export const sectionTypeDefs = gql`
   type EvidenceRowOtGenetics {
     disease: Disease!
     rsId: String!
-    # pval: Float!
-    # oddsRatio: Float
-    # confidenceInterval: String
-    # vepConsequence: VEPConsequence
+    reportedTrait: Trait
+    publications: [SimpleOtGeneticsPublication]
+    variant: Variant!
+    pval: Float!
+    genePrioritisationScore: Float!
     source: Source!
+  }
+  type Variant {
+    id: String!
+    url: String!
+  }
+  type Trait {
+    name: String!
+    url: String!
   }
   type EvidenceDetailOtGenetics {
     rows: [EvidenceRowOtGenetics!]!
+  }
+  type SimpleOtGeneticsPublication {
+    authors: [String]
+    url: String
+    year: String
+    pmId: String!
   }
 `;
 

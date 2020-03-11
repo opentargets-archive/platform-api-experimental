@@ -930,15 +930,52 @@ const evidenceOTGeneticsRowTransformer = r => {
       id: r.disease.efo_info.efo_id.split('/').pop(),
       name: r.disease.efo_info.label,
     },
-    rsId: r.variant.id.split('/').pop(),
-    // pval: r.evidence.variant2disease.resource_score.value,
-    // oddsRatio: parseFloat(r.unique_association_fields.odd_ratio),
-    // confidenceInterval: r.unique_association_fields.confidence_interval,
-    // vepConsequence: getVepConsequenceLabel(r),
+    reportedTrait: {
+      name: r.disease.reported_trait,
+      url: r.evidence.variant2disease.study_link,
+    },
+    publications: (
+      r.evidence.variant2disease.provenance_type.literature.references || []
+    ).map(ref => ({
+      authors: [ref.author],
+      year: ref.year,
+      url: ref.lit_id,
+      pmId: (ref.lit_id.endsWith('/')
+        ? ref.lit_id.substring(0, ref.lit_id.length - 1)
+        : ref.lit_id
+      )
+        .split('/')
+        .pop(),
+    })),
+    variant: {
+      id:
+        r.sourceID === 'ot_genetics_portal'
+          ? r.variant.rs_id || r.variant.id
+          : r.variant.id.split('/').pop(),
+      url:
+        r.sourceID === 'ot_genetics_portal'
+          ? r.variant.source_link
+          : 'http://www.ensembl.org/Homo_sapiens/Variation/Explore?v=' +
+            variantId,
+    },
+    pval:
+      r.evidence.variant2disease.resource_score.mantissa &&
+      r.evidence.variant2disease.resource_score.exponent
+        ? r.evidence.variant2disease.resource_score.mantissa +
+          'e' +
+          r.evidence.variant2disease.resource_score.exponent
+        : '' + r.evidence.variant2disease.resource_score.value,
+    genePrioritisationScore:
+      r.sourceID === 'ot_genetics_portal'
+        ? r.evidence.gene2variant.resource_score.value
+        : -1,
     source: {
       name: 'Open Targets Genetics',
       url:
-        'https://docs.targetvalidation.org/data-sources/genetic-associations#gwas-catalog',
+        'https://genetics.opentargets.org/study-locus/' +
+        r.evidence.variant2disease.study_link.split('/').pop() +
+        '/' +
+        r.variant.id,
     },
   };
 };
