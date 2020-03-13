@@ -30,7 +30,6 @@ export const summaryResolvers = {
 export const sectionTypeDefs = gql`
   type EvidenceRowOtGenetics {
     disease: Disease!
-    rsId: String!
     reportedTrait: Trait
     publications: [SimpleOtGeneticsPublication]
     variant: Variant!
