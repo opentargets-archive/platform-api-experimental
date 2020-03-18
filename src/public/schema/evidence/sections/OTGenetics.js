@@ -33,7 +33,7 @@ export const sectionTypeDefs = gql`
     reportedTrait: Trait
     publications: [SimpleOtGeneticsPublication]
     variant: Variant!
-    pval: Float!
+    pval: PVal!
     genePrioritisationScore: Float!
     source: Source!
   }
@@ -53,6 +53,11 @@ export const sectionTypeDefs = gql`
     url: String
     year: String
     pmId: String!
+  }
+  type PVal {
+    mantissa: Float
+    exponent: Int
+    value: Float!
   }
 `;
 

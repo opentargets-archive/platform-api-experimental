@@ -958,13 +958,11 @@ const evidenceOTGeneticsRowTransformer = r => {
           : 'http://www.ensembl.org/Homo_sapiens/Variation/Explore?v=' +
             variantId,
     },
-    pval:
-      r.evidence.variant2disease.resource_score.mantissa &&
-      r.evidence.variant2disease.resource_score.exponent
-        ? r.evidence.variant2disease.resource_score.mantissa +
-          'e' +
-          r.evidence.variant2disease.resource_score.exponent
-        : '' + r.evidence.variant2disease.resource_score.value,
+    pval: {
+      mantissa: r.evidence.variant2disease.resource_score.mantissa,
+      exponent: r.evidence.variant2disease.resource_score.exponent,
+      value: r.evidence.variant2disease.resource_score.value,
+    },
     genePrioritisationScore:
       r.sourceID === 'ot_genetics_portal'
         ? r.evidence.gene2variant.resource_score.value
