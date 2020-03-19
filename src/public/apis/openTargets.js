@@ -1173,6 +1173,16 @@ const evidenceIntogenRowTransformer = r => ({
   pmId: r.evidence.provenance_type.literature.references[0].lit_id
     .split('/')
     .pop(),
+  pval: r.evidence.resource_score.value,
+  mutationMetrics: {
+    value: r.evidence.known_mutations[0].number_mutated_samples,
+    total: r.evidence.known_mutations[0].number_samples_tested,
+  },
+  cohort: {
+    name: r.evidence.cohort.cohort_short_name,
+    description: r.evidence.cohort.cohort_description,
+  },
+  analysisMethods: r.evidence.significant_driver_methods,
 });
 export const evidenceIntogen = (ensgId, efoId) =>
   axios

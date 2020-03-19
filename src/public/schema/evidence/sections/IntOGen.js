@@ -44,9 +44,21 @@ export const sectionTypeDefs = gql`
     inheritancePattern: InheritancePattern!
     source: Source!
     pmId: String!
+    pval: Float!
+    mutationMetrics: MutationMetrics!
+    cohort: Cohort!
+    analysisMethods: [String]!
   }
   type EvidenceDetailIntogen {
     rows: [EvidenceRowIntogen!]!
+  }
+  type Cohort {
+    name: String!
+    description: String!
+  }
+  type MutationMetrics {
+    value: Int
+    total: Int
   }
 `;
 
